@@ -1,0 +1,14 @@
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.AssemblyInfoInputs.cache
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.AssemblyInfo.cs
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.csproj.CoreCompileInputs.cache
+C:\Users\simon\Documents\ProtoCHILL\bin\Debug\net8.0\ProtoCHILL.exe
+C:\Users\simon\Documents\ProtoCHILL\bin\Debug\net8.0\ProtoCHILL.deps.json
+C:\Users\simon\Documents\ProtoCHILL\bin\Debug\net8.0\ProtoCHILL.runtimeconfig.json
+C:\Users\simon\Documents\ProtoCHILL\bin\Debug\net8.0\ProtoCHILL.dll
+C:\Users\simon\Documents\ProtoCHILL\bin\Debug\net8.0\ProtoCHILL.pdb
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.dll
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\refint\ProtoCHILL.dll
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.pdb
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ProtoCHILL.genruntimeconfig.cache
+C:\Users\simon\Documents\ProtoCHILL\obj\Debug\net8.0\ref\ProtoCHILL.dll
