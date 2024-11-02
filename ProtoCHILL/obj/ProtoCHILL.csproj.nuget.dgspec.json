@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\simon\\Documents\\ProtoCHILL\\ProtoCHILL.csproj": {}
+    "C:\\Users\\Jules\\Documents\\Simon\\UnityProtoChill\\ProtoCHILL\\ProtoCHILL.csproj": {}
   },
   "projects": {
-    "C:\\Users\\simon\\Documents\\ProtoCHILL\\ProtoCHILL.csproj": {
+    "C:\\Users\\Jules\\Documents\\Simon\\UnityProtoChill\\ProtoCHILL\\ProtoCHILL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\simon\\Documents\\ProtoCHILL\\ProtoCHILL.csproj",
+        "projectUniqueName": "C:\\Users\\Jules\\Documents\\Simon\\UnityProtoChill\\ProtoCHILL\\ProtoCHILL.csproj",
         "projectName": "ProtoCHILL",
-        "projectPath": "C:\\Users\\simon\\Documents\\ProtoCHILL\\ProtoCHILL.csproj",
-        "packagesPath": "C:\\Users\\simon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\simon\\Documents\\ProtoCHILL\\obj\\",
+        "projectPath": "C:\\Users\\Jules\\Documents\\Simon\\UnityProtoChill\\ProtoCHILL\\ProtoCHILL.csproj",
+        "packagesPath": "C:\\Users\\Jules\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jules\\Documents\\Simon\\UnityProtoChill\\ProtoCHILL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\simon\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Jules\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -42,6 +42,20 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Betalgo.Ranul.OpenAI": {
+              "target": "Package",
+              "version": "[8.8.0, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "OpenAI-DotNet": {
+              "target": "Package",
+              "version": "[8.3.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

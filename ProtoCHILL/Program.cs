@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UMLStructure;
 
-public class Program
+// C'est une classe qui permet de tester la structure de données UML que j'ai créé à partir des classes Class, Attribut et Method. 
+// Pour la faire fonctionner, il faut changer le nom de la classe en Program et changer remplacer PossibleMain par Main. Inversement, il faut donner d'autres noms dans la fichier GPTGenerator. 
+// Le build se fait toujours dans la classe Program et dans la fonction Main. 
+public class PProgram
 {
-    public static void Main()
+    public static void PossibleMain()
     {
         var gameManager = new Class("GameManager");
         var player = new Class("Player");
