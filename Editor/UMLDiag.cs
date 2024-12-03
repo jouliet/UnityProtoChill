@@ -1,5 +1,10 @@
 using UnityEditor;
 using UnityEngine;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using static JsonParser;
+using System.Collections.Generic;
+
 
 public class UMLDiag : GenerativeProcess
 {
@@ -17,7 +22,13 @@ public class UMLDiag : GenerativeProcess
 
     private void GenerateUML(string input)
     {
-        string jsonResult = GPTGenerator.GenerateUML(input);
-        Debug.Log("Generated UML JSON: " + jsonResult);
+        string jsonString = GPTGenerator.GenerateUML(input);
+        Debug.Log("Generated UML JSON: " + jsonString);
+
+        //Le cast est nécessaire
+
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+        JSONMapper.MapToBaseObject(parsedObject);
+        Debug.Log("ParsedObject : "+ ObjectToString(parsedObject));
     }
 }

@@ -1,23 +1,29 @@
-using UnityEditor;
-using UnityEngine;
-
 public class Main
 {
-    private UMLDiag umlDiag; 
+    // Pattern singleton
+    private static Main _instance;
 
-    // On instancie les process et on les inscris aux events dans le constructeur de main.
-    // Main est instancié depuis EditorWindow.
-    // Que faire à la destruction ?! 
-    public Main()
+    public static Main Instance
     {
-        umlDiag = new UMLDiag();
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new Main();
+            }
+            return _instance;
+        }
+    }
+
+    public void Init(){
+        // La méthode ne fait rien mais permet d'instancier main pour la première fois depuis EditorWindow
+    }
+
+    // Constructeur privé pour empêcher la création d'instances externes
+    private Main()
+    {
+        UMLDiag umlDiag = new UMLDiag();
         MyEditorWindow.OnSubmitText += umlDiag.OnSubmit;
-        Debug.Log("Main: UMLDiag has been instantiated and event subscribed.");
     }
 
-    public void Unsubscribe()
-    {
-        MyEditorWindow.OnSubmitText -= umlDiag.OnSubmit;
-        Debug.Log("Main: UMLDiag unsubscribed from events.");
-    }
 }
