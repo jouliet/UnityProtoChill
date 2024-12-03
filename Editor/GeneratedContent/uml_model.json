@@ -1,0 +1,108 @@
+{
+  "name": "Tetris",
+  "attributes": [],
+  "methods": [
+    {
+      "name": "rotatePiece",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "movePieceLeft",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "movePieceRight",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "movePieceDown",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "dropPiece",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "clearLines",
+      "return_type": "void",
+      "parameters": []
+    }
+  ],
+  "composed_classes": [
+    {
+      "name": "Piece",
+      "attributes": [
+        {
+          "name": "shape",
+          "type": "string",
+          "default_value": null
+        },
+        {
+          "name": "position",
+          "type": "array",
+          "default_value": null
+        }
+      ],
+      "methods": [
+        {
+          "name": "rotate",
+          "return_type": "void",
+          "parameters": []
+        },
+        {
+          "name": "moveLeft",
+          "return_type": "void",
+          "parameters": []
+        },
+        {
+          "name": "moveRight",
+          "return_type": "void",
+          "parameters": []
+        },
+        {
+          "name": "moveDown",
+          "return_type": "void",
+          "parameters": []
+        }
+      ],
+      "composed_classes": [],
+      "inherited_classes": []
+    },
+    {
+      "name": "Board",
+      "attributes": [
+        {
+          "name": "grid",
+          "type": "array",
+          "default_value": null
+        }
+      ],
+      "methods": [
+        {
+          "name": "checkLines",
+          "return_type": "void",
+          "parameters": []
+        },
+        {
+          "name": "addPiece",
+          "return_type": "void",
+          "parameters": [
+            {
+              "name": "piece",
+              "type": "Piece",
+              "default_value": null
+            }
+          ]
+        }
+      ],
+      "composed_classes": [],
+      "inherited_classes": []
+    }
+  ],
+  "inherited_classes": []
+}
