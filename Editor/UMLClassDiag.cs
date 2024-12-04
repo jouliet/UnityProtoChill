@@ -147,4 +147,3 @@ public class JSONMapper
         return composedClassesList;
     }
 }
-

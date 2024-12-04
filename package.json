@@ -5,7 +5,8 @@
     "description": "This is an example package",
     "dependencies": {
         "com.unity.textmeshpro": "3.0.6",
-        "com.unity.inputsystem": "1.4.4"
+        "com.unity.inputsystem": "1.4.4",
+        "com.graesonb.chat-gpt-wrapper-for-unity": "https://github.com/GraesonB/ChatGPT-Wrapper-For-Unity.git"
     },
 
     "unity": "2019.1",

@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using static JsonParser;
 using System.Collections.Generic;
-
+using ChatGPTWrapper;
 
 public class UMLDiag : GenerativeProcess
 {
@@ -22,13 +22,24 @@ public class UMLDiag : GenerativeProcess
 
     private void GenerateUML(string input)
     {
-        string jsonString = GPTGenerator.GenerateUML(input);
-        Debug.Log("Generated UML JSON: " + jsonString);
+        if (gptGenerator == null){
+            Debug.Log("No instance of gptGenerator");
+            return;
+        }
+        gptGenerator.GenerateFromText(input, (response) =>
+        {
 
-        //Le cast est nécessaire
+            string jsonString = response;
+            Debug.Log("Generated UML JSON: " + jsonString);
 
-        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-        JSONMapper.MapToBaseObject(parsedObject);
-        Debug.Log("ParsedObject : "+ ObjectToString(parsedObject));
+            //Le cast est nécessaire pour parse
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+
+            //Mapping vers structure objet maison
+            JSONMapper.MapToBaseObject(parsedObject);
+            Debug.Log("ParsedObject : " + ObjectToString(parsedObject));
+  
+        });
+
     }
 }

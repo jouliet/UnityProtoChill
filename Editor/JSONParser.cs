@@ -82,7 +82,10 @@ public static class JsonParser
         return result;
     }
 
-    // Parse a value, which can be an object, array, string, number, true, false, or null
+    // Types : object, array, string, bool or null. TODO? numbers et vecteurs il y a des pistes mais est ce même utile.
+    // Il manque le cas des nombres et vecteurs (liste de nombres ou objet unity?) que gpt aime bien formatter (0,0,0) mais c'est surtout la "default value" qui pose problème actuellement de ce pdv la et c'est pas dit
+    // Qu'on ce soit la responsabilité du parser de s'occuper de ça. A voir comment ça avance vis à vis de la scène. La gestion comme ça (avec des "default values" pour handle level design et les positions
+    // en faisant d'une pierre 2 coups) semble être un sacré flop.
     private static object ParseValue(ref string json)
     {
         json = json.Trim();
@@ -93,10 +96,6 @@ public static class JsonParser
         else if (json.StartsWith("["))
         {
             return ParseArray(ref json);
-        }
-        else if (json.StartsWith("\""))
-        {
-            return ParseString(ref json);
         }
         else if (json.StartsWith("true") || json.StartsWith("false"))
         {
@@ -111,7 +110,8 @@ public static class JsonParser
         }
         else
         {
-            return ParseNumber(ref json);
+            
+            return ParseString(ref json);
         }
     }
 
@@ -140,14 +140,13 @@ public static class JsonParser
 
 public static string ObjectToString(object obj)
 {
-    UnityEngine.Debug.Log("o m g");
     if (obj is Dictionary<string, object> dict)
     {
         var result = new StringBuilder();
         foreach (var keyValue in dict)
         {
             result.AppendLine($"{keyValue.Key}:");
-            result.AppendLine(ObjectToString(keyValue.Value)); // Recursively call for value
+            result.AppendLine(ObjectToString(keyValue.Value)); 
         }
         return result.ToString();
     }
@@ -156,13 +155,13 @@ public static string ObjectToString(object obj)
         var result = new StringBuilder();
         foreach (var item in list)
         {
-            result.AppendLine(ObjectToString(item)); // Recursively call for item
+            result.AppendLine(ObjectToString(item)); 
         }
         return result.ToString();
     }
     else
     {
-        return obj?.ToString() ?? "null"; // Return the object as string, handle null case
+        return obj?.ToString() ?? "null"; 
     }
 }
 
