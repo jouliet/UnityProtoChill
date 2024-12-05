@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
+using UMLClassDiag;
+
 
 public static class JsonParser
 {
+    public static List<BaseObject> baseObjects = new List<BaseObject>();
     public static object Parse(string json)
     {
         // Remove whitespaces and make the JSON easier to work with
@@ -60,7 +64,7 @@ public static class JsonParser
             // Parse the value
             object value = ParseValue(ref json);
             array.Add(value);
-
+            
             // Check if there's another value or if the array is ending
             if (json.StartsWith(","))
             {
