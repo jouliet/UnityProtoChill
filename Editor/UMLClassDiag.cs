@@ -94,8 +94,8 @@ public class BaseObject
     }
     public override string ToString()
     {
-        string result = $"BaseObject : {Name}\n";
-        result += $"Name  - {Name}\n";
+        //string result = $"BaseObject : {Name}\n";
+        string result = $"Name  - {Name}\n";
         result += "Attributes:\n";
         foreach (var attribute in Attributes)
         {
