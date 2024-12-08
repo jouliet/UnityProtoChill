@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using NUnit.Framework;
 using UMLClassDiag;
@@ -11,8 +12,13 @@ public class DataStructureTests
 {
     [Test]
     public void Test1(){
-        //Change Path
-        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
@@ -66,7 +72,13 @@ public class gptTest{
         , CustomChatGPTConversation.Model.ChatGPT, "Dit 'caca'");
 
         //Récupération du json
-        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
