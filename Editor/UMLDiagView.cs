@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace UMLClassDiag
 {
@@ -7,47 +8,56 @@ namespace UMLClassDiag
     {
         private Vector2 scrollPosition;
         private BaseObject rootObject;
+        private VisualElement rootElement;
 
         public static void ShowDiagram(BaseObject root)
         {
             var window = GetWindow<UMLDiagView>("UML Diagram");
             window.rootObject = root;
             window.Repaint();
+            window.Refresh();
         }
 
-        private void OnGUI()
+        private void OnEnable()
         {
-            GUILayout.Label("UML Diagram", EditorStyles.boldLabel);
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UMLDiagram.uxml");
+            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UMLDiagram.uss");
 
-            if (rootObject == null)
+            rootElement = visualTree.CloneTree();
+            rootElement.styleSheets.Add(styleSheet);
+            rootVisualElement.Clear();
+            rootVisualElement.Add(rootElement);
+
+            if (rootObject != null)
             {
-                GUILayout.Label("No UML data to display.", EditorStyles.helpBox);
-                return;
+                DrawNode(rootObject);
             }
 
-            DrawNode(rootObject);
         }
 
         public void DrawNode(BaseObject root)
         {
-            GUILayout.BeginVertical("box");
-            GUILayout.Label(root.Name, EditorStyles.boldLabel);
+            rootElement.Q<Label>("base-object").text = root.Name;
 
-            GUILayout.Space(10);
-
+            var attributesContainer = rootElement.Q<VisualElement>("attributes");
             foreach (var attribute in root.Attributes)
             {
-                GUILayout.Label(attribute.Name);
+                attributesContainer.Add(new Label($"{attribute.Name}: {attribute.Type}"));
             }
 
-            GUILayout.Space(10);
-
+            var methodsContainer = rootElement.Q<VisualElement>("methods");
             foreach (var method in root.Methods)
             {
-                GUILayout.Label(method.Name);
+                methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
+        }
 
-            GUILayout.EndVertical();
+        private void Refresh()
+        {
+            if (rootElement != null && rootObject != null)
+            {
+                DrawNode(rootObject);
+            }
         }
 
     }

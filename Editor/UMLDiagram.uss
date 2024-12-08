@@ -1,0 +1,37 @@
+/* Container for the entire UML diagram */
+.uml-diagram {
+    background-color: #393938;
+    border-width: 5px;
+    border-color: #b83c82;
+    padding: 0px;
+    margin: 10px;
+    width: 300px;
+}
+
+/* Class name styling */
+.uml-base-object {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: #16afca;
+    -unity-text-align: middle-center;
+    padding: 5px;
+}
+
+/* Section container styling */
+.uml-section {
+    padding: 5px;
+    border-top-width: 3px;
+    border-top-color: #b83c82; 
+}
+
+/* Section title styling */
+.uml-text {
+    font-size: 14px;
+    color: #ffffff;
+    -unity-font-style: normal;
+}
+
+/* Attributes and methods styling */
+.uml-attributes, .uml-methods {
+    margin-left: 10px;
+}
