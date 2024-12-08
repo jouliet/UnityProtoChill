@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using ChatGPTWrapper;
 using UMLClassDiag;
 
+
 public class UMLDiag : GenerativeProcess
 {
     public UMLDiag()
@@ -37,6 +38,7 @@ public class UMLDiag : GenerativeProcess
 
             //Mapping vers structure objet maison
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            UMLDiagView.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
 
             if (root != null){

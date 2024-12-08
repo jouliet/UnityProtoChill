@@ -1,6 +1,11 @@
 using UnityEditor;
 using UnityEngine;
 using ChatGPTWrapper;
+using UMLClassDiag;
+using System.Collections.Generic;
+using System.IO;
+using static JsonParser;
+
 public class MyEditorWindow : EditorWindow
 {
     // Submit prompt to GPT Event
@@ -75,66 +80,74 @@ public class MyEditorWindow : EditorWindow
         GetWindow<MyEditorWindow>("ProtoChill Tool");
     }
 
-private Vector2 scrollPosition; 
-private Vector2 topScrollPosition;
-private void OnGUI()
-{
-    Main.Instance.Init();
-    //Title
-    GUILayout.Space(10);
-    GUILayout.Label("GPT Object Structure Generator", EditorStyles.boldLabel);
-    GUILayout.Space(10);
-
-    
-
-    // GPT Initialization Section
-    GUILayout.BeginVertical("box");
-    GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
-    
-
-    useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
-    proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
-    apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
-    selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
-
-    GUILayout.Label("Initial Prompt", EditorStyles.label);
-    topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
-    initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
-    GUILayout.EndScrollView();
-    
-    GUILayout.Space(15);
-
-    // Button to Initialize GPT
-    if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
+    private Vector2 scrollPosition; 
+    private Vector2 topScrollPosition;
+    private void OnGUI()
     {
-        InitializeGPTInformation();
-        Debug.Log("GPT Initialized with user parameters.");
+        Main.Instance.Init();
+        //Title
+        GUILayout.Space(10);
+        GUILayout.Label("GPT Object Structure Generator", EditorStyles.boldLabel);
+        GUILayout.Space(10);
+
+    
+
+        // GPT Initialization Section
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
+    
+
+        useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
+        proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
+        apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
+        selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
+
+        GUILayout.Label("Initial Prompt", EditorStyles.label);
+        topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
+        initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
+        GUILayout.EndScrollView();
+    
+        GUILayout.Space(15);
+
+        // Button to Initialize GPT
+        if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
+        {
+            InitializeGPTInformation();
+            Debug.Log("GPT Initialized with user parameters.");
+        }
+        GUILayout.EndVertical();
+
+        GUILayout.Space(20);
+
+        // Submit chatbox Section
+        GUILayout.BeginVertical("box"); // Begin the box around the text area
+        GUILayout.Label("Describe Your Object Structure", EditorStyles.boldLabel);
+
+        // Scrollable text area to allow for scrolling when the content exceeds the space
+        scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(150), GUILayout.ExpandHeight(false)); // Use ExpandHeight for better scroll behavior
+        userInput = EditorGUILayout.TextArea(userInput, GUILayout.Height(100));  // Height of the text area where the user will type
+        GUILayout.EndScrollView(); // End scroll view
+        GUILayout.EndVertical(); // End the vertical box for the text area
+
+        GUILayout.Space(20); // Add spacing between the text area and the button
+
+        // Submit Button Section
+        GUILayout.BeginHorizontal(); // Horizontal layout for the button
+        if (GUILayout.Button("Submit", GUILayout.Height(40))) // Button with defined height
+        {
+            SubmitText();
+            Debug.Log("Text submitted: " + userInput);
+        }
+        GUILayout.EndHorizontal(); // End the horizontal layout for the button
+
+        // Diagram Test Button
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("UML", GUILayout.Height(40)))
+        {
+            BaseUMLGenerationTest();
+        }
+        GUILayout.EndHorizontal();
     }
-    GUILayout.EndVertical();
-
-    GUILayout.Space(20);
-
-    // Submit chatbox Section
-    GUILayout.BeginVertical("box"); // Begin the box around the text area
-    GUILayout.Label("Describe Your Object Structure", EditorStyles.boldLabel);
-
-    // Scrollable text area to allow for scrolling when the content exceeds the space
-    scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(150), GUILayout.ExpandHeight(false)); // Use ExpandHeight for better scroll behavior
-    userInput = EditorGUILayout.TextArea(userInput, GUILayout.Height(100));  // Height of the text area where the user will type
-    GUILayout.EndScrollView(); // End scroll view
-    GUILayout.EndVertical(); // End the vertical box for the text area
-
-    GUILayout.Space(20); // Add spacing between the text area and the button
-
-    // Submit Button Section
-    GUILayout.BeginHorizontal(); // Horizontal layout for the button
-    if (GUILayout.Button("Submit", GUILayout.Height(40))) // Button with defined height
-    {
-        SubmitText();
-        Debug.Log("Text submitted: " + userInput);
-    }
-    GUILayout.EndHorizontal(); // End the horizontal layout for the button
-}
 
 
 
@@ -150,4 +163,13 @@ private void OnGUI()
         // instancie donc Un GPTGenerator et un CustomChatGPTConversation par generative process. 
         OnInitializeGPTInformation?.Invoke(useProxy, proxyUri, apiKey, selectedModel, initialPrompt);
     }
+
+    private void BaseUMLGenerationTest()
+    {
+        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonBaseObject.json");
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
+
 }

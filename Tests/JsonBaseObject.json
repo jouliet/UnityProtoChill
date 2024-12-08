@@ -1,0 +1,43 @@
+{
+    "Root": 
+    {
+      "Name": "Platformer",
+      "Attributes": [
+        {
+          "Name": "player",
+          "Type": "Player",
+          "DefaultValue": "null"
+        },
+        {
+          "Name": "enemies",
+          "Type": "List<Enemy>",
+          "DefaultValue": "new List<Enemy>()"
+        },
+        {
+          "Name": "bullets",
+          "Type": "List<Bullet>",
+          "DefaultValue": "new List<Bullet>()"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "Shoot",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "direction",
+              "Type": "Vector2",
+              "DefaultValue": "(0, 0)"
+            }
+          ]
+        },
+        {
+          "Name": "SpawnEnemies",
+          "ReturnType": "void",
+          "Parameters": []
+        }
+      ],
+      "ComposedClasses": [],
+      "ParentClass": "null"
+    }
+  }

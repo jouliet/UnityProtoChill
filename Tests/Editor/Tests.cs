@@ -11,7 +11,8 @@ public class DataStructureTests
 {
     [Test]
     public void Test1(){
-        string jsonString = File.ReadAllText(@"C:\Users\simon\Documents\PFE\UnityProtoChill\Tests\JsonMockUp.json");
+        //Change Path
+        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonMockUp.json");
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
@@ -65,7 +66,7 @@ public class gptTest{
         , CustomChatGPTConversation.Model.ChatGPT, "Dit 'caca'");
 
         //Récupération du json
-        string jsonString = File.ReadAllText(@"C:\Users\simon\Documents\PFE\UnityProtoChill\Tests\JsonMockUp.json");
+        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonMockUp.json");
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
@@ -155,7 +156,8 @@ public class gptTest{
 
 
 
-    
+
+
 }
 
 
