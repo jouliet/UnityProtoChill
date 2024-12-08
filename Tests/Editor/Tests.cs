@@ -126,10 +126,6 @@ public class gptTest{
         });
     }
 
-
-
-
-
     public void InitChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -166,10 +162,24 @@ public class gptTest{
 
     }
 
+}
 
-
-
-
+public class UMLViewTest
+{
+    [Test]
+    public void BaseObjectUMLGenerationTest()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonBaseObject.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
 }
 
 

@@ -1,4 +1,4 @@
-/* Container for the entire UML diagram */
+/* Container for the Base Object */
 .uml-diagram {
     background-color: #393938;
     border-width: 5px;
@@ -8,7 +8,7 @@
     width: 300px;
 }
 
-/* Class name styling */
+/* Base Object styling */
 .uml-base-object {
     font-size: 16px;
     -unity-font-style: bold;
@@ -17,14 +17,14 @@
     padding: 5px;
 }
 
-/* Section container styling */
+/* Section line styling */
 .uml-section {
     padding: 5px;
     border-top-width: 3px;
     border-top-color: #b83c82; 
 }
 
-/* Section title styling */
+/* Text styling */
 .uml-text {
     font-size: 14px;
     color: #ffffff;

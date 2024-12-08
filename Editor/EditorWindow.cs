@@ -169,7 +169,7 @@ public class MyEditorWindow : EditorWindow
         string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonBaseObject.json");
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagView.ShowDiagram(root);
+        //UMLDiagView.ShowDiagram(root);
     }
 
 }
