@@ -10,11 +10,13 @@ namespace UMLClassDiag
         private StyleSheet umlStyleSheet;
 
         private BaseObject rootObject;
-        private float x=100f;
-        private float y=0f;
+        private float width = 300f;
+        private float offset = 10f;
 
         private Vector2 dragStart;
         private VisualElement canvas;
+        private float canvasWidth = 1000f;
+        private float canvasHeight = 1000f;
 
         public static void ShowDiagram(BaseObject root)
         {
@@ -33,10 +35,10 @@ namespace UMLClassDiag
             // Hand-tool navigation set up
             canvas = new VisualElement();
             canvas.style.position = Position.Absolute;
-            canvas.style.left = 0;
-            canvas.style.top = 0;
-            canvas.style.width = 5000; // TODO: add dynamic size off canvas
-            canvas.style.height = 5000;
+            canvas.style.left = - canvasWidth / 2 + width; // Center display
+            canvas.style.top = 0f;
+            canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
+            canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
 
             rootVisualElement.Clear();
@@ -46,10 +48,14 @@ namespace UMLClassDiag
 
             if (rootObject != null)
             {
-                DrawNode(rootObject, x, y);
+                DrawNode(rootObject, canvasWidth / 2, 0f);
             }
 
         }
+
+        //
+        // DRAWING
+        //
 
         public void DrawNode(BaseObject root, float x, float y)
         {
@@ -79,19 +85,83 @@ namespace UMLClassDiag
             nodeContainer.Add(umlNode);
             canvas.Add(nodeContainer);
 
-            //Draw ComposedClasses
+            nodeContainer.schedule.Execute(() =>
+            {
+                float height = nodeContainer.resolvedStyle.height;
+
+                //Draw ComposedClasses
+                if (root.ComposedClasses.Count > 0)
+                {
+                    float totalChildWidth = 0;
+                    float[] childWidths = new float[root.ComposedClasses.Count];
+
+                    for (int i = 0; i < root.ComposedClasses.Count; i++)
+                    {
+                        childWidths[i] = CalculateTotalWidth(root.ComposedClasses[i]);
+                        totalChildWidth += childWidths[i];
+                    }
+                    totalChildWidth += (root.ComposedClasses.Count - 1) * offset;
+
+                    int count = 0;
+                    float startX = x + (width - totalChildWidth) / 2;
+                    float currentX = startX;
+                    foreach (var baseObject in root.ComposedClasses)
+                    {
+                        float currentY = y + height + offset;
+                        DrawNode(baseObject, currentX, currentY);
+                        DrawLine(currentX + width / 2, currentY + offset, x + width / 2, y +  height - offset);
+                        currentX += childWidths[count] + offset;
+                        count++;
+                    }
+                }
+
+            });
+        }
+
+        private float CalculateTotalWidth(BaseObject node)
+        {
+            if (node.ComposedClasses.Count == 0)
+            {
+                return width;
+            }
+
+            float totalWidth = 0;
+            foreach (var baseObject in node.ComposedClasses)
+            {
+                totalWidth += CalculateTotalWidth(baseObject) + offset;
+            }
+
+            return totalWidth - offset;
+        }
+
+        private void DrawLine(float endpointX, float endpointY, float originX, float originY)
+        {
+            float dx = endpointX - originX;
+            float dy = endpointY - originY;
+            float length = Mathf.Sqrt(dx * dx + dy * dy);
+            float angle = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
+
+            var line = new VisualElement();
+            line.AddToClassList("uml-line");
+            line.style.left = originX;
+            line.style.top = originY;
+            line.style.width = length;
+            line.style.rotate = new StyleRotate(new Rotate(angle));
+
+            canvas.Add(line);
         }
 
         private void Refresh()
         {
             if (rootObject != null)
             {
-                DrawNode(rootObject, x, y);
+                DrawNode(rootObject, canvasWidth / 2, 0f);
             }
         }
 
+        //
         // HAND TOOL NAVIGATION
-
+        //
         private void EnableHandTool()
         {
             canvas.RegisterCallback<MouseDownEvent>(OnMouseDown);

@@ -180,6 +180,36 @@ public class UMLViewTest
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
         UMLDiagView.ShowDiagram(root);
     }
+
+    [Test]
+    public void JsonMockUpUMLGenerationTest()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
+
+    [Test]
+    public void JsonMockUpUMLGenerationTest2()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp2.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
 }
 
 

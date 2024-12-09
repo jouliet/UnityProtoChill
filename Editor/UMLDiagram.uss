@@ -35,3 +35,11 @@
 .uml-attributes, .uml-methods {
     margin-left: 10px;
 }
+
+/* UML Lines */
+.uml-line {
+    position: absolute;
+    height: 2px;
+    background-color: #ec9533;
+    transform-origin: top left;
+}
