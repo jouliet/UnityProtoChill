@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <ui:VisualElement class="uml-diagram">
+        <ui:Label name="base-object" class="uml-base-object">ClassName</ui:Label>
+        <ui:VisualElement class="uml-section">
+            <ui:Label name="attributes" class="uml-text">Attributes</ui:Label>
+            <ui:VisualElement name="attributes" class="uml-attributes"></ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="uml-section">
+            <ui:Label name="methods" class="uml-text">Methods</ui:Label>
+            <ui:VisualElement name="methods" class="uml-methods"></ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using NUnit.Framework;
 using UMLClassDiag;
@@ -11,7 +12,13 @@ public class DataStructureTests
 {
     [Test]
     public void Test1(){
-        string jsonString = File.ReadAllText(@"C:\Users\simon\Documents\PFE\UnityProtoChill\Tests\JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
@@ -65,7 +72,13 @@ public class gptTest{
         , CustomChatGPTConversation.Model.ChatGPT, "Tu es un game dev Unity. ");
 
         //Récupération du json
-        string jsonString = File.ReadAllText(@"C:\Users\simon\Documents\PFE\UnityProtoChill\Tests\JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
         Debug.Log("Generated UML JSON: " + jsonString);
         //Le cast est nécessaire pour parse
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
@@ -111,10 +124,6 @@ public class gptTest{
         });
     }
 
-
-
-
-
     public void InitChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -151,9 +160,54 @@ public class gptTest{
 
     }
 
+}
 
+public class UMLViewTest
+{
+    [Test]
+    public void BaseObjectUMLGenerationTest()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonBaseObject.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
 
-    
+    [Test]
+    public void JsonMockUpUMLGenerationTest()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
+
+    [Test]
+    public void JsonMockUpUMLGenerationTest2()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp2.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        UMLDiagView.ShowDiagram(root);
+    }
 }
 
 

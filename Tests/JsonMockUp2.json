@@ -1,0 +1,279 @@
+{
+  "Root": {
+    "Name": "Platformer",
+    "Attributes": [
+      {
+        "Name": "player",
+        "Type": "Player",
+        "DefaultValue": "null"
+      },
+      {
+        "Name": "enemies",
+        "Type": "List<Enemy>",
+        "DefaultValue": "new List<Enemy>()"
+      },
+      {
+        "Name": "bullets",
+        "Type": "List<Bullet>",
+        "DefaultValue": "new List<Bullet>()"
+      }
+    ],
+    "Methods": [
+      {
+        "Name": "Shoot",
+        "ReturnType": "void",
+        "Parameters": [
+          {
+            "Name": "direction",
+            "Type": "Vector2",
+            "DefaultValue": "(0, 0)"
+          }
+        ]
+      },
+      {
+        "Name": "SpawnEnemies",
+        "ReturnType": "void",
+        "Parameters": []
+      }
+    ],
+    "ComposedClasses": [
+      {
+        "Name": "Player",
+        "Attributes": [
+          {
+            "Name": "health",
+            "Type": "int",
+            "DefaultValue": "100"
+          },
+          {
+            "Name": "speed",
+            "Type": "float",
+            "DefaultValue": "5.0f"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Move",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "direction",
+                "Type": "Vector2",
+                "DefaultValue": "(0, 0)"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Enemy",
+        "Attributes": [
+          {
+            "Name": "health",
+            "Type": "int",
+            "DefaultValue": "50"
+          },
+          {
+            "Name": "speed",
+            "Type": "float",
+            "DefaultValue": "3.0f"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "MoveTowardsPlayer",
+            "ReturnType": "void",
+            "Parameters": []
+          }
+        ],
+        "ComposedClasses": [
+          {
+            "Name": "Zombie",
+            "Attributes": [
+              {
+                "Name": "health",
+                "Type": "int",
+                "DefaultValue": "30"
+              },
+              {
+                "Name": "speed",
+                "Type": "float",
+                "DefaultValue": "1.5f"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "Shamble",
+                "ReturnType": "void",
+                "Parameters": []
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Enemy"
+          },
+          {
+            "Name": "FlyingEnemy",
+            "Attributes": [
+              {
+                "Name": "health",
+                "Type": "int",
+                "DefaultValue": "20"
+              },
+              {
+                "Name": "speed",
+                "Type": "float",
+                "DefaultValue": "4.5f"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "FlyTowardsPlayer",
+                "ReturnType": "void",
+                "Parameters": []
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Enemy"
+          },
+          {
+            "Name": "TankEnemy",
+            "Attributes": [
+              {
+                "Name": "health",
+                "Type": "int",
+                "DefaultValue": "100"
+              },
+              {
+                "Name": "speed",
+                "Type": "float",
+                "DefaultValue": "1.0f"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "Charge",
+                "ReturnType": "void",
+                "Parameters": []
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Enemy"
+          }
+        ],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Bullet",
+        "Attributes": [
+          {
+            "Name": "damage",
+            "Type": "int",
+            "DefaultValue": "10"
+          },
+          {
+            "Name": "speed",
+            "Type": "float",
+            "DefaultValue": "10.0f"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Move",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "direction",
+                "Type": "Vector2",
+                "DefaultValue": "(0, 0)"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": [
+          {
+            "Name": "ExplosiveBullet",
+            "Attributes": [
+              {
+                "Name": "explosionRadius",
+                "Type": "float",
+                "DefaultValue": "3.0f"
+              },
+              {
+                "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "20"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "Explode",
+                "ReturnType": "void",
+                "Parameters": []
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Bullet"
+          },
+          {
+            "Name": "PiercingBullet",
+            "Attributes": [
+              {
+                "Name": "piercingCount",
+                "Type": "int",
+                "DefaultValue": "3"
+              },
+              {
+                "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "15"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "Pierce",
+                "ReturnType": "void",
+                "Parameters": []
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Bullet"
+          },
+          {
+            "Name": "HomingBullet",
+            "Attributes": [
+              {
+                "Name": "trackingSpeed",
+                "Type": "float",
+                "DefaultValue": "2.5f"
+              },
+              {
+                "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "12"
+              }
+            ],
+            "Methods": [
+              {
+                "Name": "TrackTarget",
+                "ReturnType": "void",
+                "Parameters": [
+                  {
+                    "Name": "target",
+                    "Type": "Enemy",
+                    "DefaultValue": "null"
+                  }
+                ]
+              }
+            ],
+            "ComposedClasses": [],
+            "ParentClass": "Bullet"
+          }
+        ],
+        "ParentClass": "null"
+      }
+    ],
+    "ParentClass": "null"
+  }
+}
