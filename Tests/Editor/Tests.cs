@@ -62,7 +62,7 @@ public class gptTest{
     public void Test1(){
         GPTGenerator gptGenerator = new GPTGenerator();
         InitChatGPTConversation(false, "", "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"
-        , CustomChatGPTConversation.Model.ChatGPT, "Dit 'caca'");
+        , CustomChatGPTConversation.Model.ChatGPT, "Tu es un game dev Unity. ");
 
         //Récupération du json
         string jsonString = File.ReadAllText(@"C:\Users\simon\Documents\PFE\UnityProtoChill\Tests\JsonMockUp.json");
@@ -94,9 +94,7 @@ public class gptTest{
     {
         //Peut etre précisé que la classe doit surement hérité de mono behaviour 
         string input = 
-        "Tu es dans Unity. Tu dois écrire la classe en c# selon ses composants comme décrit ci dessous. N'oublie pas que le script doit hériter de mono behaviour, directement ou indirectement. \n"
-        + "Les types non définit sont définit ailleurs, ne t'en occupes pas. Tout le reste doit être clairement écrit, sans instructions de ta part en commentaire. \n"
-        + bo.ToString();
+        "Tu es dans Unity. Pour gameObject " + bo.Name + " écris entièrement en c# son composant : \n" + bo.ToString();
 
         Debug.Log(bo.Name);
 

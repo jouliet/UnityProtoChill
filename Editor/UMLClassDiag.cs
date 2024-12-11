@@ -92,6 +92,11 @@ public class BaseObject
         UnityEditor.AssetDatabase.Refresh();
         #endif
     }
+
+    public string RelanvantInfo(){
+        string result = "";
+        return result;
+    }
     public override string ToString()
     {
         //string result = $"BaseObject : {Name}\n";
