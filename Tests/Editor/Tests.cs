@@ -69,10 +69,10 @@ public class gptTest{
     public void Test1(){
         GPTGenerator gptGenerator = new GPTGenerator();
         InitChatGPTConversation(false, "", "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"
-        , CustomChatGPTConversation.Model.ChatGPT, "Tu es un game dev Unity. ");
+        , CustomChatGPTConversation.Model.ChatGPT, "Tu es le lead developpeur Unity. Tu prends toutes les initiatives.");
 
         //Récupération du json
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp3.json");
         if (jsonFile == null)
         {
             Debug.LogError("Failed to load JSON.");
@@ -97,18 +97,18 @@ public class gptTest{
 
     private void GenerateScripts(BaseObject root, GPTGenerator gptGenerator){
         List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
-        Debug.Log("Generation du premier script:");
+        Debug.Log("Generation d'un script:");
         //Debug.Log("baseObject.Count = " + baseObjects.Count);
         
-        GenerateScript(gptGenerator, baseObjects[0]);
+        GenerateScript(gptGenerator, baseObjects[1]);
     }
 
     public void GenerateScript(GPTGenerator gptGenerator, BaseObject bo)
     {
         //Peut etre précisé que la classe doit surement hérité de mono behaviour 
         string input = 
-        "Tu es dans Unity. Pour gameObject " + bo.Name + " écris entièrement en c# son composant : \n" + bo.ToString();
-
+        "Tu es dans Unity. Pour le gameObject " + bo.Name + " écris entièrement en c# (avec la fonction Update()) son composant : \n" + bo.ToString() + "\n";
+        input += "N'hésite pas à rajouter des attributs ou des méthodes si nécessaire.";    
         Debug.Log(bo.Name);
 
         if (gptGenerator == null){

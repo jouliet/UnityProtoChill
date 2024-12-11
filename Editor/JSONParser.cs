@@ -13,6 +13,11 @@ public static class JsonParser
         // Remove whitespaces and make the JSON easier to work with
         json = json.Trim();
         
+        if (json.StartsWith("```")) {
+            string[] lignes = json.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            json = string.Join("\n", lignes, 1, lignes.Length - 1);
+        }
         if (json.StartsWith("{"))
         {
             return ParseObject(ref json);
