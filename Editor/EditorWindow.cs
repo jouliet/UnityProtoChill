@@ -21,7 +21,7 @@ public class MyEditorWindow : EditorWindow
     private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT;
     private string initialPrompt = @"You love object abstraction and a big time JSON user. You will follow this exact format : 
 {
-  ""BaseObject"": {
+  ""Root"": {
     ""Name"": ""ObjectName"",
     ""Attributes"": [
       {

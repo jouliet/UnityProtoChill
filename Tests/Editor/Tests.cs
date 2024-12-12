@@ -51,9 +51,9 @@ public class DataStructureTests
         List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
         Debug.Log("Generation des scripts");
         //Debug.Log("baseObject.Count = " + baseObjects.Count);
-        foreach (var baseObject in baseObjects){
-            GenerateScript(baseObject);
-        }
+        // foreach (var baseObject in baseObjects){
+        //     GenerateScript(baseObject);
+        // }
     }
 
     private void GenerateScript(BaseObject _baseObject){
@@ -108,7 +108,7 @@ public class gptTest{
         //Peut etre précisé que la classe doit surement hérité de mono behaviour 
         string input = 
         "Tu es dans Unity. Pour le gameObject " + bo.Name + " écris entièrement en c# (avec la fonction Update()) son composant : \n" + bo.ToString() + "\n";
-        input += "N'hésite pas à rajouter des attributs ou des méthodes si nécessaire.";    
+
         Debug.Log(bo.Name);
 
         if (gptGenerator == null){
@@ -161,6 +161,7 @@ public class gptTest{
     }
 
 }
+
 
 public class UMLViewTest
 {

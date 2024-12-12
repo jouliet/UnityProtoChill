@@ -42,7 +42,7 @@ public class UMLDiag : GenerativeProcess
             //Debug.Log("JSONMApper : " + root.ToString());
 
             if (root != null){
-                //GenerateScripts(root, gptGenerator);
+                GenerateScripts(root, gptGenerator);
             }
         });
         
@@ -57,7 +57,7 @@ public class UMLDiag : GenerativeProcess
         // foreach (var baseObject in baseObjects){
         //     baseObject.GenerateScript(_gptGenerator);
         // }
-        baseObjects[0].GenerateScript(_gptGenerator);
+        baseObjects[1].GenerateScript(_gptGenerator);
     }
 
     private static List<BaseObject> BaseObjectList(BaseObject root){

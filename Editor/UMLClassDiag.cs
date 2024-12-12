@@ -3,6 +3,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using ChatGPTWrapper;
+using System.Text.RegularExpressions;
+
+
 namespace UMLClassDiag
 {
 
@@ -63,8 +66,7 @@ public class BaseObject
     private void WriteScriptFile(string content)
     {
         // Chemin du dossier et du fichier
-        string filename = "cac.cs";
-        Debug.Log(filename);
+        string filename = this.Name + ".cs";
         string folderPath = "Assets/Scripts";
         string filePath = Path.Combine(folderPath, filename);
         // Vérifie si le dossier existe, sinon le crée
@@ -77,7 +79,7 @@ public class BaseObject
         // Vérifie si le fichier existe, sinon le crée
         if (!File.Exists(filePath))
         {
-            File.WriteAllText(filePath, content);
+            File.WriteAllText(filePath, ExtractCSharpCode(content));
             Debug.Log("Fichier créé : " + filePath);
         }
         // else
@@ -91,6 +93,14 @@ public class BaseObject
         #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
         #endif
+    }
+    private string ExtractCSharpCode(string input)
+    {
+        // Expression régulière pour capturer le contenu entre ```csharp et ```
+        var match = Regex.Match(input, @"```csharp\s*(.*?)\s*```", RegexOptions.Singleline);
+
+        // Retourne le contenu correspondant ou un message vide
+        return match.Success ? match.Groups[1].Value : "Aucun script C# trouvé.";
     }
 
     public string RelanvantInfo(){
