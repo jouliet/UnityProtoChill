@@ -5,6 +5,7 @@ using UMLClassDiag;
 using System.Collections.Generic;
 using System.IO;
 using static JsonParser;
+using static SaverLoader;
 
 public class MyEditorWindow : EditorWindow
 {
@@ -15,7 +16,6 @@ public class MyEditorWindow : EditorWindow
 
     private BaseObject selectedObject;
     private BaseObject  rootObject;
-    private List<BaseObject> baseObjects = new List<BaseObject>(); // Liste des objets
     private int selectedObjectIndex = 0; // Indice de l'objet sélectionné
     // Init GPT Event
     public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string> OnInitializeGPTInformation;
@@ -23,59 +23,9 @@ public class MyEditorWindow : EditorWindow
     private string proxyUri = "";
     private string apiKey = "";
     private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT;
-    private string initialPrompt = @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
-{
-  ""Root"": {
-    ""Name"": ""ObjectName"",
-    ""Attributes"": [
-      {
-        ""Name"": ""AttributeName1"",
-        ""Type"": ""AttributeType1"",
-        ""DefaultValue"": ""DefaultValue1""
-      },
-      {
-        ""Name"": ""AttributeName2"",
-        ""Type"": ""AttributeType2"",
-        ""DefaultValue"": ""null""
-      }
-    ],
-    ""Methods"": [
-      {
-        ""Name"": ""MethodName1"",
-        ""ReturnType"": ""ReturnType1"",
-        ""Parameters"": [
-          {
-            ""Name"": ""ParamName1"",
-            ""Type"": ""ParamType1"",
-            ""DefaultValue"": ""ParamDefaultValue1""
-          }
-        ]
-      },
-      {
-        ""Name"": ""MethodName2"",
-        ""ReturnType"": ""ReturnType2"",
-        ""Parameters"": []
-      }
-    ],
-    ""ComposedClasses"": [
-      {
-        ""Name"": ""ComposedClassName1"",
-        ""Attributes"": [
-          {
-            ""Name"": ""AttributeName1"",
-            ""Type"": ""AttributeType1"",
-            ""DefaultValue"": ""null""
-          }
-        ],
-        ""Methods"": [],
-        ""ComposedClasses"": [],
-        ""ParentClass"": ""null""
-      }
-    ],
-    ""ParentClass"": ""null""
-  }
-}
-";
+    private string initialPrompt = @"You are a game developer in Unity.You understand how The component pattern works. 
+You are both an oriented object and gameobject oriented beast. You only use functions defined in the json or native to Unity.
+Never assume a method or function exists";
 
 
     [MenuItem("Window/ProtoChillAITool")]
@@ -87,100 +37,134 @@ public class MyEditorWindow : EditorWindow
     private Vector2 scrollPosition; 
     private Vector2 topScrollPosition;
     private void OnGUI()
+{   
+  
+
+  if (ObjectResearch.AllBaseObjects.Count == 0){
+    LoadUML();
+  }
+    // Initialisation
+    Main.Instance.Init();
+
+    // Titre
+    GUILayout.Space(10);
+    GUILayout.Label("GPT Object Structure Generator", EditorStyles.boldLabel);
+    GUILayout.Space(10);
+
+    // SECTION INIT
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
+
+    useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
+    proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
+    apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
+    selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
+
+    GUILayout.Label("Initial Prompt", EditorStyles.label);
+    topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
+    initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
+    GUILayout.EndScrollView();
+
+    GUILayout.Space(15);
+
+    // Bouton INIT GPT
+    if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
     {
-        Main.Instance.Init();
-        //Title
-        GUILayout.Space(10);
-        GUILayout.Label("GPT Object Structure Generator", EditorStyles.boldLabel);
-        GUILayout.Space(10);
+        InitializeGPTInformation();
+        Debug.Log("GPT Initialized with user parameters.");
+    }
+    GUILayout.EndVertical();
 
-    
+    GUILayout.Space(20);
 
-        // INIT SECTION
-        GUILayout.BeginVertical("box");
-        GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
-    
+    // SECTION DESCRIPTION
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("Describe Your Object Structure", EditorStyles.boldLabel);
 
-        useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
-        proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
-        apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
-        selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
+    scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(150));
+    userInput = EditorGUILayout.TextArea(userInput, GUILayout.Height(100));
+    GUILayout.EndScrollView();
+    GUILayout.EndVertical();
 
-        GUILayout.Label("Initial Prompt", EditorStyles.label);
-        topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
-        initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
-        GUILayout.EndScrollView();
-    
-        GUILayout.Space(15);
+    GUILayout.Space(20);
 
-        // INIT LLM BUTTON
-        if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
+    // Bouton SUBMIT
+    GUILayout.BeginHorizontal();
+    if (GUILayout.Button("Submit", GUILayout.Height(40)))
+    {
+        SubmitText();
+        Debug.Log("Text submitted: " + userInput);
+    }
+    GUILayout.EndHorizontal();
+
+    // Bouton UML
+    GUILayout.BeginHorizontal();
+    if (GUILayout.Button("UML", GUILayout.Height(40)))
+    {
+        if (selectedObject == null)
         {
-            InitializeGPTInformation();
-            Debug.Log("GPT Initialized with user parameters.");
+            Debug.LogWarning("L'objet root n'est toujours pas généré.");
         }
-        GUILayout.EndVertical();
-
-        GUILayout.Space(20);
-
-        // Submit chatbox Section
-        GUILayout.BeginVertical("box"); // Begin the box around the text area
-        GUILayout.Label("Describe Your Object Structure", EditorStyles.boldLabel);
-
-        // Scrollable text area to allow for scrolling when the content exceeds the space
-        scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(150), GUILayout.ExpandHeight(false)); // Use ExpandHeight for better scroll behavior
-        userInput = EditorGUILayout.TextArea(userInput, GUILayout.Height(100));  // Height of the text area where the user will type
-        GUILayout.EndScrollView(); // End scroll view
-        GUILayout.EndVertical(); // End the vertical box for the text area
-
-        GUILayout.Space(20); // Add spacing between the text area and the button
-
-        // SUBMIT BUTTON
-        GUILayout.BeginHorizontal(); // Horizontal layout for the button
-        if (GUILayout.Button("Submit", GUILayout.Height(40))) // Button with defined height
+        else
         {
             ObjectResearch.AllBaseObjects.Clear();
-            SubmitText();
             Debug.Log("Text submitted: " + userInput);
+            UMLDiagView.ShowDiagram(selectedObject);
         }
-        GUILayout.EndHorizontal(); // End the horizontal layout for the button
+    }
+    GUILayout.EndHorizontal();
 
-        // UML BUTTON
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("UML", GUILayout.Height(40)))
-        {
-          if (rootObject == null){
-            Debug.Log("L'object root n'est toujours pas généré.");
-          }else
-            UMLDiagView.ShowDiagram(rootObject);
-        }
-        GUILayout.EndHorizontal();
+    GUILayout.Space(10);
 
-        // BASE OBJECT SELECTION FOR GENERATION
-        GUILayout.Label("Base Object Selector", EditorStyles.boldLabel);
+    // Sélecteur d'objet de base
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("Base Object Selector", EditorStyles.boldLabel);
 
-        // Générer les options pour le menu déroulant
+    if (ObjectResearch.AllBaseObjects.Count > 0)
+    {
         string[] options = new string[ObjectResearch.AllBaseObjects.Count];
         for (int i = 0; i < ObjectResearch.AllBaseObjects.Count; i++)
         {
             options[i] = ObjectResearch.AllBaseObjects[i].Name;
         }
 
-        // Affichage
         selectedObjectIndex = EditorGUILayout.Popup("Select BaseObject", selectedObjectIndex, options);
-       //selectedObject = ObjectResearch.AllBaseObjects[0];
-        if (ObjectResearch.AllBaseObjects.Count > 0){
-          rootObject = ObjectResearch.AllBaseObjects[0];
-        }
 
-        // Assigner selected object
-        if (selectedObjectIndex >= 0 && selectedObjectIndex < baseObjects.Count)
+        // Assurez-vous de ne pas dépasser les limites du tableau
+        if (selectedObjectIndex >= 0 && selectedObjectIndex < ObjectResearch.AllBaseObjects.Count)
         {
-           Debug.Log("ya");
-            selectedObject = baseObjects[selectedObjectIndex];
+            selectedObject = ObjectResearch.AllBaseObjects[selectedObjectIndex];
             EditorGUILayout.LabelField("Selected Object:", selectedObject.Name);
         }
     }
+    else
+    {
+        GUILayout.Label("No base objects available.", EditorStyles.helpBox);
+    }
+    GUILayout.EndVertical();
+
+    GUILayout.Space(20);
+
+    // Bouton GENERATE SCRIPT
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("Script Generation", EditorStyles.boldLabel);
+
+    if (selectedObject != null)
+    {
+        if (GUILayout.Button("Generate Script", GUILayout.Height(40)))
+        {
+            GenerateScript();
+            Debug.Log("Script generation triggered for: " + selectedObject.Name);
+        }
+    }
+    else
+    {
+        GUILayout.Label("Please select a base object before generating a script.", EditorStyles.helpBox);
+    }
+
+    GUILayout.EndVertical(); 
+}
+
 
     private void GenerateScript(){
       //L'abonnée est toujours UMLDiag

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using ChatGPTWrapper;
 using System.Text.RegularExpressions;
-
+using static SaverLoader;
 
 namespace UMLClassDiag
 {
@@ -47,24 +47,34 @@ public class BaseObject
     public List<BaseObject> ComposedClasses { get; set; } = new List<BaseObject>();
     public BaseObject ParentClass { get; set; }
 
-    public void GenerateScript(GPTGenerator gptGenerator)
+    public void GenerateScript(GPTGenerator gptGenerator){
+
+        
+        GenerateScriptbis(gptGenerator);
+        // Des trucs s'exécutent en parallèle voir le moment ou oui arrive (bien plus tôt que les debug di generate bis)
+
+        Debug.Log("oui");
+    }
+    
+    
+    
+    
+    
+    
+    private void GenerateScriptbis(GPTGenerator gptGenerator)
     {
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
-        "Tu es dans Unity. Tu dois écrire la classe en c# selon ses composants comme décrit ici: " + this.ToString();
-
-        Debug.Log(this.Name);
-
+        "Tu es dans Unity. Tu dois écrire la classe" + this.Name + "en c# selon ses composants comme décrit ici: " + this.ToString();
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
         }
-
         gptGenerator.GenerateFromText(input, (response) =>
         {
             Debug.Log("Generated class: " + response);
             WriteScriptFile(response);
-            
+ 
         });
     }
     private void WriteScriptFile(string content)
@@ -83,20 +93,22 @@ public class BaseObject
 
         File.WriteAllText(filePath, ExtractCSharpCode(content));
         Debug.Log("Fichier créé : " + filePath);
- 
 
-        // Rafraîchit l'éditeur Unity pour inclure le nouveau fichier
-        #if UNITY_EDITOR
+
+        // REFRESH DATABASE ICI
+        // Important que ce soit à la fin comme ça !!!! (pour des raisons obscures peut être multithread unity bizarre)
+         #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
         #endif
     }
+    
     private string ExtractCSharpCode(string input)
     {
         // Expression régulière pour capturer le contenu entre ```csharp et ```
         var match = Regex.Match(input, @"```csharp\s*(.*?)\s*```", RegexOptions.Singleline);
 
         // Retourne le contenu correspondant ou un message vide
-        return match.Success ? match.Groups[1].Value : "Aucun script C# trouvé.";
+        return match.Success ? match.Groups[1].Value : "//Aucun script C# trouvé.";
     }
 
     public string RelanvantInfo(){

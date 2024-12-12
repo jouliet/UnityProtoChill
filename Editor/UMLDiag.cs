@@ -4,7 +4,7 @@ using static JsonParser;
 using System.Collections.Generic;
 using ChatGPTWrapper;
 using UMLClassDiag;
-
+using static SaverLoader;
 
 public class UMLDiag : GenerativeProcess
 {
@@ -28,6 +28,61 @@ public class UMLDiag : GenerativeProcess
     
     private void GenerateUML(string input)
     {
+
+        input =
+        @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
+{
+  ""Root"": {
+    ""Name"": ""ObjectName"",
+    ""Attributes"": [
+      {
+        ""Name"": ""AttributeName1"",
+        ""Type"": ""AttributeType1"",
+        ""DefaultValue"": ""DefaultValue1""
+      },
+      {
+        ""Name"": ""AttributeName2"",
+        ""Type"": ""AttributeType2"",
+        ""DefaultValue"": ""null""
+      }
+    ],
+    ""Methods"": [
+      {
+        ""Name"": ""MethodName1"",
+        ""ReturnType"": ""ReturnType1"",
+        ""Parameters"": [
+          {
+            ""Name"": ""ParamName1"",
+            ""Type"": ""ParamType1"",
+            ""DefaultValue"": ""ParamDefaultValue1""
+          }
+        ]
+      },
+      {
+        ""Name"": ""MethodName2"",
+        ""ReturnType"": ""ReturnType2"",
+        ""Parameters"": []
+      }
+    ],
+    ""ComposedClasses"": [
+      {
+        ""Name"": ""ComposedClassName1"",
+        ""Attributes"": [
+          {
+            ""Name"": ""AttributeName1"",
+            ""Type"": ""AttributeType1"",
+            ""DefaultValue"": ""null""
+          }
+        ],
+        ""Methods"": [],
+        ""ComposedClasses"": [],
+        ""ParentClass"": ""null""
+      }
+    ],
+    ""ParentClass"": ""null""
+  }
+}
+" + input;
         BaseObject root = null;
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
@@ -36,6 +91,7 @@ public class UMLDiag : GenerativeProcess
         gptGenerator.GenerateFromText(input, (response) =>
         {
             string jsonString = response;
+            SaveUML(jsonString);
             Debug.Log("Generated UML JSON: " + jsonString);
 
             //Le cast est nécessaire pour parse
@@ -54,4 +110,5 @@ public class UMLDiag : GenerativeProcess
         Debug.Log("Script was generated");
         root.GenerateScript(gptGenerator);        
     }
+
 }

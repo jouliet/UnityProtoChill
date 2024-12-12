@@ -10,14 +10,27 @@ public static class JsonParser
     public static List<BaseObject> baseObjects = new List<BaseObject>();
     public static object Parse(string json)
     {
-        // Remove whitespaces and make the JSON easier to work with
         json = json.Trim();
-        
-        if (json.StartsWith("```")) {
-            string[] lignes = json.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        string jsonMarker = "```json";
 
-            json = string.Join("\n", lignes, 1, lignes.Length - 1);
+        //Detecter le marker pour complètement ignorer les comms random
+        int jsonStartIndex = json.IndexOf(jsonMarker);
+        if (jsonStartIndex != -1)
+        {
+            json = json.Substring(jsonStartIndex + jsonMarker.Length).Trim();  // Extract only the JSON part
         }
+        else
+        {
+            throw new Exception("Invalid JSON format. Could not find the JSON marker.");
+        }
+        
+        // if (json.StartsWith("```")) {
+        //     string[] lignes = json.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+        //     json = string.Join("\n", lignes, 1, lignes.Length - 1);
+        // }
+
+
         if (json.StartsWith("{"))
         {
             return ParseObject(ref json);
