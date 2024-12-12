@@ -139,6 +139,7 @@ public class MyEditorWindow : EditorWindow
         GUILayout.BeginHorizontal(); // Horizontal layout for the button
         if (GUILayout.Button("Submit", GUILayout.Height(40))) // Button with defined height
         {
+            ObjectResearch.AllBaseObjects.Clear();
             SubmitText();
             Debug.Log("Text submitted: " + userInput);
         }
