@@ -14,6 +14,7 @@ public class MyEditorWindow : EditorWindow
     private string userInput = "Make a UML for a platformer in Unity. You shoot bullets at waves of ennemies running at you"; 
 
     private BaseObject selectedObject;
+    private BaseObject  rootObject;
     private List<BaseObject> baseObjects = new List<BaseObject>(); // Liste des objets
     private int selectedObjectIndex = 0; // Indice de l'objet sélectionné
     // Init GPT Event
@@ -147,7 +148,10 @@ public class MyEditorWindow : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("UML", GUILayout.Height(40)))
         {
-            //BaseUMLGenerationTest();
+          if (rootObject == null){
+            Debug.Log("L'object root n'est toujours pas généré.");
+          }else
+            UMLDiagView.ShowDiagram(rootObject);
         }
         GUILayout.EndHorizontal();
 
@@ -163,11 +167,15 @@ public class MyEditorWindow : EditorWindow
 
         // Affichage
         selectedObjectIndex = EditorGUILayout.Popup("Select BaseObject", selectedObjectIndex, options);
-        
+       //selectedObject = ObjectResearch.AllBaseObjects[0];
+        if (ObjectResearch.AllBaseObjects.Count > 0){
+          rootObject = ObjectResearch.AllBaseObjects[0];
+        }
 
         // Assigner selected object
         if (selectedObjectIndex >= 0 && selectedObjectIndex < baseObjects.Count)
         {
+           Debug.Log("ya");
             selectedObject = baseObjects[selectedObjectIndex];
             EditorGUILayout.LabelField("Selected Object:", selectedObject.Name);
         }

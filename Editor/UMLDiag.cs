@@ -8,7 +8,6 @@ using UMLClassDiag;
 
 public class UMLDiag : GenerativeProcess
 {
-
     public UMLDiag()
     {
         // UML est abonné si tout se passe bien
@@ -47,8 +46,6 @@ public class UMLDiag : GenerativeProcess
             UMLDiagView.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
         });
-        
-        
     }
 
     //Pour l'instant generateScripts est ici mais on pourra le bouger si besoin. De même pour BaseObjectList
