@@ -8,6 +8,7 @@ using UMLClassDiag;
 
 public class UMLDiag : GenerativeProcess
 {
+
     public UMLDiag()
     {
         // UML est abonné si tout se passe bien
@@ -18,9 +19,14 @@ public class UMLDiag : GenerativeProcess
     {
         Debug.Log("Submit received in UMLDiag. Generating UML...");
         GenerateUML(input);
-        
     }
 
+    public override void OnGenerateScript(BaseObject root){
+        Debug.Log("generating script for" + root.ToString() + "...");
+        GenerateScript(root);
+    }
+
+    
     private void GenerateUML(string input)
     {
         BaseObject root = null;
@@ -40,37 +46,15 @@ public class UMLDiag : GenerativeProcess
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
             UMLDiagView.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
-
-            if (root != null){
-                GenerateScripts(root, gptGenerator);
-            }
         });
         
         
     }
 
     //Pour l'instant generateScripts est ici mais on pourra le bouger si besoin. De même pour BaseObjectList
-    private void GenerateScripts(BaseObject root, GPTGenerator _gptGenerator){
-        List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
-        Debug.Log("Generation du premier script");
-        //Debug.Log("baseObject.Count = " + baseObjects.Count);
-        // foreach (var baseObject in baseObjects){
-        //     baseObject.GenerateScript(_gptGenerator);
-        // }
-        baseObjects[1].GenerateScript(_gptGenerator);
-    }
-
-    private static List<BaseObject> BaseObjectList(BaseObject root){
-        var baseObjectList = new List<BaseObject>{root};
-
-        if (root.ComposedClasses.Count > 0)
-        {
-            foreach (var composedClass in root.ComposedClasses)
-            {
-                baseObjectList.AddRange(BaseObjectList(composedClass));
-            }
-            
-        }
-        return baseObjectList;
+    //GenerateScripts est lié à l'event UI generateScripts for selected baseObject
+    private void GenerateScript(BaseObject root){
+        Debug.Log("Script was generated");
+        root.GenerateScript(gptGenerator);        
     }
 }

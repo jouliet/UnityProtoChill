@@ -10,11 +10,14 @@ public class MyEditorWindow : EditorWindow
 {
     // Submit prompt to GPT Event
     public static event System.Action<string> OnSubmitText;
+    public static event System.Action<BaseObject> OnGenerateScriptEvent;
     private string userInput = "Make a UML for a platformer in Unity. You shoot bullets at waves of ennemies running at you"; 
 
+    private BaseObject selectedObject;
+    private List<BaseObject> baseObjects = new List<BaseObject>(); // Liste des objets
+    private int selectedObjectIndex = 0; // Indice de l'objet sélectionné
     // Init GPT Event
     public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string> OnInitializeGPTInformation;
-
     private bool useProxy;
     private string proxyUri = "";
     private string apiKey = "";
@@ -92,7 +95,7 @@ public class MyEditorWindow : EditorWindow
 
     
 
-        // GPT Initialization Section
+        // INIT SECTION
         GUILayout.BeginVertical("box");
         GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
     
@@ -109,7 +112,7 @@ public class MyEditorWindow : EditorWindow
     
         GUILayout.Space(15);
 
-        // Button to Initialize GPT
+        // INIT LLM BUTTON
         if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
         {
             InitializeGPTInformation();
@@ -131,7 +134,7 @@ public class MyEditorWindow : EditorWindow
 
         GUILayout.Space(20); // Add spacing between the text area and the button
 
-        // Submit Button Section
+        // SUBMIT BUTTON
         GUILayout.BeginHorizontal(); // Horizontal layout for the button
         if (GUILayout.Button("Submit", GUILayout.Height(40))) // Button with defined height
         {
@@ -140,16 +143,40 @@ public class MyEditorWindow : EditorWindow
         }
         GUILayout.EndHorizontal(); // End the horizontal layout for the button
 
-        // Diagram Test Button
+        // UML BUTTON
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("UML", GUILayout.Height(40)))
         {
-            BaseUMLGenerationTest();
+            //BaseUMLGenerationTest();
         }
         GUILayout.EndHorizontal();
+
+        // BASE OBJECT SELECTION FOR GENERATION
+        GUILayout.Label("Base Object Selector", EditorStyles.boldLabel);
+
+        // Générer les options pour le menu déroulant
+        string[] options = new string[ObjectResearch.AllBaseObjects.Count];
+        for (int i = 0; i < ObjectResearch.AllBaseObjects.Count; i++)
+        {
+            options[i] = ObjectResearch.AllBaseObjects[i].Name;
+        }
+
+        // Affichage
+        selectedObjectIndex = EditorGUILayout.Popup("Select BaseObject", selectedObjectIndex, options);
+        
+
+        // Assigner selected object
+        if (selectedObjectIndex >= 0 && selectedObjectIndex < baseObjects.Count)
+        {
+            selectedObject = baseObjects[selectedObjectIndex];
+            EditorGUILayout.LabelField("Selected Object:", selectedObject.Name);
+        }
     }
 
-
+    private void GenerateScript(){
+      //L'abonnée est toujours UMLDiag
+      OnGenerateScriptEvent?.Invoke(selectedObject);
+    }
 
     private void SubmitText()
     {

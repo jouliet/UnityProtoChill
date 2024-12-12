@@ -35,6 +35,12 @@ public class Method
 
 public class BaseObject
 {
+    // On constitue la liste localement
+    public BaseObject(){
+        ObjectResearch.AllBaseObjects.Add(this);
+    }
+
+
     public string Name { get; set; }
     public List<Attribute> Attributes { get; set; } = new List<Attribute>();
     public List<Method> Methods { get; set; } = new List<Method>();
@@ -74,18 +80,10 @@ public class BaseObject
             Debug.Log("Dossier créé : " + folderPath);
         }
 
-        // Vérifie si le fichier existe, sinon le crée
-        if (!File.Exists(filePath))
-        {
-            File.WriteAllText(filePath, ExtractCSharpCode(content));
-            Debug.Log("Fichier créé : " + filePath);
-        }
-        // else
-        // {
-        //     // Si le fichier existe, écrase son contenu
-        //     File.WriteAllText(filePath, content);
-        //     Debug.Log("Fichier existant écrasé : " + filePath);
-        // }
+
+        File.WriteAllText(filePath, ExtractCSharpCode(content));
+        Debug.Log("Fichier créé : " + filePath);
+ 
 
         // Rafraîchit l'éditeur Unity pour inclure le nouveau fichier
         #if UNITY_EDITOR
@@ -135,43 +133,6 @@ public class BaseObject
     }
 }
 
-public class ObjectResearch
-{
-    public static BaseObject BaseObjectResearch(BaseObject root, string className)
-    {
-        string baseObjectName = "";
-        BaseObject baseObject = null;
-        if (baseObject.Name != baseObjectName){
-            if (baseObject.ComposedClasses.Count > 0){
-                foreach (var composedClass in baseObject.ComposedClasses){
-                    baseObject = BaseObjectResearch(composedClass, className);
-                    if (baseObject != null){
-                        return baseObject;
-                    }
-                }
-            }else{
-                baseObject = null;
-            }
-        }else{
-            return baseObject;
-        }
-        return baseObject;
-    }
-
-    public static List<BaseObject> BaseObjectList(BaseObject root){
-        var baseObjectList = new List<BaseObject>{root};
-
-        if (root.ComposedClasses.Count > 0)
-        {
-            foreach (var composedClass in root.ComposedClasses)
-            {
-                baseObjectList.AddRange(BaseObjectList(composedClass));
-            }
-            
-        }
-        return baseObjectList;
-    }
-}
 
 public class JSONMapper
 {
