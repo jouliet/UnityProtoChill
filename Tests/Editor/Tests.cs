@@ -68,7 +68,7 @@ public class gptTest{
     [Test]
     public void Test1(){
         GPTGenerator gptGenerator = new GPTGenerator();
-        InitChatGPTConversation(false, "", "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"
+        InitChatGPTConversation(false, "", "clé"
         , CustomChatGPTConversation.Model.ChatGPT, "Tu es le lead developpeur Unity. Tu prends toutes les initiatives.");
 
         //Récupération du json

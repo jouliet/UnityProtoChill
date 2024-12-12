@@ -19,7 +19,7 @@ public class MyEditorWindow : EditorWindow
     private string proxyUri = "";
     private string apiKey = "";
     private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT;
-    private string initialPrompt = @"You love object abstraction and a big time JSON user. You will follow this exact format : 
+    private string initialPrompt = @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
 {
   ""Root"": {
     ""Name"": ""ObjectName"",

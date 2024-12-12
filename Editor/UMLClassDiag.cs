@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace UMLClassDiag
 {
-
-
 public class Attribute
 {
     public string Name { get; set; } 
@@ -45,7 +43,7 @@ public class BaseObject
 
     public void GenerateScript(GPTGenerator gptGenerator)
     {
-        //Peut etre précisé que la classe doit surement hérité de mono behaviour 
+        //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
         "Tu es dans Unity. Tu dois écrire la classe en c# selon ses composants comme décrit ici: " + this.ToString();
 
