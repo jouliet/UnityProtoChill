@@ -18,7 +18,7 @@ namespace ChatGPTWrapper
         }
         public Model _model = Model.ChatGPT;
         private string _selectedModel = null;
-        private int _maxTokens = 1000;
+        private int _maxTokens = 1500;
         private float _temperature = 0;
         private string _uri;
         private List<(string, string)> _reqHeaders;

@@ -23,7 +23,6 @@ public class Main
     private Main()
     {
         UMLDiag umlDiag = new UMLDiag();
-        MyEditorWindow.OnSubmitText += umlDiag.OnSubmit;
     }
 
 }

@@ -86,6 +86,10 @@ public static class JsonParser
         // Remove the opening quote
         json = json.Substring(1);
         int closingQuoteIndex = json.IndexOf('"');
+        if (closingQuoteIndex == -1)
+        {
+            throw new Exception("Invalid JSON format: Unterminated string");
+        }
         string result = json.Substring(0, closingQuoteIndex);
         json = json.Substring(closingQuoteIndex + 1).Trim(); // Remove the closing quote
         return result;

@@ -1,5 +1,5 @@
 //This GPTGenerator uses the GPT Wrapper originally used in hello world project ... So no langchain and use of events with some consideration 
-//for execution/data transfer time and API Key. The InitChatGPTConversation and GenerateFromText are called in 
+//for execution/data transfer time and API Key. The InitChatGPTConversation and GenerateFromText are called in UMLClass
 
 using UnityEngine;
 using System;
@@ -8,7 +8,19 @@ namespace ChatGPTWrapper
 {
     public class GPTGenerator
     {
+    private static GPTGenerator _instance;
 
+    public static GPTGenerator Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new GPTGenerator();
+            }
+            return _instance;
+        }
+    }
         public GPTGenerator()
         {
             MyEditorWindow.OnInitializeGPTInformation += InitChatGPTConversation;
@@ -56,8 +68,7 @@ namespace ChatGPTWrapper
                 Debug.Log($"Message Received: {response}");
                 onResponse?.Invoke(response);
             });
-            
-
+        
         }
     }
 }
