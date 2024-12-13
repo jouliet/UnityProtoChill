@@ -1,3 +1,7 @@
+#if UNITY_EDITOR
+using UnityEngine;
+using UnityEditor;
+
 public class Main
 {
     // Pattern singleton
@@ -23,6 +27,9 @@ public class Main
     private Main()
     {
         UMLDiag umlDiag = new UMLDiag();
+        // GameObject fastUnityPusher = new GameObject("unityPusher");
+        // FastUnityPusher pusherComponent = fastUnityPusher.AddComponent<FastUnityPusher>();
     }
 
 }
+#endif

@@ -9,27 +9,25 @@ namespace ChatGPTWrapper
         private bool _useProxy;
         private string _proxyUri;
         private string _apiKey;
-
         public enum Model
         {
-            ChatGPT,
-            Davinci,
-            Curie
+            ChatGPT4,
+            GPT3,
+            GPT4
         }
-        public Model _model = Model.ChatGPT;
+        public Model _model = Model.ChatGPT4;
         private string _selectedModel = null;
         private int _maxTokens = 1500;
         private float _temperature = 0;
         private string _uri;
         private List<(string, string)> _reqHeaders;
-
         private Prompt _prompt;
         private Chat _chat;
         private string _lastUserMsg;
         private string _lastChatGPTMsg;
 
-        private string _chatbotName = "ChatGPT";
-        private string _initialPrompt = "You are ChatGPT, a large language model trained by OpenAI.";
+        // private string _chatbotName = "ChatGPT";
+        private string _initialPrompt = "You understand how The component pattern works. You are a game developer specialized in Unity";
 
         public CustomChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
         {
@@ -53,20 +51,20 @@ namespace ChatGPTWrapper
             _model = model;
             switch (_model)
             {
-                case Model.ChatGPT:
+                case Model.ChatGPT4:
                     _chat = new Chat(_initialPrompt);
                     _uri = "https://api.openai.com/v1/chat/completions";
                     _selectedModel = "chatgpt-4o-latest";
                     break;
-                case Model.Davinci:
-                    _prompt = new Prompt(_chatbotName, _initialPrompt);
+                case Model.GPT3:
+                    _chat = new Chat(_initialPrompt);
                     _uri = "https://api.openai.com/v1/completions";
-                    _selectedModel = "text-davinci-003";
+                    _selectedModel = "gpt-3.5-turbo";
                     break;
-                case Model.Curie:
-                    _prompt = new Prompt(_chatbotName, _initialPrompt);
+                case Model.GPT4:
+                    _chat = new Chat( _initialPrompt);
                     _uri = "https://api.openai.com/v1/completions";
-                    _selectedModel = "text-curie-001";
+                    _selectedModel = "gpt-4o-mini";
                     break;
             }
         }
@@ -75,8 +73,8 @@ namespace ChatGPTWrapper
         {
             _lastUserMsg = message;
 
-            if (_model == Model.ChatGPT)
-            {
+            // if (_model == Model.ChatGPT4)
+            // {
                 ChatGPTReq chatGPTReq = new ChatGPTReq
                 {
                     model = _selectedModel,
@@ -92,12 +90,14 @@ namespace ChatGPTWrapper
                 {
                     var chatGPTRes = JsonUtility.FromJson<ChatGPTRes>(response);
                     _lastChatGPTMsg = chatGPTRes.choices[0].message.content;
+
+                    //Gestion de la mémoire ici (actuellement 2)
                     _chat.AppendMessage(Chat.Speaker.User, _lastUserMsg);
                     _chat.AppendMessage(Chat.Speaker.ChatGPT, _lastChatGPTMsg);
                     callback?.Invoke(_lastChatGPTMsg);
                 });
-            }
-            // Similar handling for other models...
+            // }
+
         }
 
         private void PostRequest(string uri, string jsonPayload, System.Action<string> callback)

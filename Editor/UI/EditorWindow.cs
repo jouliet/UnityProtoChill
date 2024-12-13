@@ -12,7 +12,7 @@ public class MyEditorWindow : EditorWindow
     // Submit prompt to GPT Event
     public static event System.Action<string> OnSubmitText;
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
-    private string userInput = "Make a UML for a platformer in Unity. You shoot bullets at waves of ennemies running at you"; 
+    private string userInput = "A Player that may move with arrows and shoot bullets with space bar"; 
 
     private BaseObject selectedObject;
     private BaseObject  rootObject;
@@ -22,10 +22,10 @@ public class MyEditorWindow : EditorWindow
     private bool useProxy;
     private string proxyUri = "";
     private string apiKey = "";
-    private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT;
-    private string initialPrompt = @"You are a game developer in Unity.You understand how The component pattern works. 
+    private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT4;
+    private string initialPrompt = @"
 You are both an oriented object and gameobject oriented beast. You only use functions defined in the json or native to Unity.
-Never assume a method or function exists";
+Never assume a method, class or function exists without explicitly seeing it in the UML diagram you are presented. When building said diagram always be exhaustive with the links between classes and always prefer making them go both ways";
 
 
     [MenuItem("Window/ProtoChillAITool")]
@@ -55,8 +55,8 @@ Never assume a method or function exists";
     GUILayout.BeginVertical("box");
     GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
 
-    useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
-    proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
+    // useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
+    // proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
     apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
     selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
@@ -162,6 +162,25 @@ Never assume a method or function exists";
         GUILayout.Label("Please select a base object before generating a script.", EditorStyles.helpBox);
     }
 
+    GUILayout.EndVertical();
+
+    // Bouton PushObject
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("Push EXISTING script to same name GO", EditorStyles.boldLabel);
+
+    if (selectedObject != null)
+    {
+        if (GUILayout.Button("Push", GUILayout.Height(40)))
+        {
+            selectedObject.Push();
+            Debug.Log(selectedObject.Name + "was created");
+        }
+    }
+    else
+    {
+        GUILayout.Label("Please select a base object and generate it's script before pushing", EditorStyles.helpBox);
+    }
+
     GUILayout.EndVertical(); 
 }
 
@@ -174,7 +193,7 @@ Never assume a method or function exists";
     private void SubmitText()
     {
         // Actuellement le seul abonné est l'instance de UMLDiag de main.
-        OnSubmitText?.Invoke(userInput); 
+        OnSubmitText?.Invoke("Make a UML for the system :" +userInput); 
     }
 
     private void InitializeGPTInformation()

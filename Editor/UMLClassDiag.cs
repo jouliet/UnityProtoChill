@@ -38,6 +38,7 @@ public class BaseObject
     // On constitue la liste localement
     public BaseObject(){
         ObjectResearch.AllBaseObjects.Add(this);
+        
     }
 
 
@@ -47,25 +48,32 @@ public class BaseObject
     public List<BaseObject> ComposedClasses { get; set; } = new List<BaseObject>();
     public BaseObject ParentClass { get; set; }
 
+    private FastUnityPusher _fastUnityPusher = new FastUnityPusher();
+
+    // Appelé par UMLDiag ligne 110
     public void GenerateScript(GPTGenerator gptGenerator){
 
         
         GenerateScriptbis(gptGenerator);
-        // Des trucs s'exécutent en parallèle voir le moment ou oui arrive (bien plus tôt que les debug di generate bis)
+        // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
         Debug.Log("oui");
     }
     
+    public void Push(){
+        // C'est sale mais ça marche
+        _fastUnityPusher.CreateGameObjectAtZerosFromBaseObject(this);
+    }
     
     
     
-    
-    
+    // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
     private void GenerateScriptbis(GPTGenerator gptGenerator)
     {
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
-        "Tu es dans Unity. Tu dois écrire la classe" + this.Name + "en c# selon ses composants comme décrit ici: " + this.ToString();
+        "You are in Unity, write this c# class :" + this.Name + "as described in this json : " + this.ToString() + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
+Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO";
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -145,7 +153,7 @@ public class BaseObject
     }
 }
 
-
+// Mapper auquel on accède seulement avec le namespace UMLClassDiag pr le moment mais à quoi bon vaudrait très probablement mieux le staticifier dans son coin comme pr le parser
 public class JSONMapper
 {
     public static BaseObject MapPreciseBaseObject(Dictionary<string, object> jsonDict, string className){

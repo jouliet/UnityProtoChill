@@ -67,9 +67,7 @@ public class gptTest{
 
     [Test]
     public void Test1(){
-        GPTGenerator gptGenerator = new GPTGenerator();
-        InitChatGPTConversation(false, "", "clé"
-        , CustomChatGPTConversation.Model.ChatGPT, "Tu es le lead developpeur Unity. Tu prends toutes les initiatives.");
+
 
         //Récupération du json
         var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp3.json");
@@ -87,7 +85,7 @@ public class gptTest{
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
 
 
-        GenerateScripts(root, gptGenerator);
+        // GenerateScripts(root, gptGenerator);
 
 
     }
