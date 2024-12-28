@@ -99,7 +99,7 @@ public class UMLDiag : GenerativeProcess
 
             //Mapping vers structure objet maison
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-            UMLDiagView.ShowDiagram(root);
+            UMLDiagramWindow.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
         });
     }

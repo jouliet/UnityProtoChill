@@ -109,7 +109,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
         {
             ObjectResearch.AllBaseObjects.Clear();
             Debug.Log("Text submitted: " + userInput);
-            UMLDiagView.ShowDiagram(selectedObject);
+            UMLDiagramWindow.ShowDiagram(selectedObject);
         }
     }
     GUILayout.EndHorizontal();
@@ -208,7 +208,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
         string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonBaseObject.json");
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        //UMLDiagView.ShowDiagram(root);
+        //UMLDiagramWindow.ShowDiagram(root);
     }
 
 }

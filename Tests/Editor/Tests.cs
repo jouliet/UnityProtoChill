@@ -175,7 +175,7 @@ public class UMLViewTest
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagView.ShowDiagram(root);
+        UMLDiagramWindow.ShowDiagram(root);
     }
 
     [Test]
@@ -190,7 +190,7 @@ public class UMLViewTest
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagView.ShowDiagram(root);
+        UMLDiagramWindow.ShowDiagram(root);
     }
 
     [Test]
@@ -205,7 +205,7 @@ public class UMLViewTest
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagView.ShowDiagram(root);
+        UMLDiagramWindow.ShowDiagram(root);
     }
 }
 

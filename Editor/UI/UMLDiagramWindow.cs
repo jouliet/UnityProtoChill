@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace UMLClassDiag
 {
-    public class UMLDiagView : EditorWindow
+    public class UMLDiagramWindow : EditorWindow
     {
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
@@ -20,7 +20,7 @@ namespace UMLClassDiag
 
         public static void ShowDiagram(BaseObject root)
         {
-            var window = GetWindow<UMLDiagView>("UML Diagram");
+            var window = GetWindow<UMLDiagramWindow>("UML Diagram");
             window.rootObject = root;
             window.Repaint();
             window.Refresh();
@@ -29,8 +29,8 @@ namespace UMLClassDiag
         private void OnEnable()
         {
             // Load Stylesheet
-            umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UMLDiagram.uxml");
-            umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UMLDiagram.uss");
+            umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
+            umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
 
             // Hand-tool navigation set up
             canvas = new VisualElement();
