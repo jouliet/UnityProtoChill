@@ -26,7 +26,7 @@ namespace UMLClassDiag
             window.Refresh();
         }
 
-        private void OnEnable()
+        public VisualElement CreateDiagramView()
         {
             // Load Stylesheet
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
@@ -51,6 +51,7 @@ namespace UMLClassDiag
                 DrawNode(rootObject, canvasWidth / 2, 0f);
             }
 
+            return canvas;
         }
 
         //
