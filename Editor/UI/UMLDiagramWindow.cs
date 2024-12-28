@@ -26,6 +26,15 @@ namespace UMLClassDiag
             window.Refresh();
         }
 
+        public void ReloadDiagram(BaseObject root)
+        {
+            if (root != null)
+            {
+                this.rootObject = root;
+                DrawNode(rootObject, canvasWidth / 2, 0f);
+            }
+        }
+
         public VisualElement CreateDiagramView()
         {
             // Load Stylesheet

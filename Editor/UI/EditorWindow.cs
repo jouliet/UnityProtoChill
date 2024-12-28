@@ -203,12 +203,4 @@ Never assume a method, class or function exists without explicitly seeing it in 
         OnInitializeGPTInformation?.Invoke(useProxy, proxyUri, apiKey, selectedModel, initialPrompt);
     }
 
-    private void BaseUMLGenerationTest()
-    {
-        string jsonString = File.ReadAllText(@"C:\Users\User\UnityProtoChill\Tests\JsonBaseObject.json");
-        Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        //UMLDiagramWindow.ShowDiagram(root);
-    }
-
 }
