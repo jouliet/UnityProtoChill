@@ -1,0 +1,63 @@
+{
+  "gameObjects": [
+    {
+      "name": "Player",
+      "tag": "Player",
+      "layer": "Default",
+      "components": [
+        {
+          "type": "Transform",
+          "properties": {
+            "position": "Vector3(0, 0, 0)",
+            "rotation": "Quaternion.identity",
+            "scale": "Vector3(1, 1, 1)"
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "properties": {
+            "useGravity": "false",
+            "isKinematic": "true"
+          }
+        },
+        {
+          "type": "Player",
+          "properties": {
+            "Speed": "5.0",
+            "FireRate": "0.5",
+            "BulletPrefab": "Bullet"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bullet",
+      "tag": "Bullet",
+      "layer": "Default",
+      "components": [
+        {
+          "type": "Transform",
+          "properties": {
+            "position": "Vector3(0, 0, 0)",
+            "rotation": "Quaternion.identity",
+            "scale": "Vector3(0.1, 0.1, 0.1)"
+          }
+        },
+        {
+          "type": "Rigidbody",
+          "properties": {
+            "useGravity": "false",
+            "isKinematic": "true"
+          }
+        },
+        {
+          "type": "Bullet",
+          "properties": {
+            "Speed": "10.0",
+            "Direction": "Vector2(0, 1)"
+          }
+        }
+      ]
+    }
+  ]
+}

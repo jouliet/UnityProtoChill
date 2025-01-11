@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using static JsonParser;
 using ChatGPTWrapper;
+using UnityPusher;
 
 public class DataStructureTests
 {
@@ -206,6 +207,23 @@ public class UMLViewTest
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
         BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
         UMLDiagramWindow.ShowDiagram(root);
+    }
+}
+public class GameObjectCreatorTest{
+    [Test]
+    public void gameObjectCreation(){
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/gameObjects_model1.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        Debug.Log("here is the json file:");
+        Debug.Log(jsonString);
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+
+        GameObjectCreator.MapEveryGameObjects(parsedObject);
     }
 }
 

@@ -8,23 +8,40 @@ using UMLClassDiag;
 public static class JsonParser
 {
     public static List<BaseObject> baseObjects = new List<BaseObject>();
+
     public static object Parse(string json)
     {
         json = json.Trim();
 
-        if (json.StartsWith("Generated UML JSON:")){
-            json = json.Substring("Generated UML JSON:".Length).Trim();
+        // Supprimer les lignes avant celle qui commence par ```
+        while (!json.StartsWith("```")){
+            if (json.StartsWith("{"))
+            {
+                break;
             }
+
+            // Trouver l'index de la première occurrence d'un retour à la ligne
+            int newlineIndex = json.IndexOf('\n');
+            
+            // Si aucun retour à la ligne n'est trouvé, on quitte (sinon boucle infinie)
+            if (newlineIndex == -1)
+            {
+                break;
+            }
+
+            // Supprimer la première ligne en tronquant la chaîne après le retour à la ligne
+            json = json.Substring(newlineIndex + 1);
+        }
         if (json.StartsWith("```")) {
             string[] lignes = json.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
             json = string.Join("\n", lignes, 1, lignes.Length - 1);
-            }
-            string jsonMarker = "```json";
+        }
+        string jsonMarker = "```json";
 
 
 
-            //Detecter le marker pour complètement ignorer les comms random
+        //Detecter le marker pour complètement ignorer les comms random
         int jsonStartIndex = json.IndexOf(jsonMarker);
         if (jsonStartIndex != -1)
         {
