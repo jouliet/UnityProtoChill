@@ -36,13 +36,15 @@ Never assume a method, class or function exists without explicitly seeing it in 
 
     private Vector2 scrollPosition; 
     private Vector2 topScrollPosition;
+    private Vector2 globalScrollPosition;
     private void OnGUI()
 {   
-  
+    // Ajout d'un conteneur ScrollView global
+    globalScrollPosition = GUILayout.BeginScrollView(globalScrollPosition);
 
-  if (ObjectResearch.AllBaseObjects.Count == 0){
-    LoadUML();
-  }
+    if (ObjectResearch.AllBaseObjects.Count == 0){
+        LoadUML();
+    }
     // Initialisation
     Main.Instance.Init();
 
@@ -182,6 +184,9 @@ Never assume a method, class or function exists without explicitly seeing it in 
     }
 
     GUILayout.EndVertical(); 
+
+    //Fin du conteneur ScrollView global
+    GUILayout.EndScrollView();
 }
 
 
