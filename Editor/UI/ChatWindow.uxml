@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="chat-container">
+        <ui:ScrollView class="chat-messages-container">
+            <!-- Chat messages will be dynamically added here -->
+        </ui:ScrollView>
+        <ui:VisualElement class="chat-input-container">
+            <ui:TextField class="chat-input-field" multiline="true" placeholder-text="Type prompt here..." />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

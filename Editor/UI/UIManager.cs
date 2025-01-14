@@ -58,17 +58,18 @@ public class UIManager : EditorWindow
         // Set up UML Diagram View
         umlContainer = new VisualElement { name = "uml-container" };
         umlContainer.style.flexGrow = 7;
-        umlContainer.style.borderRightWidth = 2;
+        umlContainer.style.borderRightWidth = 3;
         umlContainer.style.borderRightColor = Color.gray;
-        umlContainer.style.paddingRight = 5;
         umlContainer.style.overflow = Overflow.Hidden;
         InitializeUMLView();
         mainContainer.Add(umlContainer);
 
         // Set up Chat View
-        chatContainer = new VisualElement { name = "chat-container" };
+        chatContainer = new VisualElement { name = "chat-window" };
         chatContainer.style.flexGrow = 3;
-        chatContainer.style.paddingLeft = 3;
+        chatContainer.style.flexDirection = FlexDirection.Column;
+        chatContainer.style.maxWidth = new Length(30, LengthUnit.Percent); // Ensures it never grows beyond 30%
+        chatContainer.style.width = new Length(30, LengthUnit.Percent);
         InitializeChatView();
         mainContainer.Add(chatContainer);
 

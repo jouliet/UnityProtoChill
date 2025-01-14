@@ -7,22 +7,19 @@ namespace ChatClass
 
     public class ChatWindow : EditorWindow
     {
+        private VisualTreeAsset chatVisualTree;
+        private StyleSheet chatStyleSheet;
+
         private VisualElement chatCanvas;
-        private TextField chatInputField;
-        private string userInput = "type prompt here...";
 
         public VisualElement CreateChatView()
         {
-            chatCanvas = new VisualElement();
-            chatCanvas.style.position = Position.Absolute;
+            chatVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/ChatWindow.uxml");
+            chatStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/ChatWindow.uss");
+
+            chatCanvas = chatVisualTree.CloneTree();
             chatCanvas.style.flexGrow = 1;
-
-            chatInputField = new TextField();
-            chatInputField.value = userInput;
-            chatInputField.multiline = true;
-            chatInputField.style.flexGrow = 1;
-
-            chatCanvas.Add(chatInputField);
+            chatCanvas.styleSheets.Add(chatStyleSheet);
 
             return chatCanvas;
         }

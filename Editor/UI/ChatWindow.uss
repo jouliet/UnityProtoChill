@@ -1,0 +1,35 @@
+/* ChatWindow.uss */
+
+/* Style for the main chat container */
+.chat-container {
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+/* Style for the chat messages container (ScrollView) */
+.chat-messages-container {
+    flex-grow: 6;
+    background-color: #95928f;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* Style for the input field container */
+.chat-input-container {
+    flex-grow: 4;
+    background-color: #eaac27;
+    padding: 10px;
+    border-top-width: 3px;
+    border-top-color: #ea2727; 
+}
+
+/* Style for the input field */
+.chat-input-field {
+    font-size: 14px;
+    color: white;
+    background-color: #eaac27;
+    flex-wrap: wrap;
+    white-space: normal;
+}
