@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using ChatGPTWrapper;
 using UMLClassDiag;
 using static SaverLoader;
+using UnityPusher;
 
 public class UMLDiag : GenerativeProcess
 {
@@ -25,12 +26,8 @@ public class UMLDiag : GenerativeProcess
         GenerateScript(root);
     }
 
-    
-    private void GenerateUML(string input)
-    {
-
-        input =
-        @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
+    private string umlJsonStructure = 
+    @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
 {
   ""Root"": {
     ""Name"": ""ObjectName"",
@@ -82,7 +79,12 @@ public class UMLDiag : GenerativeProcess
     ""ParentClass"": ""null""
   }
 }
-" + input;
+";
+
+    private void GenerateUML(string input)
+    {
+
+        input = umlJsonStructure + input;
         BaseObject root = null;
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
@@ -101,6 +103,8 @@ public class UMLDiag : GenerativeProcess
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
             UMLDiagramWindow.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
+
+            GenerateGameObjects(jsonString);
         });
     }
 
@@ -109,6 +113,48 @@ public class UMLDiag : GenerativeProcess
     private void GenerateScript(BaseObject root){
         Debug.Log("Script was generated");
         root.GenerateScript(gptGenerator);        
+    }
+
+    private string prefabJsonStructure = 
+    @"You are a Json Writer. You will follow this exact format with every value in between quotes :
+    {
+      ""gameObjects"": [
+        {
+          ""name"": ""string (nom du GameObject)"",
+          ""tag"": ""string (tag du GameObject ou 'Untagged')"",
+          ""layer"": ""string (layer du GameObject ou 'Default')"",
+          ""components"": [
+            {
+              ""type"": ""string (nom du composant, ex: Transform, Rigidbody, Script)"",
+              ""properties"": {
+                ""property1"": ""value1 (clé-valeurs spécifiques au composant)"",
+                ""property2"": ""value2""
+              }
+            }
+          ]
+        }
+      ]
+    }" + "\n";
+
+    private string inputToCreatePrefabs = 
+    "Make a list of the game objects that are needed to execute the scripts presented in the UML below. Remember that the script names must be coherent with the UML scripts. \n";
+    private string generalInputForPrefabs;
+    private void GenerateGameObjects(string jsoninput){
+      generalInputForPrefabs = prefabJsonStructure + inputToCreatePrefabs + jsoninput;
+
+      if (gptGenerator == null){
+          Debug.Log("No instance of gptGenerator");
+          return;
+      }
+      gptGenerator.GenerateFromText(generalInputForPrefabs, (response) =>
+      {
+          string jsonString = response;
+          Debug.Log("Generated Prefabs JSON: \n" + jsonString);
+
+          Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+
+          GameObjectCreator.MapEveryGameObjects(parsedObject);
+      });
     }
 
 }
