@@ -10,7 +10,7 @@
 
 /* Style for the chat messages container (ScrollView) */
 .chat-messages-container {
-    flex-grow: 6;
+    height: 60%;
     background-color: #95928f;
     padding: 10px;
     overflow: hidden;
@@ -18,18 +18,37 @@
 
 /* Style for the input field container */
 .chat-input-container {
-    flex-grow: 4;
-    background-color: #eaac27;
+    height: 40%;
+    background-color: white;
     padding: 10px;
     border-top-width: 3px;
-    border-top-color: #ea2727; 
+    border-top-color: black; 
 }
 
 /* Style for the input field */
-.chat-input-field {
+.chat-input-field > .unity-text-field__input {
     font-size: 14px;
-    color: white;
-    background-color: #eaac27;
+    color: black;
+    background-color: white;
     flex-wrap: wrap;
     white-space: normal;
+    height: 100%;
+    border: none;
+}
+
+.chat-input-field > .unity-base-text-field__input--placeholder {
+    color: gray;
+}
+
+.chat-input-field > .unity-base-text-field__input {
+    -unity-background-image-tint-color: transparent;
+    border-color: transparent;
+    background-color: white;
+}
+
+.chat-input-field > .unity-base-text-field__input:focus {
+    border-color: transparent;
+    border-width: 0;
+    outline-width: 0;
+    -unity-background-image-tint-color: transparent;
 }
