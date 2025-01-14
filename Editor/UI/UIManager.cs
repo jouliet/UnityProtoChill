@@ -3,10 +3,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UMLClassDiag;
 using ChatClass;
-
+using SettingsClass;
+using ChatGPTWrapper;
 using System.IO;
 using System.Collections.Generic;
 using static JsonParser;
+using static SaverLoader;
 
 public class UIManager : EditorWindow
 {
@@ -19,6 +21,7 @@ public class UIManager : EditorWindow
     private UMLDiagramWindow umlDiagramWindow;
 
     private Button testButton;
+    private Button settingsButton;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -44,9 +47,8 @@ public class UIManager : EditorWindow
         settingsContainer.style.flexDirection = FlexDirection.Row;
         settingsContainer.style.alignItems = Align.Center;
 
-        testButton = new Button() { text = "Test" };
-        testButton.clicked += OnTestButtonClick;
-        settingsContainer.Add(testButton);
+        InitializeTestButton();
+        InitializeGPTButton();
 
         rootContainer.Add(settingsContainer);
 
@@ -94,6 +96,20 @@ public class UIManager : EditorWindow
         chatContainer.Add(chatCanvas);
     }
 
+    private void InitializeTestButton()
+    {
+        testButton = new Button() { text = "Test" };
+        testButton.clicked += OnTestButtonClick;
+        settingsContainer.Add(testButton);
+    }
+
+    private void InitializeGPTButton()
+    {
+        settingsButton = new Button() { text = "Settings" };
+        settingsButton.clicked += OnSettingsButtonClick;
+        settingsContainer.Add(settingsButton);
+    }
+
     private void OnTestButtonClick()
     {
         Debug.Log("Custom OnClick Event: Test button clicked!");
@@ -108,5 +124,10 @@ public class UIManager : EditorWindow
         }
     }
 
+    private void OnSettingsButtonClick()
+    {
+        Debug.Log("Custom OnClick Event: Settings button clicked!");
 
+        SettingsWindow.ShowWindow();
+    }
 }
