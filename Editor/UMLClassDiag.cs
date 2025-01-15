@@ -57,7 +57,7 @@ public class BaseObject
         GenerateScriptbis(gptGenerator);
         // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
-        Debug.Log("oui");
+        //Debug.Log("oui");
     }
     
     public void Push(){

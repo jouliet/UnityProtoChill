@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityPusher;
 
 public class Main
 {
@@ -27,6 +28,7 @@ public class Main
     private Main()
     {
         UMLDiag umlDiag = new UMLDiag();
+        GameObjectCreator gameObjectCreator = new GameObjectCreator();
         // GameObject fastUnityPusher = new GameObject("unityPusher");
         // FastUnityPusher pusherComponent = fastUnityPusher.AddComponent<FastUnityPusher>();
     }

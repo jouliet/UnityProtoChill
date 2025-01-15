@@ -223,7 +223,7 @@ public class GameObjectCreatorTest{
         Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
 
-        GameObjectCreator.MapEveryGameObjects(parsedObject);
+        GameObjectCreator.CreateEveryGameObjects(parsedObject);
     }
 }
 

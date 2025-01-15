@@ -11,22 +11,34 @@ public abstract class GenerativeProcess
 
     //l'intance de GPTGenerator est gérée à ce niveau
 
-    public GPTGenerator gptGenerator;
-    public abstract void OnSubmit(string input);
-    public abstract void OnGenerateScript(BaseObject root);
+    public static GPTGenerator gptGenerator;
+    protected static string jsonScripts;
+    protected static string jsonGOs;
+    public static void SetJsonScripts(string json){
+        jsonScripts = json;
+    }
+
+    public static void SetJsonGOs(string json){
+        jsonGOs = json;
+    }
+    //public abstract void OnSubmit(string input);
+    //public abstract void OnGenerateScript(BaseObject root);
 
     // Generative process est abonné à l'editor window
     public GenerativeProcess()
     {
-        gptGenerator = new GPTGenerator();
-        MyEditorWindow.OnSubmitText += OnSubmit;
-        MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        if (gptGenerator == null)
+        {
+            gptGenerator = new GPTGenerator();
+        }
+        //MyEditorWindow.OnSubmitText += OnSubmit;
+        //MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
     }  
     // Abstract cleanup
     ~GenerativeProcess()
     {
-        MyEditorWindow.OnSubmitText -= OnSubmit;
-        MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
+        //MyEditorWindow.OnSubmitText -= OnSubmit;
+        //MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
     }
 
 

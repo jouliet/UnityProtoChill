@@ -12,16 +12,23 @@ public class UMLDiag : GenerativeProcess
     public UMLDiag()
     {
         // UML est abonné si tout se passe bien
+        MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        MyEditorWindow.OnSubmitText += OnSubmit;
         Debug.Log("UMLDiag process initialized.");
     }
+    ~UMLDiag()
+    {
+        MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
+        MyEditorWindow.OnSubmitText -= OnSubmit;
+    }
 
-    public override void OnSubmit(string input)
+    public void OnSubmit(string input)
     {
         Debug.Log("Submit received in UMLDiag. Generating UML...");
         GenerateUML(input);
     }
 
-    public override void OnGenerateScript(BaseObject root){
+    public void OnGenerateScript(BaseObject root){
         Debug.Log("generating script for" + root.ToString() + "...");
         GenerateScript(root);
     }
@@ -92,19 +99,19 @@ public class UMLDiag : GenerativeProcess
         }
         gptGenerator.GenerateFromText(input, (response) =>
         {
-            string jsonString = response;
-            SaveUML(jsonString);
-            Debug.Log("Generated UML JSON: " + jsonString);
+            jsonScripts = response;
+            SaveUML(jsonScripts);
+            Debug.Log("Generated UML JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
 
             //Mapping vers structure objet maison
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
             UMLDiagramWindow.ShowDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
 
-            GenerateGameObjects(jsonString);
+            //GenerateGameObjects(jsonString);
         });
     }
 
@@ -150,10 +157,12 @@ public class UMLDiag : GenerativeProcess
       {
           string jsonString = response;
           Debug.Log("Generated Prefabs JSON: \n" + jsonString);
+          GameObjectCreator.JsonToDictionary(jsonString);
 
-          Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
 
-          GameObjectCreator.MapEveryGameObjects(parsedObject);
+          // Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+
+          // GameObjectCreator.CreateEveryGameObjects(parsedObject);
       });
     }
 
