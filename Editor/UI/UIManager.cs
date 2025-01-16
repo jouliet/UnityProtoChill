@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 using UMLClassDiag;
 using ChatClass;
 using SettingsClass;
-using ChatGPTWrapper;
 using System.IO;
 using System.Collections.Generic;
 using static JsonParser;
@@ -70,7 +69,7 @@ public class UIManager : EditorWindow
         chatContainer = new VisualElement { name = "chat-window" };
         chatContainer.style.flexGrow = 3;
         chatContainer.style.flexDirection = FlexDirection.Column;
-        chatContainer.style.maxWidth = new Length(30, LengthUnit.Percent); // Ensures it never grows beyond 30%
+        chatContainer.style.maxWidth = new Length(30, LengthUnit.Percent);
         chatContainer.style.width = new Length(30, LengthUnit.Percent);
         InitializeChatView();
         mainContainer.Add(chatContainer);

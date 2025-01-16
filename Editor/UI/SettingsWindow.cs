@@ -8,11 +8,6 @@ namespace SettingsClass
 
     public class SettingsWindow : EditorWindow
     {
-        private VisualTreeAsset settingsVisualTree;
-        private StyleSheet settingsStyleSheet;
-
-        private VisualElement settingsCanvas;
-
         public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string> OnInitializeGPTInformation;
         private bool useProxy;
         private string proxyUri = "";
