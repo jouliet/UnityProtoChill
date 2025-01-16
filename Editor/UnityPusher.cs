@@ -182,6 +182,7 @@ public class GameObjectCreator : GenerativeProcess{
         }
         // Sauvegarder le GameObject en tant que prefab
         PrefabUtility.SaveAsPrefabAsset(go, prefabPath + "/" + _name + ".prefab");
+
     }
 
     public static void AddComponentsToGO(List<object> components, GameObject go){
@@ -196,6 +197,7 @@ public class GameObjectCreator : GenerativeProcess{
                 if (type == "Script"){
                     if  (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict){
                        if (propertiesDict.ContainsKey("Name") && propertiesDict["Name"] is string name){
+                            type = name;
                             componentType = Type.GetType($"UnityEngine.{name}, UnityEngine") ?? Type.GetType($"{name}, Assembly-CSharp");
                        }
                     }

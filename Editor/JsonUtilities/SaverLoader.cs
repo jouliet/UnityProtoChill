@@ -25,11 +25,10 @@ public static class SaverLoader
             }
 
             File.WriteAllText(UMLFilePath, input);
-            Console.WriteLine("UML saved successfully to " + UMLFilePath);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error saving UML: " + ex.Message);
+            Debug.LogError("Error saving UML: " + ex.Message);
         }
     }
 
@@ -44,11 +43,10 @@ public static class SaverLoader
             }
 
             File.WriteAllText(GOJsonFilePath, input);
-            Console.WriteLine("UML saved successfully to " + GOJsonFilePath);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error saving UML: " + ex.Message);
+            Debug.LogError("Error saving UML: " + ex.Message);
         }
     }
 
@@ -59,7 +57,6 @@ public static class SaverLoader
             
             if (!File.Exists(UMLFilePath))
             {
-                Console.WriteLine("UML file not found at " + UMLFilePath);
                 return;
             }
             
@@ -68,12 +65,10 @@ public static class SaverLoader
             GenerativeProcess.SetJsonScripts(jsonString);
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
             var root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-            Console.WriteLine("UML loaded");
         }
         catch (Exception ex)
         {
             Debug.LogError("Error loading UML: " + ex.Message);
-            Console.WriteLine("Error loading UML: " + ex.Message);
         }
     }
 
@@ -84,8 +79,7 @@ public static class SaverLoader
             
             if (!File.Exists(GOJsonFilePath))
             {
-                Console.WriteLine("UML file not found at " + GOJsonFilePath);
-                Debug.LogError("UML file not found at " + GOJsonFilePath);
+                //Debug.Log("There is no GOJsonfile to load at this path:  " + GOJsonFilePath);
                 return;
             }
             
@@ -94,15 +88,27 @@ public static class SaverLoader
             GenerativeProcess.SetJsonGOs(jsonString);
             GameObjectCreator.JsonToDictionary(jsonString);
             GameObjectCreator.StockEveryGOsInList();
-            Console.WriteLine("UML loaded");
             Debug.Log("GOJson Loaded");
-            //
         }
         catch (Exception ex)
         {
             Debug.LogError("Error loading GOJson: " + ex.Message);
-
-            Console.WriteLine("Error loading UML: " + ex.Message);
         }
+    }
+
+    public static void RemoveJsonFiles(){
+        try{
+            if (File.Exists(GOJsonFilePath))
+            {
+                File.Delete(GOJsonFilePath);
+            }
+
+            if (File.Exists(UMLFilePath))
+            {
+                File.Delete(UMLFilePath);
+            }
+        }catch(Exception ex){
+            Debug.Log("Failed to delete json files: " + ex);
+        }       
     }
 }

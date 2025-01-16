@@ -7,6 +7,7 @@ using System.IO;
 using static JsonParser;
 using static SaverLoader;
 using UnityPusher;
+using System;
 
 public class MyEditorWindow : EditorWindow
 {
@@ -67,6 +68,17 @@ Never assume a method, class or function exists without explicitly seeing it in 
     // useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
     // proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
     apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
+    if (apiKey == ""){
+        apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Debug.LogWarning("Variable d'environnement OPENAI_API_KEY introuvable ou vide.");
+        }
+        else
+        {
+            Debug.Log($"Variable d'environnement trouvée : {apiKey}");
+        }
+    }
     selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
     GUILayout.Label("Initial Prompt", EditorStyles.label);
@@ -84,7 +96,6 @@ Never assume a method, class or function exists without explicitly seeing it in 
     }
     GUILayout.EndVertical();
 
-    GUILayout.Space(20);
 
     // SECTION DESCRIPTION
     GUILayout.BeginVertical("box");
@@ -101,7 +112,9 @@ Never assume a method, class or function exists without explicitly seeing it in 
     GUILayout.BeginHorizontal();
     if (GUILayout.Button("Submit", GUILayout.Height(40)))
     {
+        RemoveJsonFiles();
         SubmitText();
+        AssetDatabase.Refresh();
         Debug.Log("Text submitted: " + userInput);
     }
     GUILayout.EndHorizontal();
@@ -187,7 +200,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
     GUILayout.BeginVertical("box");
     GUILayout.Label("GameObject Selector", EditorStyles.boldLabel);
 
-    if (GameObjectCreator.GameObjectNameList.Count > 0)
+    if (GameObjectCreator.GameObjectNameList != null && GameObjectCreator.GameObjectNameList.Count > 0)
     {
         string[] options = new string[GameObjectCreator.GameObjectNameList.Count];
         for (int i = 0; i < GameObjectCreator.GameObjectNameList.Count; i++)
