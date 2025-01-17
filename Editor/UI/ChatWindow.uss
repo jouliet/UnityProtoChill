@@ -12,8 +12,34 @@
 .chat-messages-container {
     height: 60%;
     background-color: #95928f;
-    padding: 10px;
-    overflow: hidden;
+    padding: 5px;
+    overflow: scroll;
+    flex-direction: column;
+    align-content: flex-end;
+}
+
+/* Style for the chat user bubbles */
+.chat-user-bubble {
+    background-color: #b294b2;
+    border-radius: 8px;
+    margin: 10px 5px 10px 50px;
+}
+
+.chat-user-text > .unity-text-field__input {
+    font-size: 12px;
+    color: black;
+    padding: 5px;
+    white-space: normal;
+}
+
+.chat-user-text > .unity-base-text-field__input {
+    -unity-background-image-tint-color: transparent;
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.chat-user-text > .unity-base-text-field__input:focus {
+    border-color: transparent;
 }
 
 /* Style for the input field container */
@@ -39,7 +65,6 @@
     white-space: normal;
     height: 100%;
     overflow: scroll;
-    white-space: normal;
 }
 
 .chat-input-field > .unity-base-text-field__input--placeholder {
@@ -54,8 +79,6 @@
 
 .chat-input-field > .unity-base-text-field__input:focus {
     border-color: transparent;
-    border-width: 0;
-    -unity-background-image-tint-color: transparent;
 }
 
 .unity-base-text-field__input > .unity-scroller {
