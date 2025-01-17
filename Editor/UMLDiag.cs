@@ -9,9 +9,18 @@ using UnityPusher;
 
 public class UMLDiag : GenerativeProcess
 {
+    private UMLDiagramWindow umlDiagramWindow;
+
     public UMLDiag()
     {
         // UML est abonné si tout se passe bien
+        Debug.Log("UMLDiag process initialized.");
+    }
+
+    public UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
+    {
+        // UML est abonné si tout se passe bien
+        umlDiagramWindow = umlDiagramWindowInstance;
         Debug.Log("UMLDiag process initialized.");
     }
 
@@ -101,10 +110,15 @@ public class UMLDiag : GenerativeProcess
 
             //Mapping vers structure objet maison
             root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-            UMLDiagramWindow.ShowDiagram(root);
+            if (umlDiagramWindow == null)
+            {
+                Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+                return;
+            }
+            umlDiagramWindow.ReloadDiagram(root);
             //Debug.Log("JSONMApper : " + root.ToString());
 
-            GenerateGameObjects(jsonString);
+            //GenerateGameObjects(jsonString);
         });
     }
 

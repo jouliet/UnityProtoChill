@@ -2,6 +2,8 @@ using UnityEditor;
 using UnityEngine;
 using ChatGPTWrapper;
 using UMLClassDiag;
+using ChatClass;
+
 public abstract class GenerativeProcess
 {
     // Une classe qui hérite de generative process doit définir OnSubmit qui est le comportement de l'event
@@ -19,13 +21,13 @@ public abstract class GenerativeProcess
     public GenerativeProcess()
     {
         gptGenerator = new GPTGenerator();
-        MyEditorWindow.OnSubmitText += OnSubmit;
+        ChatWindow.OnSubmitText += OnSubmit;
         MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
     }  
     // Abstract cleanup
     ~GenerativeProcess()
     {
-        MyEditorWindow.OnSubmitText -= OnSubmit;
+        ChatWindow.OnSubmitText -= OnSubmit;
         MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
     }
 

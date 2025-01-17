@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UMLClassDiag;
 
 public class Main
 {
@@ -21,12 +22,18 @@ public class Main
 
     public void Init(){
         // La méthode ne fait rien mais permet d'instancier main pour la première fois depuis EditorWindow
+        UMLDiag umlDiag = new UMLDiag();
+    }
+
+    public void Init(UMLDiagramWindow umlDiagramWindow)
+    {
+        // La méthode ne fait rien mais permet d'instancier main pour la première fois depuis EditorWindow
+        UMLDiag umlDiag = new UMLDiag(umlDiagramWindow);
     }
 
     // Constructeur privé pour empêcher la création d'instances externes
     private Main()
     {
-        UMLDiag umlDiag = new UMLDiag();
         // GameObject fastUnityPusher = new GameObject("unityPusher");
         // FastUnityPusher pusherComponent = fastUnityPusher.AddComponent<FastUnityPusher>();
     }

@@ -28,7 +28,12 @@ namespace UMLClassDiag
 
         public void ReloadDiagram(BaseObject root)
         {
-            if (root != null)
+            canvas.Clear();
+            if (root == null)
+            {
+                Debug.LogError("Root object is null in Reaload Diagram.");
+            }
+            else
             {
                 this.rootObject = root;
                 DrawNode(rootObject, canvasWidth / 2, 0f);

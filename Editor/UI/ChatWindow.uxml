@@ -5,8 +5,8 @@
             <!-- Chat messages will be dynamically added here -->
         </ui:ScrollView>
         <ui:VisualElement class="chat-input-container">
-            <ui:TextField class="chat-input-field" multiline="true" placeholder-text="Type prompt here..." vertical-scroller-visibility="auto"/>
-            <ui:Button class="chat-submit-button" text="Submit" />
+            <ui:TextField  name="chat-input-field" class="chat-input-field" multiline="true" placeholder-text="Type prompt here..." vertical-scroller-visibility="auto"/>
+            <ui:Button  name="chat-submit-button" class="chat-submit-button" text="Submit" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -31,6 +31,7 @@ public class UIManager : EditorWindow
     private void OnEnable()
     {
         CreateLayout();
+        Main.Instance.Init(umlDiagramWindow);
     }
 
     private void CreateLayout()

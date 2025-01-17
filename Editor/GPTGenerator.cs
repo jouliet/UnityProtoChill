@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using System;
+using SettingsClass;
 
 namespace ChatGPTWrapper
 {
@@ -23,12 +24,12 @@ namespace ChatGPTWrapper
     }
         public GPTGenerator()
         {
-            MyEditorWindow.OnInitializeGPTInformation += InitChatGPTConversation;
+            SettingsWindow.OnInitializeGPTInformation += InitChatGPTConversation;
         }
 
         ~GPTGenerator()
         {
-            MyEditorWindow.OnInitializeGPTInformation -= InitChatGPTConversation;
+            SettingsWindow.OnInitializeGPTInformation -= InitChatGPTConversation;
         }
         private CustomChatGPTConversation _chatGPTConversation;
 
