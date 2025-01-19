@@ -25,11 +25,13 @@ namespace ChatGPTWrapper
         public GPTGenerator()
         {
             SettingsWindow.OnInitializeGPTInformation += InitChatGPTConversation;
+            MyEditorWindow.OnInitializeGPTInformation += InitChatGPTConversation;
         }
 
         ~GPTGenerator()
         {
             SettingsWindow.OnInitializeGPTInformation -= InitChatGPTConversation;
+            MyEditorWindow.OnInitializeGPTInformation -= InitChatGPTConversation;
         }
         private CustomChatGPTConversation _chatGPTConversation;
 
