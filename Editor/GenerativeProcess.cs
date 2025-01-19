@@ -3,7 +3,6 @@ using UnityEngine;
 using ChatGPTWrapper;
 using UMLClassDiag;
 using ChatClass;
-using static MyEditorWindow;
 
 public abstract class GenerativeProcess
 {
@@ -38,9 +37,7 @@ public abstract class GenerativeProcess
         //MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
         gptGenerator = new GPTGenerator();
         ChatWindow.OnSubmitText += OnSubmit;
-        MyEditorWindow.OnSubmitText += OnSubmit;
         UIManager.OnGenerateScriptEvent += OnGenerateScript;
-        MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
     }  
     // Abstract cleanup
     ~GenerativeProcess()
@@ -48,9 +45,7 @@ public abstract class GenerativeProcess
         //MyEditorWindow.OnSubmitText -= OnSubmit;
         //MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
         ChatWindow.OnSubmitText -= OnSubmit;
-        MyEditorWindow.OnSubmitText -= OnSubmit;
         UIManager.OnGenerateScriptEvent -= OnGenerateScript;
-        MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
     }
 
 
