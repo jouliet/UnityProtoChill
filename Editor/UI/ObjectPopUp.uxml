@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <ui:ScrollView name="base-object-list" class="base-object-list" vertical-scroller-visibility="auto">
+        <!-- Base objects will be dynamically added here -->
+    </ui:ScrollView>
+</ui:UXML>

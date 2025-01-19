@@ -22,13 +22,13 @@ public abstract class GenerativeProcess
     {
         gptGenerator = new GPTGenerator();
         ChatWindow.OnSubmitText += OnSubmit;
-        MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        UIManager.OnGenerateScriptEvent += OnGenerateScript;
     }  
     // Abstract cleanup
     ~GenerativeProcess()
     {
         ChatWindow.OnSubmitText -= OnSubmit;
-        MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
+        UIManager.OnGenerateScriptEvent -= OnGenerateScript;
     }
 
 

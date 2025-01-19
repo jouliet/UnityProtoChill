@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using PopupWindow = UnityEditor.PopupWindow;
 using UMLClassDiag;
 using ChatClass;
 using SettingsClass;
@@ -18,9 +19,14 @@ public class UIManager : EditorWindow
 
     private ChatWindow chatWindow;
     private UMLDiagramWindow umlDiagramWindow;
+    private ObjectPopUp objectPopUp;
 
     private Button testButton;
     private Button settingsButton;
+    private Button objectSelectorButton;
+    private Button generateButton;
+
+    public static event System.Action<BaseObject> OnGenerateScriptEvent;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -49,6 +55,8 @@ public class UIManager : EditorWindow
 
         InitializeTestButton();
         InitializeGPTButton();
+        InitializeGenerateScriptPopUp();
+        InitializeGenerateScriptButton();
 
         rootContainer.Add(settingsContainer);
 
@@ -96,6 +104,10 @@ public class UIManager : EditorWindow
         chatContainer.Add(chatCanvas);
     }
 
+    //
+    // Options Initialization
+    //
+
     private void InitializeTestButton()
     {
         testButton = new Button() { text = "Test" };
@@ -109,6 +121,25 @@ public class UIManager : EditorWindow
         settingsButton.clicked += OnSettingsButtonClick;
         settingsContainer.Add(settingsButton);
     }
+
+    private void InitializeGenerateScriptPopUp()
+    {
+        objectSelectorButton = new Button() { text = "Object Selector" };
+        objectPopUp = new ObjectPopUp();
+        objectSelectorButton.clicked += () => PopupWindow.Show(objectSelectorButton.worldBound, objectPopUp);
+        settingsContainer.Add(objectSelectorButton);
+    }
+
+    private void InitializeGenerateScriptButton()
+    {
+        generateButton = new Button() { text = "Generate Script" };
+        generateButton.clicked += OnGenerateScriptButtonClick;
+        settingsContainer.Add(generateButton);
+    }
+
+    //
+    // On Click Events
+    //
 
     private void OnTestButtonClick()
     {
@@ -130,4 +161,118 @@ public class UIManager : EditorWindow
 
         SettingsWindow.ShowWindow();
     }
+
+    private void OnGenerateScriptButtonClick()
+    {
+        List<BaseObject> objects = objectPopUp.GetSelectedObjects();
+        if (objects.Count > 0)
+        {
+            foreach(var baseObject in objects)
+            {
+                OnGenerateScriptEvent?.Invoke(baseObject);
+            }
+        }
+        else
+        {
+            Debug.Log("selected objects is empty");
+        }
+
+    }
 }
+
+public class ObjectPopUp : PopupWindowContent
+{
+    private ScrollView scrollView;
+    private List<BaseObject> selectedObjects = new List<BaseObject>();
+    private bool allSelected = false;
+
+    public override void OnOpen()
+    {
+        Debug.Log("Popup opened: " + this);
+    }
+
+    public override VisualElement CreateGUI()
+    {
+        var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/ObjectPopUp.uxml");
+        var root = visualTreeAsset.CloneTree();
+        scrollView = root.Q<ScrollView>("base-object-list");
+        UpdateBaseObjectList();
+        return root;
+    }
+
+    public override void OnClose()
+    {
+        Debug.Log("Popup closed: " + this);
+    }
+
+    public void UpdateBaseObjectList()
+    {
+        scrollView.Clear();
+        selectedObjects.Clear();
+
+        if (ObjectResearch.AllBaseObjects.Count > 0)
+        {
+            foreach (var baseObject in ObjectResearch.AllBaseObjects)
+            {
+                var toggle = new Toggle(baseObject.Name)
+                {
+                    value = false
+                };
+
+                toggle.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.newValue)
+                    {
+                        if (!selectedObjects.Contains(baseObject))
+                        {
+                            selectedObjects.Add(baseObject);
+                            Debug.Log($"{baseObject.Name} added to selection.");
+                        }
+                    }
+                    else
+                    {
+                        if (selectedObjects.Contains(baseObject))
+                        {
+                            selectedObjects.Remove(baseObject);
+                            Debug.Log($"{baseObject.Name} removed from selection.");
+                        }
+                    }
+                });
+                scrollView.Add(toggle);
+            }
+
+            var allToggle = new Toggle("All");
+            allToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    allSelected = true;
+                }
+                else
+                {
+                    allSelected = false;
+                }
+            });
+            scrollView.Add(allToggle);
+        }
+        else
+        {
+            var emptyList = new Label("No base objects available");
+            scrollView.Add(emptyList);
+        }
+    }
+
+    public List<BaseObject> GetSelectedObjects()
+    {
+        if (allSelected)
+        {
+            return ObjectResearch.AllBaseObjects;
+        }
+        else
+        {
+            return selectedObjects;
+        }
+    }
+}
+
+//A Player that may move with arrows and shoot bullets with space bar
