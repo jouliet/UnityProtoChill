@@ -6,17 +6,24 @@ using System.Collections.Generic;
 using System.IO;
 using static JsonParser;
 using static SaverLoader;
+using UnityPusher;
+using System;
 
 public class MyEditorWindow : EditorWindow
 {
     // Submit prompt to GPT Event
     public static event System.Action<string> OnSubmitText;
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
+    public static event System.Action OnGenerateGameObjectListEvent;
+    public static event System.Action<string> OnGenerateGameObjectEvent;
+    //public static event System.Action
     private string userInput = "A Player that may move with arrows and shoot bullets with space bar"; 
 
     private BaseObject selectedObject;
     private BaseObject  rootObject;
     private int selectedObjectIndex = 0; // Indice de l'objet sélectionné
+    private string selectedGameObject = null;
+    private int selectedGameObjectIndex;
     // Init GPT Event
     public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string> OnInitializeGPTInformation;
     private bool useProxy;
@@ -44,6 +51,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
 
     if (ObjectResearch.AllBaseObjects.Count == 0){
         LoadUML();
+        LoadGOJson();
     }
     // Initialisation
     Main.Instance.Init();
@@ -60,6 +68,17 @@ Never assume a method, class or function exists without explicitly seeing it in 
     // useProxy = EditorGUILayout.Toggle("Use Proxy", useProxy);
     // proxyUri = EditorGUILayout.TextField("Proxy URI", proxyUri);
     apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
+    if (apiKey == ""){
+        apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Debug.LogWarning("Variable d'environnement OPENAI_API_KEY introuvable ou vide.");
+        }
+        else
+        {
+            Debug.Log($"Variable d'environnement trouvée : {apiKey}");
+        }
+    }
     selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
     GUILayout.Label("Initial Prompt", EditorStyles.label);
@@ -77,7 +96,6 @@ Never assume a method, class or function exists without explicitly seeing it in 
     }
     GUILayout.EndVertical();
 
-    GUILayout.Space(20);
 
     // SECTION DESCRIPTION
     GUILayout.BeginVertical("box");
@@ -94,7 +112,9 @@ Never assume a method, class or function exists without explicitly seeing it in 
     GUILayout.BeginHorizontal();
     if (GUILayout.Button("Submit", GUILayout.Height(40)))
     {
+        RemoveJsonFiles();
         SubmitText();
+        AssetDatabase.Refresh();
         Debug.Log("Text submitted: " + userInput);
     }
     GUILayout.EndHorizontal();
@@ -145,8 +165,6 @@ Never assume a method, class or function exists without explicitly seeing it in 
     }
     GUILayout.EndVertical();
 
-    GUILayout.Space(20);
-
     // Bouton GENERATE SCRIPT
     GUILayout.BeginVertical("box");
     GUILayout.Label("Script Generation", EditorStyles.boldLabel);
@@ -165,25 +183,85 @@ Never assume a method, class or function exists without explicitly seeing it in 
     }
 
     GUILayout.EndVertical();
+    
+    GUILayout.Space(20);
 
-    // Bouton PushObject
+    // //Bouton De génération de la list des GOs
     GUILayout.BeginVertical("box");
-    GUILayout.Label("Push EXISTING script to same name GO", EditorStyles.boldLabel);
-
-    if (selectedObject != null)
+    GUILayout.Label("GameObject List Generation", EditorStyles.boldLabel);
+    if (GUILayout.Button("Generate GO List", GUILayout.Height(40)))
     {
-        if (GUILayout.Button("Push", GUILayout.Height(40)))
+        GenerateGameObjectList();
+        Debug.Log("Generation of GameObjects List");
+    }
+    GUILayout.EndVertical();
+    
+    //Selecteur de gameObjects
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("GameObject Selector", EditorStyles.boldLabel);
+
+    if (GameObjectCreator.GameObjectNameList != null && GameObjectCreator.GameObjectNameList.Count > 0)
+    {
+        string[] options = new string[GameObjectCreator.GameObjectNameList.Count];
+        for (int i = 0; i < GameObjectCreator.GameObjectNameList.Count; i++)
         {
-            selectedObject.Push();
-            Debug.Log(selectedObject.Name + "was created");
+            options[i] = GameObjectCreator.GameObjectNameList[i];
+        }
+
+        selectedGameObjectIndex = EditorGUILayout.Popup("Select GameObject", selectedGameObjectIndex, options);
+
+        // Assurez-vous de ne pas dépasser les limites du tableau
+        if (selectedGameObjectIndex >= 0 && selectedGameObjectIndex < GameObjectCreator.GameObjectNameList.Count)
+        {
+            selectedGameObject = GameObjectCreator.GameObjectNameList[selectedGameObjectIndex];
+            EditorGUILayout.LabelField("Selected Object:", selectedGameObject);
         }
     }
     else
     {
-        GUILayout.Label("Please select a base object and generate it's script before pushing", EditorStyles.helpBox);
+        GUILayout.Label("No GameObjects available.", EditorStyles.helpBox);
+    }
+    GUILayout.EndVertical();
+
+    // Bouton GenerateGameObject
+
+    GUILayout.BeginVertical("box");
+    GUILayout.Label("GameObject Generation", EditorStyles.boldLabel);
+    if (selectedGameObject != null)
+    {
+        if (GUILayout.Button("Generate GameObject", GUILayout.Height(40)))
+        {
+            GenerateGameObject();
+            Debug.Log("GameObject generation triggered for: " + selectedGameObject);
+        }
+    }
+    else
+    {
+        GUILayout.Label("Please select a Game object before generating a script.", EditorStyles.helpBox);
     }
 
-    GUILayout.EndVertical(); 
+    GUILayout.EndVertical();
+
+
+
+    // // Bouton PushObject
+    // GUILayout.BeginVertical("box");
+    // GUILayout.Label("Push EXISTING script to same name GO", EditorStyles.boldLabel);
+
+    // if (selectedObject != null)
+    // {
+    //     if (GUILayout.Button("Push", GUILayout.Height(40)))
+    //     {
+    //         selectedObject.Push();
+    //         Debug.Log(selectedObject.Name + "was created");
+    //     }
+    // }
+    // else
+    // {
+    //     GUILayout.Label("Please select a base object and generate it's script before pushing", EditorStyles.helpBox);
+    // }
+
+    // GUILayout.EndVertical(); 
 
     //Fin du conteneur ScrollView global
     GUILayout.EndScrollView();
@@ -199,6 +277,13 @@ Never assume a method, class or function exists without explicitly seeing it in 
     {
         // Actuellement le seul abonné est l'instance de UMLDiag de main.
         OnSubmitText?.Invoke("Make a UML for the system :" +userInput); 
+    }
+
+    private void GenerateGameObjectList(){
+        OnGenerateGameObjectListEvent?.Invoke();
+    }
+    private void GenerateGameObject(){
+        OnGenerateGameObjectEvent?.Invoke(selectedGameObject);
     }
 
     private void InitializeGPTInformation()

@@ -57,7 +57,7 @@ public class BaseObject
         GenerateScriptbis(gptGenerator);
         // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
-        Debug.Log("oui");
+        //Debug.Log("oui");
     }
     
     public void Push(){
@@ -98,11 +98,9 @@ Never assume a method, class or function exists unless specified in the uml. Rel
             Debug.Log("Dossier créé : " + folderPath);
         }
 
-
         File.WriteAllText(filePath, ExtractCSharpCode(content));
         Debug.Log("Fichier créé : " + filePath);
-
-
+        
         // REFRESH DATABASE ICI
         // Important que ce soit à la fin comme ça !!!! (pour des raisons obscures peut être multithread unity bizarre)
          #if UNITY_EDITOR

@@ -11,6 +11,10 @@ public static class JsonParser
 
     public static object Parse(string json)
     {
+        if (string.IsNullOrEmpty(json)){
+            throw new Exception("Json is null so it can't be parsed.");
+        }
+        
         json = json.Trim();
 
         // Supprimer les lignes avant celle qui commence par ```

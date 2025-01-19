@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityPusher;
 using UMLClassDiag;
 
 public class Main
@@ -34,6 +35,7 @@ public class Main
     // Constructeur privé pour empêcher la création d'instances externes
     private Main()
     {
+        GameObjectCreator gameObjectCreator = new GameObjectCreator();
         // GameObject fastUnityPusher = new GameObject("unityPusher");
         // FastUnityPusher pusherComponent = fastUnityPusher.AddComponent<FastUnityPusher>();
     }
