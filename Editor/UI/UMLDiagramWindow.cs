@@ -182,6 +182,8 @@ namespace UMLClassDiag
             canvas.RegisterCallback<MouseDownEvent>(OnMouseDown);
             canvas.RegisterCallback<MouseMoveEvent>(OnMouseMove);
             canvas.RegisterCallback<MouseUpEvent>(OnMouseUp);
+            canvas.RegisterCallback<WheelEvent>(OnMouseWheel);
+            AddZoomButtons();
         }
 
         private void OnMouseDown(MouseDownEvent evt)
@@ -220,6 +222,89 @@ namespace UMLClassDiag
             }
         }
 
+        //
+        // ZOOM TOOL
+        //
+        private float zoomScale = 1.0f;
+        private const float zoomIncrement = 0.1f;
+        private const float minZoom = 0.5f;
+        private const float maxZoom = 2.0f;
+
+        private void OnMouseWheel(WheelEvent evt)
+        {
+            Vector2 mousePosition = evt.mousePosition;
+            Vector2 localMousePosition = mousePosition - canvas.worldBound.position;
+
+            // Calculate the scale before changing it
+            float oldScale = zoomScale;
+
+            // Adjust zoom scale based on scroll direction
+            if (evt.delta.y < 0)
+            {
+                zoomScale = Mathf.Min(zoomScale + zoomIncrement, maxZoom);
+            }
+            else
+            {
+                zoomScale = Mathf.Max(zoomScale - zoomIncrement, minZoom);
+            }
+
+            // Calculate the scaling factor
+            float scaleFactor = zoomScale / oldScale;
+
+            // Adjust canvas position to keep the zoom centered on the mouse position
+            Vector2 adjustment = localMousePosition * (1 - scaleFactor);
+            canvas.style.left = canvas.resolvedStyle.left + adjustment.x;
+            canvas.style.top = canvas.resolvedStyle.top + adjustment.y;
+
+            UpdateCanvasScale();
+            evt.StopPropagation();
+        }
+
+        private void AddZoomButtons()
+        {
+            var overlayContainer = new VisualElement();
+            overlayContainer.style.position = Position.Absolute;
+            overlayContainer.style.top = 0;
+            overlayContainer.style.left = 0;
+            overlayContainer.style.right = 0;
+            overlayContainer.style.bottom = 0;
+            overlayContainer.style.zIndex = 1000; // High z-index to stay on top
+            rootVisualElement.Add(overlayContainer);
+
+            var zoomInButton = new Button(() => ChangeZoom(true)) { text = "+" };
+            var zoomOutButton = new Button(() => ChangeZoom(false)) { text = "-" };
+
+            zoomInButton.style.position = Position.Absolute;
+            zoomInButton.style.top = 10;
+            zoomInButton.style.left = 10;
+
+            zoomOutButton.style.position = Position.Absolute;
+            zoomOutButton.style.top = 50;
+            zoomOutButton.style.left = 10;
+
+            overlayContainer.Add(zoomInButton);
+            overlayContainer.Add(zoomOutButton);
+        }
+
+        private void ChangeZoom(bool zoomIn)
+        {
+            if (zoomIn)
+            {
+                zoomScale = Mathf.Min(zoomScale + zoomIncrement, maxZoom);
+            }
+            else
+            {
+                zoomScale = Mathf.Max(zoomScale - zoomIncrement, minZoom);
+            }
+
+            UpdateCanvasScale();
+        }
+
+        private void UpdateCanvasScale()
+        {
+            canvas.style.transformOrigin = new StyleTransformOrigin(new TransformOrigin(50, 50, 0));
+            canvas.style.scale = new Scale(new Vector3(zoomScale, zoomScale, 1));
+        }
 
     }
 }
