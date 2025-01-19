@@ -42,6 +42,10 @@ public class ObjectResearch
         return baseObject;
     }
 
+    public static void CleanUp(){
+        AllBaseObjects = new List<BaseObject>();
+    }
+
     public static List<BaseObject> BaseObjectList(BaseObject root){
         var baseObjectList = new List<BaseObject>{root};
 
@@ -54,6 +58,10 @@ public class ObjectResearch
             
         }
         return baseObjectList;
+    }
+
+    public static void Add(BaseObject obj){
+        AllBaseObjects.Add(obj);
     }
 }
 

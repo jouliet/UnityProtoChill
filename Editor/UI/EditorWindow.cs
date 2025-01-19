@@ -53,8 +53,6 @@ Never assume a method, class or function exists without explicitly seeing it in 
         LoadUML();
         LoadGOJson();
     }
-    // Initialisation
-    Main.Instance.Init();
 
     // Titre
     GUILayout.Space(10);

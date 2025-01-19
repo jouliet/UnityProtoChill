@@ -4,7 +4,6 @@ using ChatGPTWrapper;
 using UMLClassDiag;
 using ChatClass;
 using static MyEditorWindow;
-
 public abstract class GenerativeProcess
 {
     // Une classe qui hérite de generative process doit définir OnSubmit qui est le comportement de l'event
@@ -13,7 +12,6 @@ public abstract class GenerativeProcess
     //Actuellement Idem pour OnGenerateScript qui est géré dans la même editor window et avec la même initialisation de gpt par convéniance
 
     //l'intance de GPTGenerator est gérée à ce niveau
-
     public static GPTGenerator gptGenerator;
     protected static string jsonScripts;
     protected static string jsonGOs;
@@ -34,23 +32,23 @@ public abstract class GenerativeProcess
         {
             gptGenerator = new GPTGenerator();
         }
-        //MyEditorWindow.OnSubmitText += OnSubmit;
-        //MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
-        gptGenerator = new GPTGenerator();
-        ChatWindow.OnSubmitText += OnSubmit;
-        MyEditorWindow.OnSubmitText += OnSubmit;
-        UIManager.OnGenerateScriptEvent += OnGenerateScript;
-        MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        // MyEditorWindow.OnSubmitText += OnSubmit;
+        // MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        // gptGenerator = new GPTGenerator();
+        // ChatWindow.OnSubmitText += OnSubmit;
+        // MyEditorWindow.OnSubmitText += OnSubmit;
+        // UIManager.OnGenerateScriptEvent += OnGenerateScript;
+        // MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
     }  
     // Abstract cleanup
     ~GenerativeProcess()
     {
         //MyEditorWindow.OnSubmitText -= OnSubmit;
         //MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
-        ChatWindow.OnSubmitText -= OnSubmit;
-        MyEditorWindow.OnSubmitText -= OnSubmit;
-        UIManager.OnGenerateScriptEvent -= OnGenerateScript;
-        MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
+        //ChatWindow.OnSubmitText -= OnSubmit;
+        // MyEditorWindow.OnSubmitText -= OnSubmit;
+        // UIManager.OnGenerateScriptEvent -= OnGenerateScript;
+        // MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
     }
 
 

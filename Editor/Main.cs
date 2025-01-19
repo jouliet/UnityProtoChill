@@ -21,21 +21,23 @@ public class Main
         }
     }
 
-    public void Init(){
-        // La méthode ne fait rien mais permet d'instancier main pour la première fois depuis EditorWindow
-        UMLDiag umlDiag = new UMLDiag();
-    }
+    private UMLDiag umlDiag;
 
     public void Init(UMLDiagramWindow umlDiagramWindow)
     {
-        // La méthode ne fait rien mais permet d'instancier main pour la première fois depuis EditorWindow
-        UMLDiag umlDiag = new UMLDiag(umlDiagramWindow);
+        ObjectResearch.CleanUp();
+        umlDiag = new UMLDiag(umlDiagramWindow);
     }
 
+    public void Cleanup()
+    {
+        umlDiag = null;
+    }
     // Constructeur privé pour empêcher la création d'instances externes
     private Main()
     {
         GameObjectCreator gameObjectCreator = new GameObjectCreator();
+
         // GameObject fastUnityPusher = new GameObject("unityPusher");
         // FastUnityPusher pusherComponent = fastUnityPusher.AddComponent<FastUnityPusher>();
     }

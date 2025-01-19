@@ -34,12 +34,19 @@ public class UIManager : EditorWindow
         GetWindow<UIManager>("ProtoCHILL");
     }
 
+    // Temporaire ? histoire de pas avoir de trucs sus en attendant que les choses soient bien faites
     private void OnEnable()
     {
         CreateLayout();
         Main.Instance.Init(umlDiagramWindow);
     }
 
+    private void OnDisable()
+    {
+    
+        Main.Instance.Cleanup();  
+        Debug.Log("UIManager disabled");
+    }
     private void CreateLayout()
     {
         var rootContainer = new VisualElement();
@@ -274,5 +281,3 @@ public class ObjectPopUp : PopupWindowContent
         }
     }
 }
-
-//A Player that may move with arrows and shoot bullets with space bar
