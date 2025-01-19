@@ -58,12 +58,12 @@ namespace UMLClassDiag
             rootVisualElement.Clear();
             rootVisualElement.Add(canvas);
 
-            EnableHandTool();
-
             if (rootObject != null)
             {
                 DrawNode(rootObject, canvasWidth / 2, 0f);
             }
+
+            EnableHandTool();
 
             return canvas;
         }
@@ -268,7 +268,6 @@ namespace UMLClassDiag
             overlayContainer.style.left = 0;
             overlayContainer.style.right = 0;
             overlayContainer.style.bottom = 0;
-            overlayContainer.style.zIndex = 1000; // High z-index to stay on top
             rootVisualElement.Add(overlayContainer);
 
             var zoomInButton = new Button(() => ChangeZoom(true)) { text = "+" };
