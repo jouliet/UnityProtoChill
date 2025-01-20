@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ChatGPTWrapper;
+using System;
 
 namespace SettingsClass
 {
@@ -31,6 +32,17 @@ Never assume a method, class or function exists without explicitly seeing it in 
             GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
 
             apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
+            if (apiKey == ""){
+                apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+                if (string.IsNullOrEmpty(apiKey))
+                {
+                    Debug.LogWarning("Variable d'environnement OPENAI_API_KEY introuvable ou vide.");
+                }
+                else
+                {
+                    Debug.Log($"Variable d'environnement trouvÃ©e : {apiKey}");
+                }
+            }
             selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
             GUILayout.Label("Initial Prompt", EditorStyles.label);
@@ -53,7 +65,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
 
         private void InitializeGPTInformation()
         {
-            // Le seul abonné est l'instance de GPTGenerator, elle même instanciée dans le constructeur de Generative process. On 
+            // Le seul abonnï¿½ est l'instance de GPTGenerator, elle mï¿½me instanciï¿½e dans le constructeur de Generative process. On 
             // instancie donc Un GPTGenerator et un CustomChatGPTConversation par generative process. 
             OnInitializeGPTInformation?.Invoke(useProxy, proxyUri, apiKey, selectedModel, initialPrompt);
         }
