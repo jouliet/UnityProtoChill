@@ -38,7 +38,7 @@ public class BaseObject
     // On constitue la liste localement
     public BaseObject(){
         ObjectResearch.Add(this);
-        Debug.Log("Research system base objects list updated : " + this.Name);
+        //Debug.Log("Research system base objects list updated : " + this.Name);
     }
 
 

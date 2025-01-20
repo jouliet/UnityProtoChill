@@ -25,8 +25,14 @@ public class UIManager : EditorWindow
     private Button settingsButton;
     private Button objectSelectorButton;
     private Button generateButton;
+    //GO = Game Object
+    private Button generateGOListButton;
+    private Button gameObjectSelectorButton;
+    private Button generateGOButton;
 
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
+    public static event System.Action OnGenerateGameObjectListEvent;
+    public static event System.Action<string> OnGenerateGameObjectEvent;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -43,7 +49,6 @@ public class UIManager : EditorWindow
 
     private void OnDisable()
     {
-    
         Main.Instance.Cleanup();  
         Debug.Log("UIManager disabled");
     }
@@ -64,6 +69,9 @@ public class UIManager : EditorWindow
         InitializeGPTButton();
         InitializeGenerateScriptPopUp();
         InitializeGenerateScriptButton();
+        InitializeGenerateGOListButton();
+        InitializeGOSelector();
+        InitializeGenerateGOButton();
 
         rootContainer.Add(settingsContainer);
 
@@ -139,18 +147,38 @@ public class UIManager : EditorWindow
 
     private void InitializeGenerateScriptButton()
     {
-        generateButton = new Button() { text = "Generate Script" };
+        generateButton = new Button() { text = "Generate Script(s)" };
         generateButton.clicked += OnGenerateScriptButtonClick;
         settingsContainer.Add(generateButton);
     }
 
+    private void InitializeGenerateGOListButton(){
+        generateGOListButton = new Button() { text = "Generate List of Game Objects" };
+        generateGOListButton.clicked += OnGenerateGameObjectListButton;
+        settingsContainer.Add(generateGOListButton);
+    }
+
+    private void InitializeGOSelector()
+    {
+        gameObjectSelectorButton = new Button() { text = "GameObject Selector" };
+        // objectPopUp = new ObjectPopUp();
+        // objectSelectorButton.clicked += () => PopupWindow.Show(objectSelectorButton.worldBound, objectPopUp);
+        gameObjectSelectorButton.clicked += OnGenerateGameObjectButton;
+        settingsContainer.Add(gameObjectSelectorButton);
+    }
+
+    private void InitializeGenerateGOButton(){
+        generateGOButton = new Button() { text = "Generate GameObject(s)" };
+        generateGOButton.clicked += OnGenerateGameObjectButton;
+        settingsContainer.Add(generateGOButton);
+    }
     //
     // On Click Events
     //
 
     private void OnTestButtonClick()
     {
-        Debug.Log("Custom OnClick Event: Test button clicked!");
+        //Debug.Log("Custom OnClick Event: Test button clicked!");
 
         var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
         if (jsonFile != null)
@@ -164,7 +192,7 @@ public class UIManager : EditorWindow
 
     private void OnSettingsButtonClick()
     {
-        Debug.Log("Custom OnClick Event: Settings button clicked!");
+        //Debug.Log("Custom OnClick Event: Settings button clicked!");
 
         SettingsWindow.ShowWindow();
     }
@@ -181,9 +209,17 @@ public class UIManager : EditorWindow
         }
         else
         {
-            Debug.Log("selected objects is empty");
+            //Debug.Log("selected objects is empty");
         }
+    }
 
+    private void OnGenerateGameObjectListButton(){
+        //OnGenerateGameObjectListEvent?.Invoke();
+        Debug.LogWarning("Bouton toujours pas implementé");
+    }
+    private void OnGenerateGameObjectButton(){
+        //OnGenerateGameObjectEvent?.Invoke(selectedGameObject);
+        Debug.LogWarning("Bouton toujours pas implementé");
     }
 }
 
@@ -195,7 +231,7 @@ public class ObjectPopUp : PopupWindowContent
 
     public override void OnOpen()
     {
-        Debug.Log("Popup opened: " + this);
+        //Debug.Log("Popup opened: " + this);
     }
 
     public override VisualElement CreateGUI()
@@ -209,7 +245,7 @@ public class ObjectPopUp : PopupWindowContent
 
     public override void OnClose()
     {
-        Debug.Log("Popup closed: " + this);
+        //Debug.Log("Popup closed: " + this);
     }
 
     public void UpdateBaseObjectList()
@@ -233,7 +269,7 @@ public class ObjectPopUp : PopupWindowContent
                         if (!selectedObjects.Contains(baseObject))
                         {
                             selectedObjects.Add(baseObject);
-                            Debug.Log($"{baseObject.Name} added to selection.");
+                            //Debug.Log($"{baseObject.Name} added to selection.");
                         }
                     }
                     else
@@ -241,7 +277,7 @@ public class ObjectPopUp : PopupWindowContent
                         if (selectedObjects.Contains(baseObject))
                         {
                             selectedObjects.Remove(baseObject);
-                            Debug.Log($"{baseObject.Name} removed from selection.");
+                            //Debug.Log($"{baseObject.Name} removed from selection.");
                         }
                     }
                 });

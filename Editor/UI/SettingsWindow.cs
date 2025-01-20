@@ -40,7 +40,8 @@ Never assume a method, class or function exists without explicitly seeing it in 
                 }
                 else
                 {
-                    Debug.Log($"Variable d'environnement trouvée : {apiKey}");
+                    Debug.Log("Variable d'environnement trouvée");
+                    //Debug.Log($"Variable d'environnement trouvée : {apiKey}");
                 }
             }
             selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
