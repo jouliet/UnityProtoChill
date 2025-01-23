@@ -10,7 +10,7 @@ using UnityEditor;
 
 public static class SaverLoader
 {
-    private static string generatedContentFolder = "generatedContent"; 
+    private static string generatedContentFolder = "Assets/generatedContent"; 
     private static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
     private static string GOJsonFilePath = Path.Combine(generatedContentFolder, "currentGameObjects.json");
 
@@ -25,6 +25,7 @@ public static class SaverLoader
             }
 
             File.WriteAllText(UMLFilePath, input);
+            Debug.Log("UML saved at :" + UMLFilePath);
         }
         catch (Exception ex)
         {

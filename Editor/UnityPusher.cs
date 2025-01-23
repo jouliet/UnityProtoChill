@@ -9,6 +9,8 @@ using static JsonParser;
 using System.Threading.Tasks;
 using static SaverLoader;
 using Unity.VisualScripting;
+using System.Globalization;
+using System.Security.Permissions;
 
 
 
@@ -40,27 +42,28 @@ public class GameObjectCreator : GenerativeProcess{
         }
       ]
     }
-    For type = Script, there is always a properties ""Name"" who must be an existing script name" + "\n";
+    Float values format exemple : 10.5
+    For type = Script, there is always a properties ""Name"" who must be an existing script name" + "\n" +
+    "Don't hesitate to add boxCollider or rigidbody components if necessary.\n";
     
     private static string inputToCreatePrefabs = 
     "Make a list of the game objects that are needed to execute the scripts presented in the UML below. Remember that the script names must be coherent with the UML scripts. \n";
     private static string generalInputForPrefabs;
 
     public GameObjectCreator(){
-        MyEditorWindow.OnGenerateGameObjectEvent += OnGenerateGameObject;
-        MyEditorWindow.OnGenerateGameObjectListEvent += GenerateGOs;
+        UIManager.OnGenerateGameObjectEvent += OnGenerateGameObject;
+        UIManager.OnGenerateGameObjectListEvent += GenerateGOs;
         Debug.Log("GameObject process initialized.");
     }
 
     ~GameObjectCreator(){
-        MyEditorWindow.OnGenerateGameObjectEvent -= OnGenerateGameObject;
-        MyEditorWindow.OnGenerateGameObjectListEvent -= GenerateGOs;
+        UIManager.OnGenerateGameObjectEvent -= OnGenerateGameObject;
+        UIManager.OnGenerateGameObjectListEvent -= GenerateGOs;
     }
 
 
     public static void GenerateGOs(){
         //Abonné à son event
-
         if (string.IsNullOrEmpty(jsonScripts)){
             throw new Exception("Generate UML for scripts before generate GO list.");
         }
@@ -71,8 +74,6 @@ public class GameObjectCreator : GenerativeProcess{
             Debug.Log("No instance of gptGenerator");
             return;
         }
-
-        TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
 
         gptGenerator.GenerateFromText(generalInputForPrefabs, (response) =>
         {
@@ -197,7 +198,6 @@ public class GameObjectCreator : GenerativeProcess{
                 if (type == "Script"){
                     if  (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict){
                        if (propertiesDict.ContainsKey("Name") && propertiesDict["Name"] is string name){
-                            type = name;
                             componentType = Type.GetType($"UnityEngine.{name}, UnityEngine") ?? Type.GetType($"{name}, Assembly-CSharp");
                        }
                     }
@@ -235,17 +235,38 @@ public class GameObjectCreator : GenerativeProcess{
         foreach (var kvp in jsonDict)
         {
             var propertyInfo = componentType.GetProperty(kvp.Key);
-            if (propertyInfo == null){
-                throw new Exception("Cette property n'est pas reconnu: " + kvp.Key);
-            }
-
-            if (propertyInfo != null && propertyInfo.CanWrite)
+            try 
             {
-                // Ecrit les properties dans le component
-                propertyInfo.SetValue(component, Convert.ChangeType(kvp.Value, propertyInfo.PropertyType));
-            }else{
-                Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
+                if (propertyInfo == null){
+                    throw new Exception("Cette property n'est pas reconnu: " + kvp.Key + " : " + kvp.Value);
+                }
+
+                if (propertyInfo != null && propertyInfo.CanWrite)
+                {
+                    // Ecrit les properties dans le component
+                    //Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
+        
+                    object value = kvp.Value;
+                    Type propertyType = propertyInfo.PropertyType;
+
+                    // Gestion spécifique des floats
+                    if (propertyType == typeof(float) || propertyType == typeof(Single))
+                    {
+                        value = Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        value = Convert.ChangeType(value, propertyType);
+                    }
+                    propertyInfo.SetValue(component, value);
+                    //Debug.LogException(ex);
+                }else{
+                    Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
+                }
+            }catch (Exception ex){
+                Debug.LogWarning("Exeption for property value : " + kvp.Value + " with asked type: " + propertyInfo.PropertyType + "\nExeption : " + ex);
             }
+            
         }
     }
 
@@ -264,7 +285,29 @@ public class GameObjectCreator : GenerativeProcess{
             if (fieldInfo != null && fieldInfo.CanWrite())
             {
                 // Ecrit les properties dans le component
-                fieldInfo.SetValue(component, Convert.ChangeType(kvp.Value, fieldInfo.FieldType));
+                try{
+                    object value = kvp.Value;
+                    Type fieldType = fieldInfo.FieldType;
+
+                    // Gestion spécifique des floats
+                    if (fieldType == typeof(float) || fieldType == typeof(Single))
+                    {
+                        value = Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                    }else if (fieldType == typeof(GameObject)){
+                        value = Resources.Load<GameObject>("Prefabs/" + kvp.Value);
+                        if (value == null){
+                            throw new Exception("Il n'existe pas de prefab " + kvp.Value + "." );
+                        }
+                    }
+                    else
+                    {
+                        value = Convert.ChangeType(value, fieldType);
+                    }
+                    fieldInfo.SetValue(component, value);
+                }catch( Exception ex){
+                    Debug.LogWarning("Exeption for field value : " + kvp.Value + " With asked type: " + fieldInfo.FieldType + "\nException : " +  ex);
+                } 
+                
             }else{
                 Debug.LogWarning($"Field déjà définit ou non éditable : {kvp.Key}");
             }
@@ -304,7 +347,7 @@ public static class UsefulFunctions{
         }
         else
         {
-            Debug.Log($"Tag '{tag}' existe déjà.");
+            //Debug.Log($"Tag '{tag}' existe déjà.");
         }
         #else
         Debug.LogError("Cette méthode fonctionne uniquement dans l'éditeur Unity.");
@@ -343,7 +386,7 @@ public static class UsefulFunctions{
         }
         else
         {
-            Debug.Log($"Layer '{layerName}' existe déjà.");
+            //Debug.Log($"Layer '{layerName}' existe déjà.");
         }
         #else
         Debug.LogError("Cette méthode fonctionne uniquement dans l'éditeur Unity.");

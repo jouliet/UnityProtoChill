@@ -6,25 +6,31 @@ using ChatGPTWrapper;
 using UMLClassDiag;
 using static SaverLoader;
 using UnityPusher;
-
+using ChatClass;
+using static MyEditorWindow;
 public class UMLDiag : GenerativeProcess
 {
     private UMLDiagramWindow umlDiagramWindow;
 
-    public UMLDiag()
+    ~UMLDiag()
     {
-        // UML est abonné si tout se passe bien
-        Debug.Log("UMLDiag process initialized.");
+      MyEditorWindow.OnSubmitText -= OnSubmit;
+      MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
+      ChatWindow.OnSubmitText -= OnSubmit;
+      UIManager.OnGenerateScriptEvent -= OnGenerateScript;
+
     }
 
     public UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
     {
         // UML est abonné si tout se passe bien
         umlDiagramWindow = umlDiagramWindowInstance;
+        ChatWindow.OnSubmitText += OnSubmit;
+        UIManager.OnGenerateScriptEvent += OnGenerateScript;
         Debug.Log("UMLDiag process initialized.");
     }
 
-    public override void OnSubmit(string input)
+    public void OnSubmit(string input)
     {
         Debug.Log("Submit received in UMLDiag. Generating UML...");
         GenerateUML(input);
@@ -102,7 +108,7 @@ public class UMLDiag : GenerativeProcess
         gptGenerator.GenerateFromText(input, (response) =>
         {
             jsonScripts = response;
-            SaveUML(jsonScripts);
+            SaveUML(response);
             Debug.Log("Generated UML JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
@@ -116,9 +122,7 @@ public class UMLDiag : GenerativeProcess
                 return;
             }
             umlDiagramWindow.ReloadDiagram(root);
-            //Debug.Log("JSONMApper : " + root.ToString());
 
-            //GenerateGameObjects(jsonString);
         });
     }
 

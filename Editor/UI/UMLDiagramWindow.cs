@@ -1,6 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.IO;
+using System.Collections.Generic;
+using static JsonParser;
 
 namespace UMLClassDiag
 {
@@ -16,7 +19,7 @@ namespace UMLClassDiag
         private Vector2 dragStart;
         private VisualElement canvas;
         private float canvasWidth = 1000f;
-        private float canvasHeight = 1000f;
+        // private float canvasHeight = 1000f;
 
         public static void ShowDiagram(BaseObject root)
         {
@@ -45,27 +48,36 @@ namespace UMLClassDiag
             // Load Stylesheet
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
             umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
+            var windowVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uxml");
 
-            // Hand-tool navigation set up
-            canvas = new VisualElement();
-            canvas.style.position = Position.Absolute;
-            canvas.style.left = - canvasWidth / 2 + width; // Center display
-            canvas.style.top = 0f;
-            canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
-            canvas.style.height = canvasHeight;
-            canvas.styleSheets.Add(umlStyleSheet);
-
+            var root = windowVisualTree.CloneTree();
             rootVisualElement.Clear();
-            rootVisualElement.Add(canvas);
+            rootVisualElement.Add(root);
+
+            // Set up UML canvas
+            canvas = root.Q<VisualElement>("canvas");
+            //canvas.style.left = - canvasWidth / 2 + width; // Center display
+            //canvas.style.top = 0f;
+            //canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
+            //canvas.style.height = canvasHeight;
+            canvas.styleSheets.Add(umlStyleSheet);
 
             if (rootObject != null)
             {
                 DrawNode(rootObject, canvasWidth / 2, 0f);
             }
 
+            // Zoom buttons set up
+            var zoomInButton = root.Q<Button>("zoom-in-button");
+            zoomInButton.clicked += () => ChangeZoom(true);
+            var zoomOutButton = root.Q<Button>("zoom-out-button");
+            zoomOutButton.clicked += () => ChangeZoom(false);
+            var refreshButton = root.Q<Button>("refresh-button");
+            refreshButton.clicked += OnRefreshtButtonClick;
+
             EnableHandTool();
 
-            return canvas;
+            return root;
         }
 
         //
@@ -183,7 +195,6 @@ namespace UMLClassDiag
             canvas.RegisterCallback<MouseMoveEvent>(OnMouseMove);
             canvas.RegisterCallback<MouseUpEvent>(OnMouseUp);
             canvas.RegisterCallback<WheelEvent>(OnMouseWheel);
-            AddZoomButtons();
         }
 
         private void OnMouseDown(MouseDownEvent evt)
@@ -260,31 +271,6 @@ namespace UMLClassDiag
             evt.StopPropagation();
         }
 
-        private void AddZoomButtons()
-        {
-            var overlayContainer = new VisualElement();
-            overlayContainer.style.position = Position.Absolute;
-            overlayContainer.style.top = 0;
-            overlayContainer.style.left = 0;
-            overlayContainer.style.right = 0;
-            overlayContainer.style.bottom = 0;
-            rootVisualElement.Add(overlayContainer);
-
-            var zoomInButton = new Button(() => ChangeZoom(true)) { text = "+" };
-            var zoomOutButton = new Button(() => ChangeZoom(false)) { text = "-" };
-
-            zoomInButton.style.position = Position.Absolute;
-            zoomInButton.style.top = 10;
-            zoomInButton.style.left = 10;
-
-            zoomOutButton.style.position = Position.Absolute;
-            zoomOutButton.style.top = 50;
-            zoomOutButton.style.left = 10;
-
-            overlayContainer.Add(zoomInButton);
-            overlayContainer.Add(zoomOutButton);
-        }
-
         private void ChangeZoom(bool zoomIn)
         {
             if (zoomIn)
@@ -305,5 +291,20 @@ namespace UMLClassDiag
             canvas.style.scale = new Scale(new Vector3(zoomScale, zoomScale, 1));
         }
 
+        private void OnRefreshtButtonClick()
+        {
+            string generatedContentFolder = "Assets/generatedContent";
+            string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
+        
+            if (!File.Exists(UMLFilePath))
+            {
+                Debug.LogError("Error refreshing UML.");
+                return;
+            }
+            string jsonString = File.ReadAllText(UMLFilePath);
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+            var baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            ReloadDiagram(baseObject);
+        }
     }
 }

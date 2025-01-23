@@ -58,12 +58,12 @@ namespace ChatGPTWrapper
                     break;
                 case Model.GPT3:
                     _chat = new Chat(_initialPrompt);
-                    _uri = "https://api.openai.com/v1/completions";
+                    _uri = "https://api.openai.com/v1/chat/completions";
                     _selectedModel = "gpt-3.5-turbo";
                     break;
                 case Model.GPT4:
                     _chat = new Chat( _initialPrompt);
-                    _uri = "https://api.openai.com/v1/completions";
+                    _uri = "https://api.openai.com/v1/chat/completions";
                     _selectedModel = "gpt-4o-mini";
                     break;
             }

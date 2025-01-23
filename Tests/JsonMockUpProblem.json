@@ -1,12 +1,7 @@
 {
   "Root": {
-    "Name": "Game",
+    "Name": "GameManager",
     "Attributes": [
-      {
-        "Name": "Name",
-        "Type": "string",
-        "DefaultValue": "Tower Defense Game"
-      },
       {
         "Name": "CurrentWave",
         "Type": "int",
@@ -20,7 +15,7 @@
       {
         "Name": "Currency",
         "Type": "int",
-        "DefaultValue": "50"
+        "DefaultValue": "500"
       }
     ],
     "Methods": [
@@ -55,9 +50,14 @@
             "DefaultValue": "5.0"
           },
           {
+            "Name": "FireRate",
+            "Type": "float",
+            "DefaultValue": "1.0"
+          },
+          {
             "Name": "Cost",
             "Type": "int",
-            "DefaultValue": "20"
+            "DefaultValue": "100"
           }
         ],
         "Methods": [
@@ -71,21 +71,31 @@
                 "DefaultValue": "null"
               }
             ]
+          },
+          {
+            "Name": "Upgrade",
+            "ReturnType": "void",
+            "Parameters": []
           }
         ],
         "ComposedClasses": [
           {
-            "Name": "CannonTower",
+            "Name": "SniperTower",
             "Attributes": [
               {
-                "Name": "SplashRadius",
+                "Name": "CriticalHitChance",
+                "Type": "float",
+                "DefaultValue": "0.2"
+              },
+              {
+                "Name": "CriticalHitMultiplier",
                 "Type": "float",
                 "DefaultValue": "2.0"
               }
             ],
             "Methods": [
               {
-                "Name": "Explode",
+                "Name": "PerformCriticalHit",
                 "ReturnType": "void",
                 "Parameters": [
                   {
@@ -100,22 +110,27 @@
             "ParentClass": "Tower"
           },
           {
-            "Name": "ArrowTower",
+            "Name": "CannonTower",
             "Attributes": [
               {
-                "Name": "AttackSpeed",
+                "Name": "SplashDamage",
+                "Type": "int",
+                "DefaultValue": "15"
+              },
+              {
+                "Name": "SplashRadius",
                 "Type": "float",
-                "DefaultValue": "1.5"
+                "DefaultValue": "3.0"
               }
             ],
             "Methods": [
               {
-                "Name": "ShootArrow",
+                "Name": "PerformSplashAttack",
                 "ReturnType": "void",
                 "Parameters": [
                   {
-                    "Name": "target",
-                    "Type": "Enemy",
+                    "Name": "targetPosition",
+                    "Type": "Vector3",
                     "DefaultValue": "null"
                   }
                 ]
@@ -158,6 +173,76 @@
             "Parameters": [
               {
                 "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Path",
+        "Attributes": [
+          {
+            "Name": "Waypoints",
+            "Type": "List<Vector3>",
+            "DefaultValue": "null"
+          }
+        ],
+        "Methods": [],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "UIManager",
+        "Attributes": [
+          {
+            "Name": "HealthDisplay",
+            "Type": "string",
+            "DefaultValue": "null"
+          },
+          {
+            "Name": "CurrencyDisplay",
+            "Type": "string",
+            "DefaultValue": "null"
+          },
+          {
+            "Name": "WaveDisplay",
+            "Type": "string",
+            "DefaultValue": "null"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "UpdateHealth",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "health",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          },
+          {
+            "Name": "UpdateCurrency",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "currency",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          },
+          {
+            "Name": "UpdateWave",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "wave",
                 "Type": "int",
                 "DefaultValue": "0"
               }
