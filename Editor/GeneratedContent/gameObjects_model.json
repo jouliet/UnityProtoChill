@@ -17,12 +17,14 @@
             "type": "Rigidbody",
             "properties": {
               "useGravity": "false",
-              "isKinematic": "true"
+              "isKinematic": "true",
+              "angularDamping" : "1"
             }
           },
-          {
-            "type": "PlayerScript",
+          { 
+            "type": "Script",
             "properties": {
+              "Name" : "Player",
               "Speed": "5.0",
               "FireRate": "0.5",
               "BulletPrefab": "Bullet"
@@ -51,8 +53,9 @@
             }
           },
           {
-            "type": "BulletScript",
+            "type": "Script",
             "properties": {
+              "Name" : "Bullet",
               "Speed": "10.0",
               "Direction": "Vector2(0, 1)"
             }

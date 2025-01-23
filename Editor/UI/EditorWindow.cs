@@ -16,9 +16,9 @@ public class MyEditorWindow : EditorWindow
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public static event System.Action OnGenerateGameObjectListEvent;
     public static event System.Action<string> OnGenerateGameObjectEvent;
+
     //public static event System.Action
     private string userInput = "A Player that may move with arrows and shoot bullets with space bar"; 
-
     private BaseObject selectedObject;
     private BaseObject  rootObject;
     private int selectedObjectIndex = 0; // Indice de l'objet sélectionné

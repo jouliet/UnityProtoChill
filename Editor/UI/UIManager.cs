@@ -9,6 +9,8 @@ using System.IO;
 using System.Collections.Generic;
 using static JsonParser;
 using static SaverLoader;
+using UnityPusher;
+using System;
 
 public class UIManager : EditorWindow
 {
@@ -29,6 +31,7 @@ public class UIManager : EditorWindow
     private Button generateGOListButton;
     private Button gameObjectSelectorButton;
     private Button generateGOButton;
+    private GameObjectPopUp GOPopup;
 
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public static event System.Action OnGenerateGameObjectListEvent;
@@ -161,9 +164,8 @@ public class UIManager : EditorWindow
     private void InitializeGOSelector()
     {
         gameObjectSelectorButton = new Button() { text = "GameObject Selector" };
-        // objectPopUp = new ObjectPopUp();
-        // objectSelectorButton.clicked += () => PopupWindow.Show(objectSelectorButton.worldBound, objectPopUp);
-        gameObjectSelectorButton.clicked += OnGenerateGameObjectButton;
+        GOPopup = new GameObjectPopUp();
+        gameObjectSelectorButton.clicked += () => PopupWindow.Show(gameObjectSelectorButton.worldBound, GOPopup);
         settingsContainer.Add(gameObjectSelectorButton);
     }
 
@@ -186,6 +188,7 @@ public class UIManager : EditorWindow
             string jsonString = jsonFile.text;
             Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
             BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            GenerativeProcess.SetJsonScripts(jsonString);
             umlDiagramWindow.ReloadDiagram(baseObject);
         }
     }
@@ -209,17 +212,44 @@ public class UIManager : EditorWindow
         }
         else
         {
-            //Debug.Log("selected objects is empty");
+            Debug.LogWarning("There is no selected script object to be generated.");
         }
     }
 
     private void OnGenerateGameObjectListButton(){
-        //OnGenerateGameObjectListEvent?.Invoke();
-        Debug.LogWarning("Bouton toujours pas implementé");
+        Debug.Log("Wait for GOList generation.");
+        OnGenerateGameObjectListEvent?.Invoke();
+        //Debug.LogWarning("Bouton toujours pas implementé!!!");  
+    }
+
+    private void OnTestGOButtonClick()
+    {
+        Debug.Log("Custom OnClick Event: GO Test button clicked!");
+
+        var GOJsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/GeneratedContent/gameObjects_model.json");
+        //C:\Users\simon\Documents\PFE\PFEUnityProject\Packages\UnityProtoChill\Editor\GeneratedContent\gameObjects_model.json
+        if (GOJsonFile != null)
+        {
+            string jsonString = GOJsonFile.text;
+            GenerativeProcess.SetJsonGOs(jsonString);
+            GameObjectCreator.JsonToDictionary("");
+            GameObjectCreator.StockEveryGOsInList();
+        }
     }
     private void OnGenerateGameObjectButton(){
-        //OnGenerateGameObjectEvent?.Invoke(selectedGameObject);
-        Debug.LogWarning("Bouton toujours pas implementé");
+        List<string> gameObjectNames = GOPopup.GetSelectedGameObjects();
+        if (gameObjectNames.Count > 0)
+        {
+            foreach(var goName in gameObjectNames)
+            {
+                OnGenerateGameObjectEvent?.Invoke(goName);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("There is no selected game object to be generated.");
+        }
+        //Debug.LogWarning("Bouton toujours pas implementé");
     }
 }
 
@@ -314,6 +344,108 @@ public class ObjectPopUp : PopupWindowContent
         else
         {
             return selectedObjects;
+        }
+    }
+}
+
+
+public class GameObjectPopUp : PopupWindowContent
+{
+    private ScrollView scrollView;
+    private List<string> selectedGameObjectNames = new List<string>();
+    private bool allSelected = false;
+
+    public override void OnOpen()
+    {
+        //Debug.Log("Popup opened: " + this);
+    }
+
+    public override VisualElement CreateGUI()
+    {
+        var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/GameObjectPopUp.uxml");
+        
+        var root = visualTreeAsset.CloneTree();
+        scrollView = root.Q<ScrollView>("game-object-list");
+        if (scrollView == null){
+            throw new Exception("Don't find scrollView");
+        }
+        UpdateGameObjectList();
+        return root;
+    }
+
+    public override void OnClose()
+    {
+        //Debug.Log("Popup closed: " + this);
+    }
+
+    
+    public void UpdateGameObjectList()
+    {
+        scrollView.Clear();
+        selectedGameObjectNames.Clear();
+
+        if (GameObjectCreator.GameObjectNameList != null && GameObjectCreator.GameObjectNameList.Count > 0)
+        {
+            foreach (var GOName in GameObjectCreator.GameObjectNameList)
+            {
+                var toggle = new Toggle(GOName)
+                {
+                    value = false
+                };
+
+                toggle.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.newValue)
+                    {
+                        if (!selectedGameObjectNames.Contains(GOName))
+                        {
+                            selectedGameObjectNames.Add(GOName);
+                            //Debug.Log($"{baseObject.Name} added to selection.");
+                        }
+                    }
+                    else
+                    {
+                        if (selectedGameObjectNames.Contains(GOName))
+                        {
+                            selectedGameObjectNames.Remove(GOName);
+                            //Debug.Log($"{baseObject.Name} removed from selection.");
+                        }
+                    }
+                });
+                scrollView.Add(toggle);
+            }
+
+            var allToggle = new Toggle("All");
+            allToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    allSelected = true;
+                }
+                else
+                {
+                    allSelected = false;
+                }
+            });
+            scrollView.Add(allToggle);
+        }
+        else
+        {
+            var emptyList = new Label("No game objects available");
+            scrollView.Add(emptyList);
+        }
+    }
+
+    public List<string> GetSelectedGameObjects()
+    {
+        if (allSelected)
+        {
+            return GameObjectCreator.GameObjectNameList;
+            
+        }
+        else
+        {
+            return selectedGameObjectNames;
         }
     }
 }
