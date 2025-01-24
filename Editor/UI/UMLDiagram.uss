@@ -8,6 +8,24 @@
     width: 300px;
 }
 
+.uml-diagram__selected {
+    background-color: #8f8f8c;
+    border-color: #ffffff;
+}
+
+.uml-diagram-header {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.uml-base-object {
+    flex-grow: 1;
+}
+
+.expand-button {
+    align-items: flex-end;
+}
+
 /* Base Object styling */
 .uml-base-object {
     font-size: 16px;

@@ -2,12 +2,15 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ChatGPTWrapper;
+using static UIManager;
 
 namespace ChatClass
 {
 
     public class ChatWindow : EditorWindow
     {
+        private UIManager uiManager;
+
         private VisualTreeAsset chatVisualTree;
         private StyleSheet chatStyleSheet;
 
@@ -20,8 +23,10 @@ namespace ChatClass
 
         private ScrollView chatContainer;
 
-        public VisualElement CreateChatView()
+        public VisualElement CreateChatView(UIManager manager)
         {
+            uiManager = manager;
+
             chatVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/ChatWindow.uxml");
             chatStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/ChatWindow.uss");
 
@@ -34,6 +39,7 @@ namespace ChatClass
             chatContainer = chatCanvas.Q<ScrollView>("chat-messages-container");
 
             submitButton.clicked += OnSubmitButtonClick;
+            uiManager.OnMessageToChat += PushProtochillMessage;
 
             return chatCanvas;
         }
@@ -49,7 +55,7 @@ namespace ChatClass
                 VisualElement bubble = new VisualElement();
                 bubble.AddToClassList("chat-user-bubble");
                 TextField content = new TextField();
-                content.AddToClassList("chat-user-text");
+                content.AddToClassList("chat-text");
                 content.multiline = true;
                 content.value = userInput;
                 content.isReadOnly = true;
@@ -61,6 +67,21 @@ namespace ChatClass
                 userInput = "";
                 inputField.value = "";
             }
+        }
+
+        private void PushProtochillMessage(string message)
+        {
+            VisualElement bubble = new VisualElement();
+            bubble.AddToClassList("chat-protochill-bubble");
+            TextField content = new TextField();
+            content.AddToClassList("chat-text");
+            content.multiline = true;
+            content.value = message;
+            content.isReadOnly = true;
+            bubble.Add(content);
+
+            chatContainer.Add(bubble);
+            chatContainer.ScrollTo(bubble);
         }
     }
 

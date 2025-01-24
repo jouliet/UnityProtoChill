@@ -36,6 +36,7 @@ public class UIManager : EditorWindow
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public static event System.Action OnGenerateGameObjectListEvent;
     public static event System.Action<string> OnGenerateGameObjectEvent;
+    public event System.Action<string> OnMessageToChat;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -115,7 +116,7 @@ public class UIManager : EditorWindow
     private void InitializeUMLView()
     {
         umlDiagramWindow = ScriptableObject.CreateInstance<UMLClassDiag.UMLDiagramWindow>();
-        var umlCanvas = umlDiagramWindow.CreateDiagramView();
+        var umlCanvas = umlDiagramWindow.CreateDiagramView(this);
         umlCanvas.style.flexGrow = 1;
         umlContainer.Add(umlCanvas);
     }
@@ -123,7 +124,7 @@ public class UIManager : EditorWindow
     private void InitializeChatView()
     {
         chatWindow = ScriptableObject.CreateInstance<ChatClass.ChatWindow>();
-        var chatCanvas = chatWindow.CreateChatView();
+        var chatCanvas = chatWindow.CreateChatView(this);
         chatContainer.Add(chatCanvas);
     }
 
@@ -241,6 +242,7 @@ public class UIManager : EditorWindow
             GameObjectCreator.StockEveryGOsInList();
         }
     }
+
     private void OnGenerateGameObjectButton(){
         List<string> gameObjectNames = GOPopUp.GetSelectedGameObjects();
         if (gameObjectNames.Count > 0)
@@ -255,6 +257,11 @@ public class UIManager : EditorWindow
             Debug.LogWarning("There is no selected game object to be generated.");
         }
         //Debug.LogWarning("Bouton toujours pas implementé");
+    }
+
+    public void SendMessageToChatWindow(string message)
+    {
+        OnMessageToChat?.Invoke(message);
     }
 }
 

@@ -4,11 +4,14 @@ using UnityEngine.UIElements;
 using System.IO;
 using System.Collections.Generic;
 using static JsonParser;
+using static UIManager;
 
 namespace UMLClassDiag
 {
     public class UMLDiagramWindow : EditorWindow
     {
+        private UIManager uiManager;
+
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
 
@@ -20,6 +23,9 @@ namespace UMLClassDiag
         private VisualElement canvas;
         private float canvasWidth = 1000f;
         // private float canvasHeight = 1000f;
+
+        private VisualElement selectedNode;
+        private BaseObject selectedObject;
 
         public static void ShowDiagram(BaseObject root)
         {
@@ -43,8 +49,10 @@ namespace UMLClassDiag
             }
         }
 
-        public VisualElement CreateDiagramView()
+        public VisualElement CreateDiagramView(UIManager manager)
         {
+            uiManager = manager;
+
             // Load Stylesheet
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
             umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
@@ -110,6 +118,26 @@ namespace UMLClassDiag
             }
 
             nodeContainer.Add(umlNode);
+            nodeContainer.RegisterCallback<MouseDownEvent>(evt =>
+            {
+                if (selectedObject != null && selectedObject != root)
+                {
+                    selectedNode.RemoveFromClassList("uml-diagram__selected");
+                }
+                if (nodeContainer.ClassListContains("uml-diagram__selected"))
+                {
+                    nodeContainer.RemoveFromClassList("uml-diagram__selected");
+                    selectedNode = null;
+                    selectedObject = null;
+                }
+                else
+                {
+                    nodeContainer.AddToClassList("uml-diagram__selected");
+                    selectedNode = nodeContainer;
+                    OnSelectNode(root);
+                }
+                evt.StopPropagation();
+            });
             canvas.Add(nodeContainer);
 
             nodeContainer.schedule.Execute(() =>
@@ -291,6 +319,9 @@ namespace UMLClassDiag
             canvas.style.scale = new Scale(new Vector3(zoomScale, zoomScale, 1));
         }
 
+        /// 
+        /// CLICK EVENTS
+        /// 
         private void OnRefreshtButtonClick()
         {
             string generatedContentFolder = "Assets/generatedContent";
@@ -305,6 +336,13 @@ namespace UMLClassDiag
             Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
             var baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
             ReloadDiagram(baseObject);
+        }
+
+        private void OnSelectNode(BaseObject baseObject)
+        {
+            selectedObject = baseObject;
+            string msg = $"Node {baseObject.Name} selected in UML Diagram.";
+            uiManager.SendMessageToChatWindow(msg);
         }
     }
 }
