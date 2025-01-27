@@ -6,12 +6,12 @@ using UMLClassDiag;
 using UnityPusher;
 using UnityEngine;
 using UnityEditor;
-
+using static UMLDiag;
 
 public static class SaverLoader
 {
     private static string generatedContentFolder = "Assets/generatedContent"; 
-    private static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
+    public static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
     private static string GOJsonFilePath = Path.Combine(generatedContentFolder, "currentGameObjects.json");
 
     public static void SaveUML(string input)
@@ -51,7 +51,7 @@ public static class SaverLoader
         }
     }
 
-    public static void LoadUML()
+    public static void LoadUML() //Si t'utilises ça depuis l'UI il se passe des choses suspectes (ça marche pas en gros, faut faire depuis là bas)
     {
         try
         {
@@ -66,6 +66,18 @@ public static class SaverLoader
             GenerativeProcess.SetJsonScripts(jsonString);
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
             var root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            Debug.Log("UML Loaded");
+
+            //Reload UI (cas relous...) géré par uml diag
+            if (root != null)
+            {
+                UMLDiag.Instance.ReloadUI(root);
+                Debug.Log("reload ui?");
+            }
+            else {
+                Debug.Log("TRES SUS NE PAS IGNORER CE DEBUG");
+            }
+
         }
         catch (Exception ex)
         {

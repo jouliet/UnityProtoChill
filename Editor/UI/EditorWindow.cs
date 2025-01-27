@@ -129,7 +129,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
         {
             ObjectResearch.AllBaseObjects.Clear();
             Debug.Log("Text submitted: " + userInput);
-            UMLDiagramWindow.ShowDiagram(selectedObject);
+            //UMLDiagramWindow.ShowDiagram(selectedObject);
         }
     }
     GUILayout.EndHorizontal();

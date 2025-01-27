@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static SaverLoader;
 
 namespace UMLClassDiag
 {
@@ -25,7 +26,13 @@ namespace UMLClassDiag
             window.Repaint();
             window.Refresh();
         }
+        private void OnGUI()
+        {   
 
+            if (ObjectResearch.AllBaseObjects.Count == 0){
+                LoadUML();
+            }
+        }
         public void ReloadDiagram(BaseObject root)
         {
             canvas.Clear();
@@ -97,6 +104,9 @@ namespace UMLClassDiag
                 methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
 
+            var generateButton = new Button(() => GenerateObject(root)) { text = "Generate" };
+            umlNode.Add(generateButton);
+
             nodeContainer.Add(umlNode);
             canvas.Add(nodeContainer);
 
@@ -132,7 +142,14 @@ namespace UMLClassDiag
 
             });
         }
+        public void GenerateObject(BaseObject obj)
+        {
+            // Ajoutez la logique pour générer un objet à partir de `obj`.
+            Debug.Log($"GenerateObject called for {obj.Name}");
 
+            // Exemple d'appel d'une méthode `Generate` sur l'objet
+            obj.GenerateScript();  // Si vous avez une méthode `Generate` sur votre classe `BaseObject`
+        }
         private float CalculateTotalWidth(BaseObject node)
         {
             if (node.ComposedClasses.Count == 0)

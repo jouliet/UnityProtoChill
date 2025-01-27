@@ -10,24 +10,50 @@ using ChatClass;
 using static MyEditorWindow;
 public class UMLDiag : GenerativeProcess
 {
-    private UMLDiagramWindow umlDiagramWindow;
+    private static UMLDiag _instance;
 
-    ~UMLDiag()
+    public static UMLDiag Instance
     {
-      MyEditorWindow.OnSubmitText -= OnSubmit;
-      MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
-      ChatWindow.OnSubmitText -= OnSubmit;
-      UIManager.OnGenerateScriptEvent -= OnGenerateScript;
-
+        get
+        {
+            if (_instance == null)
+            {
+                Debug.LogError("UMLDiag instance not initialized. Call Initialize() first.");
+            }
+            return _instance;
+        }
     }
 
-    public UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
+    private UMLDiagramWindow umlDiagramWindow;
+
+    private UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
     {
-        // UML est abonné si tout se passe bien
         umlDiagramWindow = umlDiagramWindowInstance;
+
+
         ChatWindow.OnSubmitText += OnSubmit;
         UIManager.OnGenerateScriptEvent += OnGenerateScript;
-        Debug.Log("UMLDiag process initialized.");
+    }
+
+
+    public static void Initialize(UMLDiagramWindow umlDiagramWindowInstance)
+    {
+        if (_instance != null)
+        {
+            return;
+        }
+
+        _instance = new UMLDiag(umlDiagramWindowInstance);
+    }
+
+
+
+    // Méthode de nettoyage pour désabonner les événements
+    private void Cleanup()
+    {
+        ChatWindow.OnSubmitText -= OnSubmit;
+        UIManager.OnGenerateScriptEvent -= OnGenerateScript;
+        Debug.Log("UMLDiag events unsubscribed.");
     }
 
     public void OnSubmit(string input)
@@ -130,7 +156,7 @@ public class UMLDiag : GenerativeProcess
     //GenerateScripts est lié à l'event UI generateScripts for selected baseObject
     private void GenerateScript(BaseObject root){
         Debug.Log("Script was generated");
-        root.GenerateScript(gptGenerator);        
+        root.GenerateScript();
     }
 
     private string prefabJsonStructure = 
@@ -177,4 +203,14 @@ public class UMLDiag : GenerativeProcess
       });
     }
 
+
+
+    public void ReloadUI(BaseObject root){
+      if (umlDiagramWindow == null)
+        {
+          Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+          return;
+        }
+      umlDiagramWindow.ReloadDiagram(root);
+    }
 }

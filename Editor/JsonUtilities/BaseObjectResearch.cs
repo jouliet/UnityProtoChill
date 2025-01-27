@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UMLClassDiag;
-
+using System.Linq;
 public class ObjectResearch
 {
     private static ObjectResearch _instance;
@@ -60,8 +60,19 @@ public class ObjectResearch
         return baseObjectList;
     }
 
+    //NO DOUBLONS I SAID
     public static void Add(BaseObject obj){
-        AllBaseObjects.Add(obj);
+    
+        var existingObject = AllBaseObjects.FirstOrDefault(o => o.Equals(obj));
+        
+        if (existingObject == null)
+        {
+            AllBaseObjects.Add(obj);
+        }
+        else
+        {
+            Debug.Log($"objet {obj.Name} doublon grrr");
+        }
     }
 }
 
