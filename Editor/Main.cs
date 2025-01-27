@@ -21,18 +21,13 @@ public class Main
         }
     }
 
-    private UMLDiag umlDiag;
 
     public void Init(UMLDiagramWindow umlDiagramWindow)
     {
         ObjectResearch.CleanUp();
-        umlDiag = new UMLDiag(umlDiagramWindow);
+        UMLDiag.Initialize(umlDiagramWindow);
     }
 
-    public void Cleanup()
-    {
-        umlDiag = null;
-    }
     // Constructeur privé pour empêcher la création d'instances externes
     private Main()
     {

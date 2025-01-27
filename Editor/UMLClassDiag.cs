@@ -5,6 +5,9 @@ using System.IO;
 using ChatGPTWrapper;
 using System.Text.RegularExpressions;
 using static SaverLoader;
+using static ObjectResearch;
+using System.Linq;
+using System;
 
 namespace UMLClassDiag
 {
@@ -38,9 +41,28 @@ public class BaseObject
     // On constitue la liste localement
     public BaseObject(){
         ObjectResearch.Add(this);
-        //Debug.Log("Research system base objects list updated : " + this.Name);
+        Debug.Log("Research system base objects list updated, new object : " + Name);
+        Debug.Log(AllBaseObjects.Count + "hmmm");
     }
 
+    ~BaseObject(){
+        AllBaseObjects.Remove(this);
+    }
+ 
+    public override bool Equals(object obj)
+    {
+        if (obj is BaseObject other)
+        {
+            return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
+    }
+
+    // Implémenter GetHashCode pour garantir que l'égalité fonctionne dans les collections
+    public override int GetHashCode()
+    {
+        return Name?.GetHashCode() ?? 0;
+    }
 
     public string Name { get; set; }
     public List<Attribute> Attributes { get; set; } = new List<Attribute>();
@@ -51,10 +73,10 @@ public class BaseObject
     private FastUnityPusher _fastUnityPusher = new FastUnityPusher();
 
     // Appelé par UMLDiag ligne 110
-    public void GenerateScript(GPTGenerator gptGenerator){
+    public void GenerateScript(){
 
         
-        GenerateScriptbis(gptGenerator);
+        GenerateScriptbis();
         // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
         //Debug.Log("oui");
@@ -68,17 +90,17 @@ public class BaseObject
     
     
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
-    private void GenerateScriptbis(GPTGenerator gptGenerator)
+    private void GenerateScriptbis()
     {
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
         "You are in Unity, write this c# class :" + this.Name + "as described in this json : " + this.ToString() + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
 Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO";
-        if (gptGenerator == null){
+        if (UMLDiag.gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
         }
-        gptGenerator.GenerateFromText(input, (response) =>
+        UMLDiag.gptGenerator.GenerateFromText(input, (response) =>
         {
             Debug.Log("Generated class: " + response);
             WriteScriptFile(response);
@@ -105,6 +127,7 @@ Never assume a method, class or function exists unless specified in the uml. Rel
         // Important que ce soit à la fin comme ça !!!! (pour des raisons obscures peut être multithread unity bizarre)
          #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
+        //LoadUML();
         #endif
     }
     
@@ -165,17 +188,27 @@ public class JSONMapper
         return baseObject;
     }
 
-
+    //No duplicate names allowed!!
     public static BaseObject MapToBaseObject(Dictionary<string, object> jsonDict)
     {
+        
+        var name = jsonDict.ContainsKey("Name") ? jsonDict["Name"].ToString() : string.Empty;
+
+        // var existingObject = AllBaseObjects.FirstOrDefault(obj => obj.Name == name);
+        // if (existingObject != null)
+        // {
+        //     return existingObject; // On retourne l'objet existant si noms égaux, conséquences imprévisibles jcomprend plus rien à ce que je code
+        // }
+
         var baseObject = new BaseObject
         {
-            Name = jsonDict.ContainsKey("Name") ? jsonDict["Name"].ToString() : string.Empty,
+            Name = name,
             Attributes = MapAttributes(jsonDict),
             Methods = MapMethods(jsonDict),
             ComposedClasses = MapComposedClasses(jsonDict)
         };
 
+        AllBaseObjects.Add(baseObject);
         return baseObject;
     }
 
