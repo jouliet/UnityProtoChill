@@ -1,0 +1,18 @@
+{
+    "gameObjects": [
+        {
+        "name": "string (nom du GameObject)",
+        "tag": "string (tag du GameObject ou 'Untagged')",
+        "layer": "string (layer du GameObject ou 'Default')",
+        "components": [
+            {
+            "type": "string (nom du composant, ex: Transform, Rigidbody, Script)",
+            "properties": {
+                "property1": "value1 (clé-valeurs spécifiques au composant)",
+                "property2": "value2"
+            }
+            }
+        ]
+        }
+    ]
+}

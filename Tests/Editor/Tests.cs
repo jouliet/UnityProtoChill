@@ -227,6 +227,27 @@ public class GameObjectCreatorTest{
     }
 }
 
+public class NewUMLJsonStructTest{
+    [Test]
+    public void TestNewMapper(){
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/UMLStructure.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        //Debug.Log("here is the json file:");
+        //Debug.Log(jsonString);
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+        List<BaseObject> bos = NewJsonMapper.MapAllBaseObjects(parsedObject);
+        Debug.Log ("nb classes: " + bos.Count);
+        foreach(BaseObject bo in bos){
+            Debug.Log(bo);
+        }
+    }
+}
+
 
 
 

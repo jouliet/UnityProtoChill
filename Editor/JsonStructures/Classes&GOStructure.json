@@ -1,0 +1,77 @@
+{
+    "Classes&GOs": {
+      "Classes": [
+        {
+        "Name": "Script1",
+        "Attributes": [
+            {
+            "Name": "AttributeName1",
+            "Type": "AttributeType1",
+            "DefaultValue": "DefaultValue1"
+            },
+            {
+            "Name": "AttributeName2",
+            "Type": "AttributeType2",
+            "DefaultValue": "null"
+            }
+        ],
+        "Methods": [
+            {
+            "Name": "MethodName1",
+            "ReturnType": "ReturnType1",
+            "Parameters": [
+                {
+                "Name": "ParamName1",
+                "Type": "ParamType1",
+                "DefaultValue": "ParamDefaultValue1"
+                }
+            ]
+            },
+            {
+            "Name": "MethodName2",
+            "ReturnType": "ReturnType2",
+            "Parameters": []
+            }
+        ],
+        "ComposedClasses": ["Script2"],
+        "ParentClass": "null"
+        },
+        {
+        "Name": "Script2",
+        "Attributes": [
+            {
+            "Name": "AttributeName1",
+            "Type": "AttributeType1",
+            "DefaultValue": "DefaultValue1"
+            }
+        ],
+        "Methods": [
+            {
+            "Name": "MethodName2",
+            "ReturnType": "ReturnType2",
+            "Parameters": []
+            }
+        ],
+        "ComposedClasses": "null",
+        "ParentClass": "null"
+        }
+        ]
+    },
+    "GameObjects": [
+        {
+        "name": "string (nom du GameObject)",
+        "tag": "string (tag du GameObject ou 'Untagged')",
+        "layer": "string (layer du GameObject ou 'Default')",
+        "components": [
+            {
+            "type": "string (nom du composant, ex: Transform, Rigidbody, Script)",
+            "properties": {
+                "property1": "value1 (clé-valeurs spécifiques au composant)",
+                "property2": "value2"
+            }
+            }
+        ]
+        }
+    ]
+}
+  

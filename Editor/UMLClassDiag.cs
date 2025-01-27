@@ -5,6 +5,8 @@ using System.IO;
 using ChatGPTWrapper;
 using System.Text.RegularExpressions;
 using static SaverLoader;
+using System;
+using Unity.VisualScripting.YamlDotNet.Core.Events;
 
 namespace UMLClassDiag
 {
@@ -241,6 +243,153 @@ public class JSONMapper
                 {
                     var composedClass = MapToBaseObject(composedClassDict);
                     composedClassesList.Add(composedClass);
+                }
+            }
+        }
+
+        return composedClassesList;
+    }
+}
+
+public class NewJsonMapper{
+    public static List<object> Classes;
+    public static List<BaseObject> BaseObjects;
+    public static BaseObject TrackBaseObjectByName(string className){
+        foreach (BaseObject bo in BaseObjects){
+            if (bo.Name == className){
+                return bo;
+            }
+        }
+        return null;
+    }
+    public static BaseObject MapPreciseBaseObject(List<object> jsonList, string className){
+        var baseObject = TrackBaseObjectByName(className);
+        if (baseObject != null){
+            return baseObject;
+        }
+        throw new Exception("La classe " + className  + " n'existe pas.");
+    }
+
+    public static List<BaseObject> MapAllBaseObjects(Dictionary<string, object> jsonDict){
+        if (BaseObjects == null){
+            BaseObjects = new List<BaseObject>();
+        }
+        
+        BaseObject bo;
+        if (jsonDict == null){
+            throw new Exception("Dictionary of classes no defined: Unable to create baseObjects");
+        }
+
+        if (jsonDict.ContainsKey("Classes") && jsonDict["Classes"] is List<object> classes)
+        {
+            if (Classes == null){
+                Classes = (List<object>)jsonDict["Classes"];
+            }
+            foreach (var _class in classes) 
+            {
+                if (_class is Dictionary<string, object> classDict)
+                {
+                    bo = MapToBaseObject(classDict);
+                }
+            }
+            AddComposedClasses(classes);
+            return BaseObjects;
+        }else{
+            Debug.LogError("Le json est mal écrit à la racine. Le parser ne fonctionne pas!");
+            return null;
+        }
+    }
+
+    public static void AddComposedClasses(List<object> classes){
+        foreach (var _class in classes) 
+        {
+            if (_class is Dictionary<string, object> _classDict)
+            {
+                string className = _classDict.ContainsKey("Name") ? _classDict["Name"].ToString() : string.Empty;
+                BaseObject bo = TrackBaseObjectByName(className);
+                if (bo == null){
+                    throw new Exception("la classe " + className + " n'existe pas." );
+                }
+                bo.ComposedClasses = MapComposedClasses(_classDict);
+            }
+        }
+    }
+
+    public static BaseObject MapToBaseObject(Dictionary<string, object> jsonDict)
+    {
+        var baseObject = new BaseObject
+        {
+            Name = jsonDict.ContainsKey("Name") ? jsonDict["Name"].ToString() : string.Empty,
+            Attributes = MapAttributes(jsonDict),
+            Methods = MapMethods(jsonDict),
+            // Les classes composées seront ajoutées après. Si on le fait tout de suite, 
+            // ca fait une boucle infini.
+        };
+        BaseObjects.Add(baseObject);
+    
+        return baseObject;
+    }
+
+    private static List<Attribute> MapAttributes(Dictionary<string, object> jsonDict)
+    {
+        var attributesList = new List<Attribute>();
+
+        if (jsonDict.ContainsKey("Attributes") && jsonDict["Attributes"] is List<object> attributes)
+        {
+            foreach (var attributeObj in attributes)
+            {
+                if (attributeObj is Dictionary<string, object> attributeDict)
+                {
+                    var attribute = new Attribute
+                    {
+                        Name = attributeDict.ContainsKey("Name") ? attributeDict["Name"].ToString() : string.Empty,
+                        Type = attributeDict.ContainsKey("Type") ? attributeDict["Type"].ToString() : string.Empty,
+                        DefaultValue = attributeDict.ContainsKey("DefaultValue") ? attributeDict["DefaultValue"]?.ToString() : null
+                    };
+
+                    attributesList.Add(attribute);
+                }
+            }
+        }
+        return attributesList;
+    }
+
+    private static List<Method> MapMethods(Dictionary<string, object> jsonDict)
+    {
+        var methodsList = new List<Method>();
+
+        if (jsonDict.ContainsKey("Methods") && jsonDict["Methods"] is List<object> methods)
+        {
+            foreach (var methodObj in methods)
+            {
+                if (methodObj is Dictionary<string, object> methodDict)
+                {
+                    var method = new Method
+                    {
+                        Name = methodDict.ContainsKey("Name") ? methodDict["Name"].ToString() : string.Empty,
+                        ReturnType = methodDict.ContainsKey("ReturnType") ? methodDict["ReturnType"].ToString() : string.Empty,
+                        Parameters = MapAttributes(methodDict)
+                    };
+
+                    methodsList.Add(method);
+                }
+            }
+        }
+
+        return methodsList;
+    }
+
+    private static List<BaseObject> MapComposedClasses(Dictionary<string, object> jsonDict)
+    {
+        var composedClassesList = new List<BaseObject>();
+        if (jsonDict.ContainsKey("ComposedClasses") && jsonDict["ComposedClasses"] is List<object> composedClasses)
+        {
+            foreach (var composedClass in composedClasses)
+            {
+                if (composedClass is string composedClassName)
+                {
+                    var composedClassObject = MapPreciseBaseObject(Classes, composedClassName);
+                    composedClassesList.Add(composedClassObject);
                 }
             }
         }
