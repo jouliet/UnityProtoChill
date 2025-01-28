@@ -10,7 +10,7 @@ using static UMLDiag;
 
 public static class SaverLoader
 {
-    private static string generatedContentFolder = "Assets/generatedContent"; 
+    private static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
     public static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
     private static string GOJsonFilePath = Path.Combine(generatedContentFolder, "currentGameObjects.json");
 
@@ -58,6 +58,7 @@ public static class SaverLoader
             
             if (!File.Exists(UMLFilePath))
             {
+                Debug.Log("fichier n'existe po");
                 return;
             }
             
@@ -65,14 +66,13 @@ public static class SaverLoader
             string jsonString = File.ReadAllText(UMLFilePath);
             GenerativeProcess.SetJsonScripts(jsonString);
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-            var root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            var root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             Debug.Log("UML Loaded");
 
             //Reload UI (cas relous...) géré par uml diag
             if (root != null)
             {
                 UMLDiag.Instance.ReloadUI(root);
-                Debug.Log("reload ui?");
             }
             else {
                 Debug.Log("TRES SUS NE PAS IGNORER CE DEBUG");

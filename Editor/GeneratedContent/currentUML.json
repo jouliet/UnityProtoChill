@@ -1,0 +1,134 @@
+```user
+To create a UML for a tower defense system, I will define the main components of the game, such as the Tower, Enemy, and GameManager classes. Each class will have attributes and methods relevant to its role in the game. I will also include relationships between these classes, such as composition, where appropriate. The UML will be structured in JSON format as per your request.
+```
+
+```json
+{
+  "UML": {
+    "Name": "GameManager",
+    "Attributes": [
+      {
+        "Name": "WaveNumber",
+        "Type": "int",
+        "DefaultValue": "0"
+      },
+      {
+        "Name": "PlayerHealth",
+        "Type": "int",
+        "DefaultValue": "100"
+      },
+      {
+        "Name": "Currency",
+        "Type": "int",
+        "DefaultValue": "50"
+      }
+    ],
+    "Methods": [
+      {
+        "Name": "StartWave",
+        "ReturnType": "void",
+        "Parameters": []
+      },
+      {
+        "Name": "EndWave",
+        "ReturnType": "void",
+        "Parameters": []
+      },
+      {
+        "Name": "SpawnEnemy",
+        "ReturnType": "void",
+        "Parameters": [
+          {
+            "Name": "enemyType",
+            "Type": "string",
+            "DefaultValue": "null"
+          }
+        ]
+      }
+    ],
+    "ComposedClasses": [
+      {
+        "Name": "Tower",
+        "Attributes": [
+          {
+            "Name": "Damage",
+            "Type": "int",
+            "DefaultValue": "10"
+          },
+          {
+            "Name": "Range",
+            "Type": "float",
+            "DefaultValue": "5.0"
+          },
+          {
+            "Name": "FireRate",
+            "Type": "float",
+            "DefaultValue": "1.0"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Shoot",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "target",
+                "Type": "Enemy",
+                "DefaultValue": "null"
+              }
+            ]
+          },
+          {
+            "Name": "Upgrade",
+            "ReturnType": "void",
+            "Parameters": []
+          }
+        ],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Enemy",
+        "Attributes": [
+          {
+            "Name": "Health",
+            "Type": "int",
+            "DefaultValue": "50"
+          },
+          {
+            "Name": "Speed",
+            "Type": "float",
+            "DefaultValue": "2.0"
+          },
+          {
+            "Name": "Reward",
+            "Type": "int",
+            "DefaultValue": "10"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Move",
+            "ReturnType": "void",
+            "Parameters": []
+          },
+          {
+            "Name": "TakeDamage",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      }
+    ],
+    "ParentClass": "null"
+  }
+}
+```

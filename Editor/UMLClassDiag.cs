@@ -9,7 +9,7 @@ using static ObjectResearch;
 using System.Linq;
 using System;
 using Unity.VisualScripting.YamlDotNet.Core.Events;
-
+using static JsonParser;
 namespace UMLClassDiag
 {
 public class Attribute
@@ -42,8 +42,6 @@ public class BaseObject
     // On constitue la liste localement
     public BaseObject(){
         ObjectResearch.Add(this);
-        Debug.Log("Research system base objects list updated, new object : " + Name);
-        Debug.Log(AllBaseObjects.Count + "hmmm");
     }
 
     ~BaseObject(){
@@ -96,7 +94,7 @@ public class BaseObject
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
         "You are in Unity, write this c# class :" + this.Name + "as described in this json : " + this.ToString() + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
-Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO";
+Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
         if (UMLDiag.gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -104,7 +102,7 @@ Never assume a method, class or function exists unless specified in the uml. Rel
         UMLDiag.gptGenerator.GenerateFromText(input, (response) =>
         {
             Debug.Log("Generated class: " + response);
-            WriteScriptFile(response);
+            WriteScriptFile(GetScript(response));
  
         });
     }

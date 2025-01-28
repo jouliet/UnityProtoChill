@@ -51,7 +51,6 @@ public abstract class GenerativeProcess
         // MyEditorWindow.OnGenerateScriptEvent -= OnGenerateScript;
     }
 
-
 }
 
 

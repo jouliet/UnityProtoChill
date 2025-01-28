@@ -49,7 +49,7 @@ namespace ChatClass
             userInput = inputField.value;
             if (!string.IsNullOrWhiteSpace(userInput))
             {
-                // Actuellement le seul abonné est l'instance de UMLDiag de main.
+                // Actuellement le seul abonnï¿½ est l'instance de UMLDiag de main.
                 OnSubmitText?.Invoke("Make a UML for the system :" + userInput);
 
                 VisualElement bubble = new VisualElement();
@@ -78,6 +78,28 @@ namespace ChatClass
             content.multiline = true;
             content.value = message;
             content.isReadOnly = true;
+            bubble.Add(content);
+
+            chatContainer.Add(bubble);
+            chatContainer.ScrollTo(bubble);
+        }
+        
+        public void AddChatResponse(string responseText)
+        {
+            if (string.IsNullOrWhiteSpace(responseText))
+                return;
+
+
+            VisualElement bubble = new VisualElement();
+            bubble.AddToClassList("chat-response-bubble");
+            TextField content = new TextField();
+            content.AddToClassList("chat-response-text");
+
+            content.multiline = true;
+            content.value = responseText;
+            content.isReadOnly = true;
+            content.style.flexGrow = 1;
+            content.style.whiteSpace = WhiteSpace.Normal;
             bubble.Add(content);
 
             chatContainer.Add(bubble);

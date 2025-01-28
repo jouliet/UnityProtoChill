@@ -53,7 +53,7 @@ public class GameObjectCreator : GenerativeProcess{
     public GameObjectCreator(){
         UIManager.OnGenerateGameObjectEvent += OnGenerateGameObject;
         UIManager.OnGenerateGameObjectListEvent += GenerateGOs;
-        Debug.Log("GameObject process initialized.");
+        // Debug.Log("GameObject process initialized.");
     }
 
     ~GameObjectCreator(){
