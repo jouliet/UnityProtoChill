@@ -32,11 +32,12 @@ public class UIManager : EditorWindow
     private Button generateGOListButton;
     private Button gameObjectSelectorButton;
     private Button generateGOButton;
-    private GameObjectPopUp GOPopup;
+    private GameObjectPopUp GOPopUp;
 
     public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public static event System.Action OnGenerateGameObjectListEvent;
     public static event System.Action<string> OnGenerateGameObjectEvent;
+    public event System.Action<string> OnMessageToChat;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -120,17 +121,22 @@ public class UIManager : EditorWindow
         rootVisualElement.Add(rootContainer);
     }
 
+    //
+    // Views Initialization
+    //
+
     private void InitializeUMLView()
     {
         umlDiagramWindow = ScriptableObject.CreateInstance<UMLClassDiag.UMLDiagramWindow>();
-        var umlCanvas = umlDiagramWindow.CreateDiagramView();
+        var umlCanvas = umlDiagramWindow.CreateDiagramView(this);
+        umlCanvas.style.flexGrow = 1;
         umlContainer.Add(umlCanvas);
     }
 
     private void InitializeChatView()
     {
         chatWindow = ScriptableObject.CreateInstance<ChatClass.ChatWindow>();
-        var chatCanvas = chatWindow.CreateChatView();
+        var chatCanvas = chatWindow.CreateChatView(this);
         chatContainer.Add(chatCanvas);
     }
 
@@ -184,8 +190,8 @@ public class UIManager : EditorWindow
     private void InitializeGOSelector()
     {
         gameObjectSelectorButton = new Button() { text = "GameObject Selector" };
-        GOPopup = new GameObjectPopUp();
-        gameObjectSelectorButton.clicked += () => PopupWindow.Show(gameObjectSelectorButton.worldBound, GOPopup);
+        GOPopUp = new GameObjectPopUp();
+        gameObjectSelectorButton.clicked += () => PopupWindow.Show(gameObjectSelectorButton.worldBound, GOPopUp);
         settingsContainer.Add(gameObjectSelectorButton);
     }
 
@@ -194,15 +200,15 @@ public class UIManager : EditorWindow
         generateGOButton.clicked += OnGenerateGameObjectButton;
         settingsContainer.Add(generateGOButton);
     }
+
+    //
     //
     // On Click Events
     //
 
     private void OnTestButtonClick()
     {
-        //Debug.Log("Custom OnClick Event: Test button clicked!");
-
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUpProblem.json");
         if (jsonFile != null)
         {
             string jsonString = jsonFile.text;
@@ -271,8 +277,9 @@ public class UIManager : EditorWindow
             GameObjectCreator.StockEveryGOsInList();
         }
     }
+
     private void OnGenerateGameObjectButton(){
-        List<string> gameObjectNames = GOPopup.GetSelectedGameObjects();
+        List<string> gameObjectNames = GOPopUp.GetSelectedGameObjects();
         if (gameObjectNames.Count > 0)
         {
             foreach(var goName in gameObjectNames)
@@ -285,6 +292,11 @@ public class UIManager : EditorWindow
             Debug.LogWarning("There is no selected game object to be generated.");
         }
         //Debug.LogWarning("Bouton toujours pas implementé");
+    }
+
+    public void SendMessageToChatWindow(string message)
+    {
+        OnMessageToChat?.Invoke(message);
     }
 }
 

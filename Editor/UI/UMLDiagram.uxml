@@ -1,6 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
     <ui:VisualElement class="uml-diagram">
-        <ui:Label name="base-object" class="uml-base-object">ClassName</ui:Label>
+        <ui:VisualElement class="uml-diagram-header">
+            <ui:Label name="base-object" class="uml-base-object">ClassName</ui:Label>
+            <ui:Button name="expand-button" class="expand-button"/>
+        </ui:VisualElement>
         <ui:VisualElement class="uml-section">
             <ui:Label name="attributes" class="uml-text">Attributes</ui:Label>
             <ui:VisualElement name="attributes" class="uml-attributes"></ui:VisualElement>

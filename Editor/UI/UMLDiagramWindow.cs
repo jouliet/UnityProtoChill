@@ -1,12 +1,18 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.IO;
+using System.Collections.Generic;
+using static JsonParser;
+using static UIManager;
 using static SaverLoader;
 
 namespace UMLClassDiag
 {
     public class UMLDiagramWindow : EditorWindow
     {
+        private UIManager uiManager;
+
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
 
@@ -15,9 +21,13 @@ namespace UMLClassDiag
         private float offset = 10f;
 
         private Vector2 dragStart;
+        private bool isDragging;
         private VisualElement canvas;
         private float canvasWidth = 1000f;
-        private float canvasHeight = 1000f;
+        // private float canvasHeight = 1000f;
+
+        private VisualElement selectedNode;
+        private BaseObject selectedObject;
 
         public static void ShowDiagram(BaseObject root)
         {
@@ -47,32 +57,43 @@ namespace UMLClassDiag
             }
         }
 
-        public VisualElement CreateDiagramView()
+        public VisualElement CreateDiagramView(UIManager manager)
         {
+            uiManager = manager;
+
             // Load Stylesheet
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
             umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
+            var windowVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uxml");
 
-            // Hand-tool navigation set up
-            canvas = new VisualElement();
-            canvas.style.position = Position.Absolute;
-            canvas.style.left = - canvasWidth / 2 + width; // Center display
-            canvas.style.top = 0f;
-            canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
-            canvas.style.height = canvasHeight;
-            canvas.styleSheets.Add(umlStyleSheet);
-
+            var root = windowVisualTree.CloneTree();
             rootVisualElement.Clear();
-            rootVisualElement.Add(canvas);
+            rootVisualElement.Add(root);
+
+            // Set up UML canvas
+            canvas = root.Q<VisualElement>("canvas");
+            //canvas.style.left = - canvasWidth / 2 + width; // Center display
+            //canvas.style.top = 0f;
+            //canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
+            //canvas.style.height = canvasHeight;
+            canvas.styleSheets.Add(umlStyleSheet);
 
             if (rootObject != null)
             {
                 DrawNode(rootObject, canvasWidth / 2, 0f);
             }
 
+            // Zoom buttons set up
+            var zoomInButton = root.Q<Button>("zoom-in-button");
+            zoomInButton.clicked += () => ChangeZoom(true);
+            var zoomOutButton = root.Q<Button>("zoom-out-button");
+            zoomOutButton.clicked += () => ChangeZoom(false);
+            var refreshButton = root.Q<Button>("refresh-button");
+            refreshButton.clicked += OnRefreshtButtonClick;
+
             EnableHandTool();
 
-            return canvas;
+            return root;
         }
 
         //
@@ -108,6 +129,28 @@ namespace UMLClassDiag
             umlNode.Add(generateButton);
 
             nodeContainer.Add(umlNode);
+            nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
+            {
+                if (!isDragging) {
+                    if (selectedObject != null && selectedObject != root)
+                    {
+                        selectedNode.RemoveFromClassList("uml-diagram__selected");
+                    }
+                    if (nodeContainer.ClassListContains("uml-diagram__selected"))
+                    {
+                        nodeContainer.RemoveFromClassList("uml-diagram__selected");
+                        selectedNode = null;
+                        selectedObject = null;
+                    }
+                    else
+                    {
+                        nodeContainer.AddToClassList("uml-diagram__selected");
+                        selectedNode = nodeContainer;
+                        OnSelectNode(root);
+                    }
+                }
+                evt.StopPropagation();
+            });
             canvas.Add(nodeContainer);
 
             nodeContainer.schedule.Execute(() =>
@@ -144,11 +187,11 @@ namespace UMLClassDiag
         }
         public void GenerateObject(BaseObject obj)
         {
-            // Ajoutez la logique pour générer un objet à partir de `obj`.
+            // Ajoutez la logique pour g�n�rer un objet � partir de `obj`.
             Debug.Log($"GenerateObject called for {obj.Name}");
 
-            // Exemple d'appel d'une méthode `Generate` sur l'objet
-            obj.GenerateScript();  // Si vous avez une méthode `Generate` sur votre classe `BaseObject`
+            // Exemple d'appel d'une m�thode `Generate` sur l'objet
+            obj.GenerateScript();  // Si vous avez une m�thode `Generate` sur votre classe `BaseObject`
         }
         private float CalculateTotalWidth(BaseObject node)
         {
@@ -200,15 +243,16 @@ namespace UMLClassDiag
             canvas.RegisterCallback<MouseMoveEvent>(OnMouseMove);
             canvas.RegisterCallback<MouseUpEvent>(OnMouseUp);
             canvas.RegisterCallback<WheelEvent>(OnMouseWheel);
-            AddZoomButtons();
         }
 
         private void OnMouseDown(MouseDownEvent evt)
         {
             // Record the starting point of the drag
-            if (evt.button == 0)
+            if (evt.button == 0) // left click event
             {
                 dragStart = evt.mousePosition;
+                isDragging = false;
+
                 evt.StopPropagation();
             }
         }
@@ -216,8 +260,10 @@ namespace UMLClassDiag
         private void OnMouseMove(MouseMoveEvent evt)
         {
             // Adjust canvas position
-            if (evt.pressedButtons == 1)
+            if (evt.pressedButtons == 1) // for left mouse button
             {
+                isDragging = true;
+
                 Vector2 currentMousePosition = evt.mousePosition;
                 Vector2 delta = currentMousePosition - dragStart;
 
@@ -232,9 +278,20 @@ namespace UMLClassDiag
 
         private void OnMouseUp(MouseUpEvent evt)
         {
-            // Stop dragging
             if (evt.button == 0)
             {
+                // handles deselected when clicking on canvas
+                if (!isDragging)
+                {
+                    if (selectedNode != null)
+                    {
+                        selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        selectedNode = null;
+                        selectedObject = null;
+                    }
+                }
+                isDragging = false;
+
                 evt.StopPropagation();
             }
         }
@@ -277,31 +334,6 @@ namespace UMLClassDiag
             evt.StopPropagation();
         }
 
-        private void AddZoomButtons()
-        {
-            var overlayContainer = new VisualElement();
-            overlayContainer.style.position = Position.Absolute;
-            overlayContainer.style.top = 0;
-            overlayContainer.style.left = 0;
-            overlayContainer.style.right = 0;
-            overlayContainer.style.bottom = 0;
-            rootVisualElement.Add(overlayContainer);
-
-            var zoomInButton = new Button(() => ChangeZoom(true)) { text = "+" };
-            var zoomOutButton = new Button(() => ChangeZoom(false)) { text = "-" };
-
-            zoomInButton.style.position = Position.Absolute;
-            zoomInButton.style.top = 10;
-            zoomInButton.style.left = 10;
-
-            zoomOutButton.style.position = Position.Absolute;
-            zoomOutButton.style.top = 50;
-            zoomOutButton.style.left = 10;
-
-            overlayContainer.Add(zoomInButton);
-            overlayContainer.Add(zoomOutButton);
-        }
-
         private void ChangeZoom(bool zoomIn)
         {
             if (zoomIn)
@@ -322,5 +354,39 @@ namespace UMLClassDiag
             canvas.style.scale = new Scale(new Vector3(zoomScale, zoomScale, 1));
         }
 
+        /// 
+        /// CLICK EVENTS
+        /// 
+        private void OnRefreshtButtonClick()
+        {
+            string generatedContentFolder = "Assets/generatedContent";
+            string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
+        
+            if (!File.Exists(UMLFilePath))
+            {
+                Debug.LogError("Error refreshing UML.");
+                return;
+            }
+            string jsonString = File.ReadAllText(UMLFilePath);
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+            var baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            ReloadDiagram(baseObject);
+        }
+        
+        /// 
+        /// BASE OBJECT SELECTION
+        /// 
+        ///
+        private void OnSelectNode(BaseObject baseObject)
+        {
+            selectedObject = baseObject;
+            string msg = $"Node {baseObject.Name} selected in UML Diagram.";
+            uiManager.SendMessageToChatWindow(msg);
+        }
+
+        public BaseObject GetSelectedBaseObjectFromUML()
+        {
+            return selectedObject;
+        }
     }
 }

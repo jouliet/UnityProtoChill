@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="root" style="flex-grow: 1">
+        <ui:VisualElement name="canvas" style="width: 100%; height: 100%; border-color: white; border-width:3px;">
+            <!-- UML Diagram is dynamically addes here -->
+        </ui:VisualElement>
+
+        <ui:VisualElement name="overlay-container" style="position: absolute; top: 0px; left: 0px;">
+            <ui:Button name="zoom-in-button" style="top: 5px; left: 5px; background-color: red;" text="+"/>
+            <ui:Button name="zoom-out-button" style="top: 10px; left: 5px; background-color: blue;" text="-"/>
+            <ui:Button name="refresh-button" style="top: 50px; left: 5px;" text="R"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
