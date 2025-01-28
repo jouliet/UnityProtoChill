@@ -23,7 +23,6 @@ public class UIManager : EditorWindow
 
     public ChatWindow chatWindow;
     private UMLDiagramWindow umlDiagramWindow;
-    private ObjectPopUp objectPopUp;
 
     private Button testButton;
     private Button settingsButton;
@@ -97,10 +96,7 @@ public class UIManager : EditorWindow
         settingsContainer.style.flexDirection = FlexDirection.Row;
         settingsContainer.style.alignItems = Align.Center;
 
-        InitializeTestButton();
         InitializeGPTButton();
-        InitializeGenerateScriptPopUp();
-        InitializeGenerateScriptButton();
         InitializeGenerateGOListButton();
         InitializeGOSelector();
         InitializeGenerateGOButton();
@@ -160,12 +156,6 @@ public class UIManager : EditorWindow
     // Options Initialization
     //
 
-    private void InitializeTestButton()
-    {
-        testButton = new Button() { text = "Test" };
-        testButton.clicked += OnTestButtonClick;
-        settingsContainer.Add(testButton);
-    }
 
     private void InitializeGPTButton()
     {
@@ -174,20 +164,6 @@ public class UIManager : EditorWindow
         settingsContainer.Add(settingsButton);
     }
 
-    private void InitializeGenerateScriptPopUp()
-    {
-        objectSelectorButton = new Button() { text = "Object Selector" };
-        objectPopUp = new ObjectPopUp();
-        objectSelectorButton.clicked += () => PopupWindow.Show(objectSelectorButton.worldBound, objectPopUp);
-        settingsContainer.Add(objectSelectorButton);
-    }
-
-    private void InitializeGenerateScriptButton()
-    {
-        generateButton = new Button() { text = "Generate Script(s)" };
-        generateButton.clicked += OnGenerateScriptButtonClick;
-        settingsContainer.Add(generateButton);
-    }
 
     private void InitializeGenerateGOListButton(){
         generateGOListButton = new Button() { text = "Generate List of Game Objects" };
@@ -227,19 +203,6 @@ public class UIManager : EditorWindow
         }
     }
 
-    private void OnLoadUMLButtonClick(){
-
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
-        if (jsonFile != null)
-        {
-            string jsonString = jsonFile.text;
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-            ObjectResearch.CleanUp();
-            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
-            GenerativeProcess.SetJsonScripts(jsonString);
-            umlDiagramWindow.ReloadDiagram(baseObject);
-        }
-    }
 
 
     private void OnSettingsButtonClick()
@@ -249,21 +212,6 @@ public class UIManager : EditorWindow
         SettingsWindow.ShowWindow();
     }
 
-    private void OnGenerateScriptButtonClick()
-    {
-        List<BaseObject> objects = objectPopUp.GetSelectedObjects();
-        if (objects.Count > 0)
-        {
-            foreach(var baseObject in objects)
-            {
-                OnGenerateScriptEvent?.Invoke(baseObject);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("There is no selected script object to be generated.");
-        }
-    }
 
     private void OnGenerateGameObjectListButton(){
         Debug.Log("Wait for GOList generation.");
@@ -313,101 +261,6 @@ public class UIManager : EditorWindow
 
 }
 
-public class ObjectPopUp : PopupWindowContent
-{
-    private ScrollView scrollView;
-    private List<BaseObject> selectedObjects = new List<BaseObject>();
-    private bool allSelected = false;
-
-    public override void OnOpen()
-    {
-        //Debug.Log("Popup opened: " + this);
-    }
-
-    public override VisualElement CreateGUI()
-    {
-        var visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/ObjectPopUp.uxml");
-        var root = visualTreeAsset.CloneTree();
-        scrollView = root.Q<ScrollView>("base-object-list");
-        UpdateBaseObjectList();
-        return root;
-    }
-
-    public override void OnClose()
-    {
-        //Debug.Log("Popup closed: " + this);
-    }
-
-    public void UpdateBaseObjectList()
-    {
-        Debug.Log("update obj list");
-        scrollView.Clear();
-        selectedObjects.Clear();
-
-        if (ObjectResearch.AllBaseObjects.Count > 0)
-        {
-            foreach (var baseObject in ObjectResearch.AllBaseObjects)
-            {
-                var toggle = new Toggle(baseObject.Name)
-                {
-                    value = false
-                };
-
-                toggle.RegisterValueChangedCallback(evt =>
-                {
-                    if (evt.newValue)
-                    {
-                        if (!selectedObjects.Contains(baseObject))
-                        {
-                            selectedObjects.Add(baseObject);
-                            //Debug.Log($"{baseObject.Name} added to selection.");
-                        }
-                    }
-                    else
-                    {
-                        if (selectedObjects.Contains(baseObject))
-                        {
-                            selectedObjects.Remove(baseObject);
-                            //Debug.Log($"{baseObject.Name} removed from selection.");
-                        }
-                    }
-                });
-                scrollView.Add(toggle);
-            }
-
-            var allToggle = new Toggle("All");
-            allToggle.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue)
-                {
-                    allSelected = true;
-                }
-                else
-                {
-                    allSelected = false;
-                }
-            });
-            scrollView.Add(allToggle);
-        }
-        else
-        {
-            var emptyList = new Label("No base objects available");
-            scrollView.Add(emptyList);
-        }
-    }
-
-    public List<BaseObject> GetSelectedObjects()
-    {
-        if (allSelected)
-        {
-            return ObjectResearch.AllBaseObjects;
-        }
-        else
-        {
-            return selectedObjects;
-        }
-    }
-}
 
 
 public class GameObjectPopUp : PopupWindowContent
