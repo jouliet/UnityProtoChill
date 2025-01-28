@@ -58,7 +58,7 @@ public class UMLDiag : GenerativeProcess
 
     public void OnSubmit(string input)
     {
-        Debug.Log("Submit received in UMLDiag. Generating UML...");
+        Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
         GenerateUML(input);
     }
 
@@ -70,7 +70,7 @@ public class UMLDiag : GenerativeProcess
     private string umlJsonStructure = 
     @"You love object abstraction and are a big time JSON user. You will follow this exact format : 
 {
-  ""Root"": {
+  ""UML"": {
     ""Name"": ""ObjectName"",
     ""Attributes"": [
       {
@@ -124,9 +124,9 @@ public class UMLDiag : GenerativeProcess
 
     private void GenerateUML(string input)
     {
-
+      
         input = umlJsonStructure + input;
-        BaseObject root = null;
+        BaseObject root;
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -134,20 +134,20 @@ public class UMLDiag : GenerativeProcess
         gptGenerator.GenerateFromText(input, (response) =>
         {
             jsonScripts = response;
-            SaveUML(response);
+            SaveUML(jsonScripts);
             Debug.Log("Generated UML JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
 
             //Mapping vers structure objet maison
-            root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             if (umlDiagramWindow == null)
             {
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
-            umlDiagramWindow.ReloadDiagram(root);
+            umlDiagramWindow.ReloadDiagram(root); 
 
         });
     }

@@ -13,6 +13,7 @@ using UnityPusher;
 using System;
 using static ObjectResearch;
 
+using ChatGPTWrapper;
 public class UIManager : EditorWindow
 {
     private VisualElement mainContainer;
@@ -20,7 +21,7 @@ public class UIManager : EditorWindow
     private VisualElement chatContainer;
     private VisualElement settingsContainer;
 
-    private ChatWindow chatWindow;
+    public ChatWindow chatWindow;
     private UMLDiagramWindow umlDiagramWindow;
     private ObjectPopUp objectPopUp;
 
@@ -42,14 +43,26 @@ public class UIManager : EditorWindow
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
     {
+        if (HasOpenInstances<UIManager>())
+        {
+            CloseAllInstances();
+        }
         GetWindow<UIManager>("ProtoCHILL");
+    }
+
+    private static void CloseAllInstances()
+    {
+        var windows = Resources.FindObjectsOfTypeAll<UIManager>();
+        foreach (var window in windows)
+        {
+            window.Close();
+        }
     }
 
     // Temporaire ? histoire de pas avoir de trucs sus en attendant que les choses soient bien faites
 
     private void OnGUI()
     {   
-
         if (ObjectResearch.AllBaseObjects.Count == 0){
             LoadUML();
             LoadGOJson();
@@ -61,11 +74,15 @@ public class UIManager : EditorWindow
     {
         CreateLayout();
         Main.Instance.Init(umlDiagramWindow);
+        //Initialise GPTGenerator pour qu'il puisse envoyer des réponses quel que soit la source de l'appel ... On fait le tri après
+        GPTGenerator.Instance.uIManager =this;
+       
     }
 
     private void OnDisable()
     {
-        Debug.Log("UIManager disabled");
+        AssetDatabase.Refresh();
+        // Debug.Log("UIManager disabled");
     }
     private void CreateLayout()
     {
@@ -204,11 +221,26 @@ public class UIManager : EditorWindow
         {
             string jsonString = jsonFile.text;
             Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             GenerativeProcess.SetJsonScripts(jsonString);
             umlDiagramWindow.ReloadDiagram(baseObject);
         }
     }
+
+    private void OnLoadUMLButtonClick(){
+
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
+        if (jsonFile != null)
+        {
+            string jsonString = jsonFile.text;
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+            ObjectResearch.CleanUp();
+            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+            GenerativeProcess.SetJsonScripts(jsonString);
+            umlDiagramWindow.ReloadDiagram(baseObject);
+        }
+    }
+
 
     private void OnSettingsButtonClick()
     {
@@ -274,6 +306,11 @@ public class UIManager : EditorWindow
     {
         OnMessageToChat?.Invoke(message);
     }
+    public void AddChatResponse(string response){
+        chatWindow.AddChatResponse(response);
+    }
+
+
 }
 
 public class ObjectPopUp : PopupWindowContent

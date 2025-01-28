@@ -95,7 +95,7 @@ namespace UMLClassDiag
 
             return root;
         }
-
+ 
         //
         // DRAWING
         //
@@ -359,13 +359,14 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
+            LoadUML();
             var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
             if (jsonFile != null)
             {
                 string jsonString = jsonFile.text;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();
-                BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+                BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
                 GenerativeProcess.SetJsonScripts(jsonString);
                 ReloadDiagram(baseObject);
             }

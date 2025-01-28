@@ -214,4 +214,32 @@ public static string ObjectToString(object obj)
     }
 }
 
+public static string GetUserResponse(string response){
+
+    if (string.IsNullOrEmpty(response))
+    {
+        throw new Exception("Response is null or empty so it can't be parsed.");
+    }
+
+    response = response.Trim();
+    string userMarker = "```user";
+
+    int userStartIndex = response.IndexOf(userMarker);
+    if (userStartIndex != -1)
+    {
+        response = response.Substring(userStartIndex + userMarker.Length).Trim();
+    }
+    int endMarkerIndex = response.IndexOf("```");
+        if (endMarkerIndex != -1)
+        {
+            response = response.Substring(0, endMarkerIndex).Trim();
+        }
+    return response;
+    }
+public static string GetScript(string response){
+    return response;
 }
+
+
+}
+
