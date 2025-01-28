@@ -199,7 +199,7 @@ public class UIManager : EditorWindow
 
     private void OnTestButtonClick()
     {
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUpProblem.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonBaseObject.json");
         if (jsonFile != null)
         {
             string jsonString = jsonFile.text;

@@ -2,15 +2,17 @@
     <ui:VisualElement class="uml-diagram">
         <ui:VisualElement class="uml-diagram-header">
             <ui:Label name="base-object" class="uml-base-object">ClassName</ui:Label>
-            <ui:Button name="expand-button" class="expand-button"/>
+            <ui:Button name="collapse-button" class="collapse-button__down"/>
         </ui:VisualElement>
-        <ui:VisualElement class="uml-section">
-            <ui:Label name="attributes" class="uml-text">Attributes</ui:Label>
-            <ui:VisualElement name="attributes" class="uml-attributes"></ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement class="uml-section">
-            <ui:Label name="methods" class="uml-text">Methods</ui:Label>
-            <ui:VisualElement name="methods" class="uml-methods"></ui:VisualElement>
+        <ui:VisualElement name="uml-diagram-contents">
+            <ui:VisualElement class="uml-section">
+                <ui:Label name="attributes" class="uml-text">Attributes</ui:Label>
+                <ui:VisualElement name="attributes" class="uml-attributes"></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="uml-section">
+                <ui:Label name="methods" class="uml-text">Methods</ui:Label>
+                <ui:VisualElement name="methods" class="uml-methods"></ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
