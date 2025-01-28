@@ -20,6 +20,7 @@ namespace UMLClassDiag
         private float offset = 10f;
 
         private Vector2 dragStart;
+        private bool isDragging;
         private VisualElement canvas;
         private float canvasWidth = 1000f;
         // private float canvasHeight = 1000f;
@@ -118,23 +119,25 @@ namespace UMLClassDiag
             }
 
             nodeContainer.Add(umlNode);
-            nodeContainer.RegisterCallback<MouseDownEvent>(evt =>
+            nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
             {
-                if (selectedObject != null && selectedObject != root)
-                {
-                    selectedNode.RemoveFromClassList("uml-diagram__selected");
-                }
-                if (nodeContainer.ClassListContains("uml-diagram__selected"))
-                {
-                    nodeContainer.RemoveFromClassList("uml-diagram__selected");
-                    selectedNode = null;
-                    selectedObject = null;
-                }
-                else
-                {
-                    nodeContainer.AddToClassList("uml-diagram__selected");
-                    selectedNode = nodeContainer;
-                    OnSelectNode(root);
+                if (!isDragging) {
+                    if (selectedObject != null && selectedObject != root)
+                    {
+                        selectedNode.RemoveFromClassList("uml-diagram__selected");
+                    }
+                    if (nodeContainer.ClassListContains("uml-diagram__selected"))
+                    {
+                        nodeContainer.RemoveFromClassList("uml-diagram__selected");
+                        selectedNode = null;
+                        selectedObject = null;
+                    }
+                    else
+                    {
+                        nodeContainer.AddToClassList("uml-diagram__selected");
+                        selectedNode = nodeContainer;
+                        OnSelectNode(root);
+                    }
                 }
                 evt.StopPropagation();
             });
@@ -228,9 +231,11 @@ namespace UMLClassDiag
         private void OnMouseDown(MouseDownEvent evt)
         {
             // Record the starting point of the drag
-            if (evt.button == 0)
+            if (evt.button == 0) // left click event
             {
                 dragStart = evt.mousePosition;
+                isDragging = false;
+
                 evt.StopPropagation();
             }
         }
@@ -238,8 +243,10 @@ namespace UMLClassDiag
         private void OnMouseMove(MouseMoveEvent evt)
         {
             // Adjust canvas position
-            if (evt.pressedButtons == 1)
+            if (evt.pressedButtons == 1) // for left mouse button
             {
+                isDragging = true;
+
                 Vector2 currentMousePosition = evt.mousePosition;
                 Vector2 delta = currentMousePosition - dragStart;
 
@@ -254,9 +261,20 @@ namespace UMLClassDiag
 
         private void OnMouseUp(MouseUpEvent evt)
         {
-            // Stop dragging
             if (evt.button == 0)
             {
+                // handles deselected when clicking on canvas
+                if (!isDragging)
+                {
+                    if (selectedNode != null)
+                    {
+                        selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        selectedNode = null;
+                        selectedObject = null;
+                    }
+                }
+                isDragging = false;
+
                 evt.StopPropagation();
             }
         }
