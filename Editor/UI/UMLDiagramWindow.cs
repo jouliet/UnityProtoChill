@@ -359,18 +359,16 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
-            string generatedContentFolder = "Assets/generatedContent";
-            string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
-        
-            if (!File.Exists(UMLFilePath))
+            var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
+            if (jsonFile != null)
             {
-                Debug.LogError("Error refreshing UML.");
-                return;
+                string jsonString = jsonFile.text;
+                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+                ObjectResearch.CleanUp();
+                BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+                GenerativeProcess.SetJsonScripts(jsonString);
+                ReloadDiagram(baseObject);
             }
-            string jsonString = File.ReadAllText(UMLFilePath);
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-            var baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-            ReloadDiagram(baseObject);
         }
         
         /// 

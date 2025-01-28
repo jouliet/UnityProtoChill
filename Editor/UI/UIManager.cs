@@ -12,6 +12,7 @@ using static SaverLoader;
 using UnityPusher;
 using System;
 using static ObjectResearch;
+
 public class UIManager : EditorWindow
 {
     private VisualElement mainContainer;
@@ -23,7 +24,6 @@ public class UIManager : EditorWindow
     private UMLDiagramWindow umlDiagramWindow;
     private ObjectPopUp objectPopUp;
 
-    private Button loadUMLButton;
     private Button testButton;
     private Button settingsButton;
     private Button objectSelectorButton;
@@ -87,7 +87,6 @@ public class UIManager : EditorWindow
         InitializeGenerateGOListButton();
         InitializeGOSelector();
         InitializeGenerateGOButton();
-        InitializeLoadUMLButton();
         
         rootContainer.Add(settingsContainer);
 
@@ -143,14 +142,6 @@ public class UIManager : EditorWindow
     //
     // Options Initialization
     //
-
-    private void InitializeLoadUMLButton()
-    {
-        loadUMLButton = new Button() { text = "reload UML" };
-        loadUMLButton.clicked += OnLoadUMLButtonClick;
-        settingsContainer.Add(loadUMLButton);
-    }
-
 
     private void InitializeTestButton()
     {
@@ -218,21 +209,6 @@ public class UIManager : EditorWindow
             umlDiagramWindow.ReloadDiagram(baseObject);
         }
     }
-
-    private void OnLoadUMLButtonClick(){
-
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
-        if (jsonFile != null)
-        {
-            string jsonString = jsonFile.text;
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-            ObjectResearch.CleanUp();
-            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-            GenerativeProcess.SetJsonScripts(jsonString);
-            umlDiagramWindow.ReloadDiagram(baseObject);
-        }
-    }
-
 
     private void OnSettingsButtonClick()
     {
