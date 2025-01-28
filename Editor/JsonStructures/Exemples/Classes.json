@@ -1,0 +1,208 @@
+{
+  "Classes": [
+    {
+      "Name": "UIManager",
+      "Attributes": [
+        {
+          "Name": "Lives",
+          "Type": "int",
+          "DefaultValue": "3"
+        },
+        {
+          "Name": "GameStatus",
+          "Type": "string",
+          "DefaultValue": "Playing"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "UpdateLives",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "amount",
+              "Type": "int",
+              "DefaultValue": "0"
+            }
+          ]
+        },
+        {
+          "Name": "DisplayGameOver",
+          "ReturnType": "void",
+          "Parameters": []
+        }
+      ],
+      "ComposedClasses": ["Player"],
+      "ParentClass": "null"
+    },
+    {
+      "Name": "Bullet",
+      "Attributes": [
+        {
+          "Name": "Speed",
+          "Type": "float",
+          "DefaultValue": "10.0"
+        },
+        {
+          "Name": "Damage",
+          "Type": "int",
+          "DefaultValue": "10"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "Move",
+          "ReturnType": "void",
+          "Parameters": []
+        },
+        {
+          "Name": "HitTarget",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "target",
+              "Type": "Enemy",
+              "DefaultValue": "null"
+            }
+          ]
+        }
+      ],
+      "ComposedClasses": [],
+      "ParentClass": "null"
+    },
+    {
+      "Name": "Player",
+      "Attributes": [
+        {
+          "Name": "Health",
+          "Type": "int",
+          "DefaultValue": "100"
+        },
+        {
+          "Name": "Score",
+          "Type": "int",
+          "DefaultValue": "0"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "Move",
+          "ReturnType": "void",
+          "Parameters": []
+        },
+        {
+          "Name": "TakeDamage",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "amount",
+              "Type": "int",
+              "DefaultValue": "0"
+            }
+          ]
+        }
+      ],
+      "ComposedClasses": ["Bullet"],
+      "ParentClass": "null"
+    },
+    {
+      "Name": "Enemy",
+      "Attributes": [
+        {
+          "Name": "Health",
+          "Type": "int",
+          "DefaultValue": "50"
+        },
+        {
+          "Name": "Damage",
+          "Type": "int",
+          "DefaultValue": "10"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "Move",
+          "ReturnType": "void",
+          "Parameters": []
+        },
+        {
+          "Name": "Attack",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "target",
+              "Type": "Player",
+              "DefaultValue": "null"
+            }
+          ]
+        }
+      ],
+      "ComposedClasses": ["Bullet"],
+      "ParentClass": "null"
+    },
+    {
+      "Name": "EnemySpawner",
+      "Attributes": [
+        {
+          "Name": "SpawnRate",
+          "Type": "float",
+          "DefaultValue": "5.0"
+        },
+        {
+          "Name": "MaxEnemies",
+          "Type": "int",
+          "DefaultValue": "10"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "SpawnEnemy",
+          "ReturnType": "void",
+          "Parameters": []
+        },
+        {
+          "Name": "StopSpawning",
+          "ReturnType": "void",
+          "Parameters": []
+        }
+      ],
+      "ComposedClasses": ["Enemy"],
+      "ParentClass": "null"
+    },
+    {
+      "Name": "LevelManager",
+      "Attributes": [
+        {
+          "Name": "CurrentLevel",
+          "Type": "int",
+          "DefaultValue": "1"
+        },
+        {
+          "Name": "MaxEnemies",
+          "Type": "int",
+          "DefaultValue": "10"
+        }
+      ],
+      "Methods": [
+        {
+          "Name": "LoadLevel",
+          "ReturnType": "void",
+          "Parameters": [
+            {
+              "Name": "levelNumber",
+              "Type": "int",
+              "DefaultValue": "1"
+            }
+          ]
+        },
+        {
+          "Name": "RestartLevel",
+          "ReturnType": "void",
+          "Parameters": []
+        }
+      ],
+      "ComposedClasses": ["EnemySpawner", "UIManager"],
+      "ParentClass": "null"
+    }
+  ]
+}

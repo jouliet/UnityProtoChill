@@ -230,7 +230,7 @@ public class GameObjectCreatorTest{
 public class NewUMLJsonStructTest{
     [Test]
     public void TestNewMapper(){
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/UMLStructure.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/Exemples/Classes.json");
         if (jsonFile == null)
         {
             Debug.LogError("Failed to load JSON.");

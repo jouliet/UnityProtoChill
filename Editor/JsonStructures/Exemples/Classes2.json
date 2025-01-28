@@ -1,0 +1,201 @@
+{
+    "Classes": [
+      {
+        "Name": "GameManager",
+        "Attributes": [
+          {
+            "Name": "CurrentLevel",
+            "Type": "int",
+            "DefaultValue": "1"
+          },
+          {
+            "Name": "GameState",
+            "Type": "string",
+            "DefaultValue": "Idle"
+          },
+          {
+            "Name": "GameState",
+            "Type": "string",
+            "DefaultValue": "Idle"
+          },
+          {
+            "Name": "GameState",
+            "Type": "string",
+            "DefaultValue": "Idle"
+          },
+          {
+            "Name": "GameState",
+            "Type": "string",
+            "DefaultValue": "Idle"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "StartGame",
+            "ReturnType": "void",
+            "Parameters": []
+          },
+          {
+            "Name": "EndGame",
+            "ReturnType": "void",
+            "Parameters": []
+          }
+        ],
+        "ComposedClasses": ["Enemy", "Player"],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Enemy",
+        "Attributes": [
+          {
+            "Name": "Health",
+            "Type": "int",
+            "DefaultValue": "100"
+          },
+          {
+            "Name": "Speed",
+            "Type": "float",
+            "DefaultValue": "1.0"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Move",
+            "ReturnType": "void",
+            "Parameters": []
+          },
+          {
+            "Name": "TakeDamage",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "damage",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": ["Bullet"],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Player",
+        "Attributes": [
+          {
+            "Name": "Health",
+            "Type": "int",
+            "DefaultValue": "100"
+          },
+          {
+            "Name": "Gold",
+            "Type": "int",
+            "DefaultValue": "200"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "SpendGold",
+            "ReturnType": "bool",
+            "Parameters": [
+              {
+                "Name": "amount",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          },
+          {
+            "Name": "EarnGold",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "amount",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": ["Bullet"],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "Bullet",
+        "Attributes": [
+          {
+            "Name": "Speed",
+            "Type": "float",
+            "DefaultValue": "10.0"
+          },
+          {
+            "Name": "Damage",
+            "Type": "int",
+            "DefaultValue": "10"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "Move",
+            "ReturnType": "void",
+            "Parameters": []
+          },
+          {
+            "Name": "HitTarget",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "target",
+                "Type": "Enemy",
+                "DefaultValue": "null"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": [],
+        "ParentClass": "null"
+      },
+      {
+        "Name": "UIManager",
+        "Attributes": [
+          {
+            "Name": "Score",
+            "Type": "int",
+            "DefaultValue": "0"
+          },
+          {
+            "Name": "Lives",
+            "Type": "int",
+            "DefaultValue": "3"
+          }
+        ],
+        "Methods": [
+          {
+            "Name": "UpdateScore",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "amount",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          },
+          {
+            "Name": "UpdateLives",
+            "ReturnType": "void",
+            "Parameters": [
+              {
+                "Name": "amount",
+                "Type": "int",
+                "DefaultValue": "0"
+              }
+            ]
+          }
+        ],
+        "ComposedClasses": ["Player"],
+        "ParentClass": "null"
+      }
+    ]
+  }
+  

@@ -146,7 +146,7 @@ public class UIManager : EditorWindow
     private void InitializeTestButton()
     {
         testButton = new Button() { text = "Test" };
-        testButton.clicked += OnTestButtonClick;
+        testButton.clicked += OnTestButtonClickForNewMapper;
         settingsContainer.Add(testButton);
     }
 
@@ -208,6 +208,29 @@ public class UIManager : EditorWindow
             GenerativeProcess.SetJsonScripts(jsonString);
             umlDiagramWindow.ReloadDiagram(baseObject);
         }
+    }
+
+    private void OnTestButtonClickForNewMapper()
+    {
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/Exemples/Classes.json");
+        if (jsonFile == null)
+        {
+            Debug.LogError("Failed to load JSON.");
+            return;
+        }
+        string jsonString = jsonFile.text;
+        //Debug.Log("here is the json file:");
+        //Debug.Log(jsonString);
+        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+        List<BaseObject> bos = NewJsonMapper.MapAllBaseObjects(parsedObject);
+        GenerativeProcess.SetJsonScripts(jsonString);
+        umlDiagramWindow._ReloadDiagram(bos);
+
+        
+        // Debug.Log ("nb classes: " + bos.Count);
+        // foreach(BaseObject bo in bos){
+        //     Debug.Log(bo);
+        // }
     }
 
     private void OnSettingsButtonClick()

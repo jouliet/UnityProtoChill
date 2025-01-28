@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,8 +18,12 @@ namespace UMLClassDiag
         private StyleSheet umlStyleSheet;
 
         private BaseObject rootObject;
+        private List<BaseObject> baseObjects = new List<BaseObject>();
+        private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
+        private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
+
         private float width = 300f;
-        private float offset = 10f;
+        private float offset = 50f;
 
         private Vector2 dragStart;
         private bool isDragging;
@@ -36,9 +41,15 @@ namespace UMLClassDiag
             window.Repaint();
             window.Refresh();
         }
+        public static void _ShowDiagram(List<BaseObject> baseObjects){
+            var window = GetWindow<UMLDiagramWindow>("UML Diagram");
+            window.baseObjects = baseObjects;
+            window.Repaint();
+            window.Refresh();
+        }
+
         private void OnGUI()
         {   
-
             if (ObjectResearch.AllBaseObjects.Count == 0){
                 LoadUML();
             }
@@ -54,6 +65,20 @@ namespace UMLClassDiag
             {
                 this.rootObject = root;
                 DrawNode(rootObject, canvasWidth / 2, 0f);
+            }
+        }
+        public void _ReloadDiagram(List<BaseObject> baseObjects)
+        {
+            canvas.Clear();
+            if (baseObjects == null)
+            {
+                Debug.LogError("Root object is null in Reaload Diagram.");
+            }
+            else
+            {
+                this.baseObjects = baseObjects;
+                // DrawNode(rootObject, canvasWidth / 2, 0f);
+                DrawNetwork();
             }
         }
 
@@ -78,10 +103,12 @@ namespace UMLClassDiag
             //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
 
-            if (rootObject != null)
-            {
-                DrawNode(rootObject, canvasWidth / 2, 0f);
-            }
+            // if (rootObject != null)
+            // {
+            //     DrawNode(rootObject, canvasWidth / 2, 0f);
+            // }
+            DrawNetwork();
+
 
             // Zoom buttons set up
             var zoomInButton = root.Q<Button>("zoom-in-button");
@@ -94,6 +121,109 @@ namespace UMLClassDiag
             EnableHandTool();
 
             return root;
+        }
+
+
+        //
+        // DESSIN DU RÉSEAU
+        //
+        private void DrawNetwork()
+        {
+            float currentX = 50f; // Position initiale pour les nœuds
+            float currentY = 50f;
+
+            foreach (var baseObject in baseObjects)
+            {
+                if (!drawnNodes.Contains(baseObject))
+                {
+                    _DrawNode(baseObject, currentX, currentY);
+                    currentX += width + offset; // Avancer horizontalement pour le prochain nœud
+                }
+            }
+        }
+
+        public void _DrawNode(BaseObject obj, float x, float y)
+        {
+            if (drawnNodes.Contains(obj)) return; // Ne pas redessiner un nœud déjà affiché
+
+            var nodeContainer = new VisualElement();
+            nodeContainer.style.position = Position.Absolute;
+            nodeContainer.style.left = x;
+            nodeContainer.style.top = y;
+
+            // Créer et configurer le nœud
+            var umlNode = umlVisualTree.CloneTree();
+            umlNode.Q<Label>("base-object").text = obj.Name;
+
+            // Ajouter les attributs
+            var attributesContainer = umlNode.Q<VisualElement>("attributes");
+            foreach (var attribute in obj.Attributes)
+            {
+                attributesContainer.Add(new Label($"{attribute.Name}: {attribute.Type}"));
+            }
+
+            // Ajouter les méthodes
+            var methodsContainer = umlNode.Q<VisualElement>("methods");
+            foreach (var method in obj.Methods)
+            {
+                methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
+            }
+
+            // Bouton d'action
+            var generateButton = new Button(() => GenerateObject(obj)) { text = "Generate" };
+            umlNode.Add(generateButton);
+
+            nodeContainer.Add(umlNode);
+            canvas.Add(nodeContainer);
+            
+            // Mémoriser le nœud dessiné
+            drawnNodes.Add(obj);
+            nodeElements[obj] = nodeContainer;
+            
+            // Dessiner les connexions vers les ComposedClasses
+            float childY = y + 300f; // Position verticale pour les enfants
+            float childX = x; // Position horizontale initiale pour les enfants
+            foreach (var child in obj.ComposedClasses)
+            {
+                
+                if (!drawnNodes.Contains(child))
+                {
+                    _DrawNode(child, childX, childY);
+                    childX += width + offset; // Avancer horizontalement pour chaque enfant
+                }
+            }
+
+            
+             // Planifier les connexions après le rendu
+            nodeContainer.schedule.Execute(() =>
+            {
+                DrawConnections();
+            });
+        }
+        public void DrawConnections()
+        {
+            foreach (var kvp in nodeElements)
+            {
+                var parentObject = kvp.Key;
+                var parentNode = kvp.Value;
+
+                foreach (var child in parentObject.ComposedClasses)
+                {
+                    if (nodeElements.TryGetValue(child, out var childNode))
+                    {
+                        // Récupérer les positions et dimensions directement des nœuds
+                        float parentX = parentNode.resolvedStyle.left + parentNode.resolvedStyle.width / 2;
+                        float parentY = parentNode.resolvedStyle.top + parentNode.resolvedStyle.height;
+
+                        float childX = childNode.resolvedStyle.left + childNode.resolvedStyle.width / 2;
+                        float childY = childNode.resolvedStyle.top;
+
+                        
+                        // Dessiner une ligne entre le parent et l'enfant
+                        DrawLine(childX, childY, parentX, parentY);
+                    }
+                }
+            }
         }
 
         //
