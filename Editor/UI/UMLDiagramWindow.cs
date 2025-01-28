@@ -355,12 +355,21 @@ namespace UMLClassDiag
             var baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
             ReloadDiagram(baseObject);
         }
-
+        
+        /// 
+        /// BASE OBJECT SELECTION
+        /// 
+        ///
         private void OnSelectNode(BaseObject baseObject)
         {
             selectedObject = baseObject;
             string msg = $"Node {baseObject.Name} selected in UML Diagram.";
             uiManager.SendMessageToChatWindow(msg);
+        }
+
+        public BaseObject GetSelectedBaseObjectFromUML()
+        {
+            return selectedObject;
         }
     }
 }
