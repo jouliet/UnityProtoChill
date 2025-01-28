@@ -26,11 +26,10 @@ public class DataStructureTests
         //Debug.Log("parsedObject to string : " + ObjectToString(parsedObject));
 
         //Mapping vers structure objet maison
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        //BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
         //Debug.Log("JSonMapper : " + root.ToString());
-
-        
-        GenerateScripts(root);
+       
+       // GenerateScripts(root);
     }
     
     public static List<BaseObject> BaseObjectList(BaseObject root){
@@ -65,31 +64,6 @@ public class DataStructureTests
 // Ici j'ai réimplémenté beaucoup de chose de GPTWrapper car il me fallait initialiser moi même le gptGenerator dans le Test. 
 
 public class gptTest{
-
-    [Test]
-    public void Test1(){
-
-
-        //Récupération du json
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUp3.json");
-        if (jsonFile == null)
-        {
-            Debug.LogError("Failed to load JSON.");
-            return;
-        }
-        string jsonString = jsonFile.text;
-        Debug.Log("Generated UML JSON: " + jsonString);
-        //Le cast est nécessaire pour parse
-        Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-
-        //Mapping vers structure objet maison
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-
-
-        // GenerateScripts(root, gptGenerator);
-
-
-    }
 
     private CustomChatGPTConversation _chatGPTConversation;
 
@@ -175,8 +149,8 @@ public class UMLViewTest
         }
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagramWindow.ShowDiagram(root);
+        // BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        // UMLDiagramWindow.ShowDiagram(root);
     }
 
     [Test]
@@ -190,8 +164,8 @@ public class UMLViewTest
         }
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagramWindow.ShowDiagram(root);
+        BaseObject root = JsonMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        //UMLDiagramWindow.ShowDiagram(root);
     }
 
     [Test]
@@ -205,8 +179,8 @@ public class UMLViewTest
         }
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-        BaseObject root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
-        UMLDiagramWindow.ShowDiagram(root);
+        List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+        //UMLDiagramWindow.ShowDiagram(baseObjects);
     }
 }
 public class GameObjectCreatorTest{
@@ -240,7 +214,7 @@ public class NewUMLJsonStructTest{
         //Debug.Log("here is the json file:");
         //Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-        List<BaseObject> bos = NewJsonMapper.MapAllBaseObjects(parsedObject);
+        List<BaseObject> bos = JsonMapper.MapAllBaseObjects(parsedObject);
         Debug.Log ("nb classes: " + bos.Count);
         foreach(BaseObject bo in bos){
             Debug.Log(bo);

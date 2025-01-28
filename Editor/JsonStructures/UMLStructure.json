@@ -67,7 +67,7 @@
           "Parameters": []
         }
       ],
-      "ComposedClasses": ["Script1"],
+      "ComposedClasses": "null",
       "ParentClass": "null"
     }
     ]

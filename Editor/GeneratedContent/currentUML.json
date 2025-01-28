@@ -1,134 +1,181 @@
 ```user
-To create a UML for a tower defense system, I will define the main components of the game, such as the Tower, Enemy, and GameManager classes. Each class will have attributes and methods relevant to its role in the game. I will also include relationships between these classes, such as composition, where appropriate. The UML will be structured in JSON format as per your request.
+To create a shoot'em up game system, I have designed a UML diagram in JSON format. The system includes classes for the player, enemies, bullets, and game management. Each class has attributes, methods, and relationships with other classes. The player can shoot bullets, enemies can move and take damage, and the game manager handles the overall game logic. Below is the JSON representation of the UML.
 ```
 
 ```json
 {
-  "UML": {
-    "Name": "GameManager",
-    "Attributes": [
-      {
-        "Name": "WaveNumber",
-        "Type": "int",
-        "DefaultValue": "0"
-      },
-      {
-        "Name": "PlayerHealth",
-        "Type": "int",
-        "DefaultValue": "100"
-      },
-      {
-        "Name": "Currency",
-        "Type": "int",
-        "DefaultValue": "50"
-      }
-    ],
-    "Methods": [
-      {
-        "Name": "StartWave",
-        "ReturnType": "void",
-        "Parameters": []
-      },
-      {
-        "Name": "EndWave",
-        "ReturnType": "void",
-        "Parameters": []
-      },
-      {
-        "Name": "SpawnEnemy",
-        "ReturnType": "void",
-        "Parameters": [
-          {
-            "Name": "enemyType",
-            "Type": "string",
-            "DefaultValue": "null"
-          }
-        ]
-      }
-    ],
-    "ComposedClasses": [
-      {
-        "Name": "Tower",
-        "Attributes": [
-          {
-            "Name": "Damage",
-            "Type": "int",
-            "DefaultValue": "10"
-          },
-          {
-            "Name": "Range",
-            "Type": "float",
-            "DefaultValue": "5.0"
-          },
-          {
-            "Name": "FireRate",
-            "Type": "float",
-            "DefaultValue": "1.0"
-          }
-        ],
-        "Methods": [
-          {
-            "Name": "Shoot",
-            "ReturnType": "void",
-            "Parameters": [
-              {
-                "Name": "target",
-                "Type": "Enemy",
-                "DefaultValue": "null"
-              }
-            ]
-          },
-          {
-            "Name": "Upgrade",
-            "ReturnType": "void",
-            "Parameters": []
-          }
-        ],
-        "ComposedClasses": [],
-        "ParentClass": "null"
-      },
-      {
-        "Name": "Enemy",
-        "Attributes": [
-          {
-            "Name": "Health",
-            "Type": "int",
-            "DefaultValue": "50"
-          },
-          {
-            "Name": "Speed",
-            "Type": "float",
-            "DefaultValue": "2.0"
-          },
-          {
-            "Name": "Reward",
-            "Type": "int",
-            "DefaultValue": "10"
-          }
-        ],
-        "Methods": [
-          {
-            "Name": "Move",
-            "ReturnType": "void",
-            "Parameters": []
-          },
-          {
-            "Name": "TakeDamage",
-            "ReturnType": "void",
-            "Parameters": [
-              {
-                "Name": "damage",
-                "Type": "int",
-                "DefaultValue": "0"
-              }
-            ]
-          }
-        ],
-        "ComposedClasses": [],
-        "ParentClass": "null"
-      }
-    ],
-    "ParentClass": "null"
-  }
+    "Classes": [
+        {
+            "Name": "Player",
+            "Attributes": [
+                {
+                    "Name": "Health",
+                    "Type": "int",
+                    "DefaultValue": "100"
+                },
+                {
+                    "Name": "Speed",
+                    "Type": "float",
+                    "DefaultValue": "5.0"
+                },
+                {
+                    "Name": "Position",
+                    "Type": "Vector3",
+                    "DefaultValue": "Vector3.zero"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "direction",
+                            "Type": "Vector3",
+                            "DefaultValue": "Vector3.zero"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Shoot",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "TakeDamage",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "damage",
+                            "Type": "int",
+                            "DefaultValue": "0"
+                        }
+                    ]
+                }
+            ],
+            "ComposedClasses": ["Bullet"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Enemy",
+            "Attributes": [
+                {
+                    "Name": "Health",
+                    "Type": "int",
+                    "DefaultValue": "50"
+                },
+                {
+                    "Name": "Speed",
+                    "Type": "float",
+                    "DefaultValue": "3.0"
+                },
+                {
+                    "Name": "Position",
+                    "Type": "Vector3",
+                    "DefaultValue": "Vector3.zero"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "TakeDamage",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "damage",
+                            "Type": "int",
+                            "DefaultValue": "0"
+                        }
+                    ]
+                }
+            ],
+            "ComposedClasses": "null",
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Bullet",
+            "Attributes": [
+                {
+                    "Name": "Speed",
+                    "Type": "float",
+                    "DefaultValue": "10.0"
+                },
+                {
+                    "Name": "Damage",
+                    "Type": "int",
+                    "DefaultValue": "10"
+                },
+                {
+                    "Name": "Position",
+                    "Type": "Vector3",
+                    "DefaultValue": "Vector3.zero"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "OnCollision",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "other",
+                            "Type": "GameObject",
+                            "DefaultValue": "null"
+                        }
+                    ]
+                }
+            ],
+            "ComposedClasses": "null",
+            "ParentClass": "null"
+        },
+        {
+            "Name": "GameManager",
+            "Attributes": [
+                {
+                    "Name": "Score",
+                    "Type": "int",
+                    "DefaultValue": "0"
+                },
+                {
+                    "Name": "IsGameOver",
+                    "Type": "bool",
+                    "DefaultValue": "false"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "StartGame",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "EndGame",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "UpdateScore",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "points",
+                            "Type": "int",
+                            "DefaultValue": "0"
+                        }
+                    ]
+                }
+            ],
+            "ComposedClasses": ["Player", "Enemy", "Bullet"],
+            "ParentClass": "null"
+        }
+    ]
 }
 ```

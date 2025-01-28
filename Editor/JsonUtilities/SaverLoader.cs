@@ -58,21 +58,20 @@ public static class SaverLoader
             
             if (!File.Exists(UMLFilePath))
             {
-                Debug.Log("fichier n'existe po");
+                //Debug.Log("fichier n'existe po");
                 return;
             }
             
-
             string jsonString = File.ReadAllText(UMLFilePath);
             GenerativeProcess.SetJsonScripts(jsonString);
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-            var root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+            List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
             Debug.Log("UML Loaded");
 
             //Reload UI (cas relous...) géré par uml diag
-            if (root != null)
+            if (baseObjects != null)
             {
-                UMLDiag.Instance.ReloadUI(root);
+                UMLDiag.Instance.ReloadUI(baseObjects);
             }
             else {
                 Debug.Log("TRES SUS NE PAS IGNORER CE DEBUG");

@@ -196,18 +196,18 @@ public class UIManager : EditorWindow
     // On Click Events
     //
 
-    private void OnTestButtonClick()
-    {
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUpProblem.json");
-        if (jsonFile != null)
-        {
-            string jsonString = jsonFile.text;
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-            BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
-            GenerativeProcess.SetJsonScripts(jsonString);
-            umlDiagramWindow.ReloadDiagram(baseObject);
-        }
-    }
+    // private void OnTestButtonClick()
+    // {
+    //     var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/JsonMockUpProblem.json");
+    //     if (jsonFile != null)
+    //     {
+    //         string jsonString = jsonFile.text;
+    //         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+    //         BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+    //         GenerativeProcess.SetJsonScripts(jsonString);
+    //         umlDiagramWindow.ReloadDiagram(baseObject);
+    //     }
+    // }
 
     private void OnTestButtonClickForNewMapper()
     {
@@ -221,9 +221,9 @@ public class UIManager : EditorWindow
         //Debug.Log("here is the json file:");
         //Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-        List<BaseObject> bos = NewJsonMapper.MapAllBaseObjects(parsedObject);
+        List<BaseObject> bos = JsonMapper.MapAllBaseObjects(parsedObject);
         GenerativeProcess.SetJsonScripts(jsonString);
-        umlDiagramWindow._ReloadDiagram(bos);
+        umlDiagramWindow.ReloadDiagram(bos);
 
         
         // Debug.Log ("nb classes: " + bos.Count);

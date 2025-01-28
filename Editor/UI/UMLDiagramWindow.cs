@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.IO;
-using System.Collections.Generic;
 using static JsonParser;
 using static UIManager;
 using static SaverLoader;
@@ -34,14 +33,7 @@ namespace UMLClassDiag
         private VisualElement selectedNode;
         private BaseObject selectedObject;
 
-        public static void ShowDiagram(BaseObject root)
-        {
-            var window = GetWindow<UMLDiagramWindow>("UML Diagram");
-            window.rootObject = root;
-            window.Repaint();
-            window.Refresh();
-        }
-        public static void _ShowDiagram(List<BaseObject> baseObjects){
+        public static void ShowDiagram(List<BaseObject> baseObjects){
             var window = GetWindow<UMLDiagramWindow>("UML Diagram");
             window.baseObjects = baseObjects;
             window.Repaint();
@@ -54,20 +46,7 @@ namespace UMLClassDiag
                 LoadUML();
             }
         }
-        public void ReloadDiagram(BaseObject root)
-        {
-            canvas.Clear();
-            if (root == null)
-            {
-                Debug.LogError("Root object is null in Reaload Diagram.");
-            }
-            else
-            {
-                this.rootObject = root;
-                DrawNode(rootObject, canvasWidth / 2, 0f);
-            }
-        }
-        public void _ReloadDiagram(List<BaseObject> baseObjects)
+        public void ReloadDiagram(List<BaseObject> baseObjects)
         {
             canvas.Clear();
             if (baseObjects == null)
@@ -131,7 +110,8 @@ namespace UMLClassDiag
         {
             float currentX = 50f; // Position initiale pour les nœuds
             float currentY = 50f;
-
+            drawnNodes.Clear();
+            
             foreach (var baseObject in baseObjects)
             {
                 if (!drawnNodes.Contains(baseObject))
@@ -140,6 +120,7 @@ namespace UMLClassDiag
                     currentX += width + offset; // Avancer horizontalement pour le prochain nœud
                 }
             }
+            DrawConnections();
         }
 
         public void _DrawNode(BaseObject obj, float x, float y)
@@ -174,6 +155,30 @@ namespace UMLClassDiag
             umlNode.Add(generateButton);
 
             nodeContainer.Add(umlNode);
+
+            nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
+            {
+                if (!isDragging) {
+                    if (selectedObject != null && selectedObject != obj)
+                    {
+                        selectedNode.RemoveFromClassList("uml-diagram__selected");
+                    }
+                    if (nodeContainer.ClassListContains("uml-diagram__selected"))
+                    {
+                        nodeContainer.RemoveFromClassList("uml-diagram__selected");
+                        selectedNode = null;
+                        selectedObject = null;
+                    }
+                    else
+                    {
+                        nodeContainer.AddToClassList("uml-diagram__selected");
+                        selectedNode = nodeContainer;
+                        OnSelectNode(obj);
+                        
+                    }
+                }
+                evt.StopPropagation();
+            });
             canvas.Add(nodeContainer);
             
             // Mémoriser le nœud dessiné
@@ -193,7 +198,7 @@ namespace UMLClassDiag
                 }
             }
 
-            
+
              // Planifier les connexions après le rendu
             nodeContainer.schedule.Execute(() =>
             {
@@ -202,6 +207,10 @@ namespace UMLClassDiag
         }
         public void DrawConnections()
         {
+            if (nodeElements == null)
+            {
+                Debug.LogWarning("La liste nodeElements est null donc impossible de dessiner les liens.");
+            }
             foreach (var kvp in nodeElements)
             {
                 var parentObject = kvp.Key;
@@ -224,96 +233,6 @@ namespace UMLClassDiag
                     }
                 }
             }
-        }
-
-        //
-        // DRAWING
-        //
-
-        public void DrawNode(BaseObject root, float x, float y)
-        {
-            var nodeContainer = new VisualElement();
-            nodeContainer.style.position = Position.Absolute;
-            nodeContainer.style.left = x;
-            nodeContainer.style.top = y;
-
-            // Apply style to node
-            var umlNode = umlVisualTree.CloneTree();
-
-            umlNode.Q<Label>("base-object").text = root.Name;
-
-            //Add attributes of BaseObject
-            var attributesContainer = umlNode.Q<VisualElement>("attributes");
-            foreach (var attribute in root.Attributes)
-            {
-                attributesContainer.Add(new Label($"{attribute.Name}: {attribute.Type}"));
-            }
-            //Add methods of BaseObject
-            var methodsContainer = umlNode.Q<VisualElement>("methods");
-            foreach (var method in root.Methods)
-            {
-                methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
-            }
-
-            var generateButton = new Button(() => GenerateObject(root)) { text = "Generate" };
-            umlNode.Add(generateButton);
-
-            nodeContainer.Add(umlNode);
-            nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
-            {
-                if (!isDragging) {
-                    if (selectedObject != null && selectedObject != root)
-                    {
-                        selectedNode.RemoveFromClassList("uml-diagram__selected");
-                    }
-                    if (nodeContainer.ClassListContains("uml-diagram__selected"))
-                    {
-                        nodeContainer.RemoveFromClassList("uml-diagram__selected");
-                        selectedNode = null;
-                        selectedObject = null;
-                    }
-                    else
-                    {
-                        nodeContainer.AddToClassList("uml-diagram__selected");
-                        selectedNode = nodeContainer;
-                        OnSelectNode(root);
-                    }
-                }
-                evt.StopPropagation();
-            });
-            canvas.Add(nodeContainer);
-
-            nodeContainer.schedule.Execute(() =>
-            {
-                float height = nodeContainer.resolvedStyle.height;
-
-                //Draw ComposedClasses
-                if (root.ComposedClasses.Count > 0)
-                {
-                    float totalChildWidth = 0;
-                    float[] childWidths = new float[root.ComposedClasses.Count];
-
-                    for (int i = 0; i < root.ComposedClasses.Count; i++)
-                    {
-                        childWidths[i] = CalculateTotalWidth(root.ComposedClasses[i]);
-                        totalChildWidth += childWidths[i];
-                    }
-                    totalChildWidth += (root.ComposedClasses.Count - 1) * offset;
-
-                    int count = 0;
-                    float startX = x + (width - totalChildWidth) / 2;
-                    float currentX = startX;
-                    foreach (var baseObject in root.ComposedClasses)
-                    {
-                        float currentY = y + height + offset;
-                        DrawNode(baseObject, currentX, currentY);
-                        DrawLine(currentX + width / 2, currentY + offset, x + width / 2, y +  height - offset);
-                        currentX += childWidths[count] + offset;
-                        count++;
-                    }
-                }
-
-            });
         }
         public void GenerateObject(BaseObject obj)
         {
@@ -358,9 +277,9 @@ namespace UMLClassDiag
 
         private void Refresh()
         {
-            if (rootObject != null)
+            if (baseObjects != null)
             {
-                DrawNode(rootObject, canvasWidth / 2, 0f);
+                DrawNetwork();
             }
         }
 
@@ -496,9 +415,9 @@ namespace UMLClassDiag
                 string jsonString = jsonFile.text;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();
-                BaseObject baseObject = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+                List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 GenerativeProcess.SetJsonScripts(jsonString);
-                ReloadDiagram(baseObject);
+                ReloadDiagram(baseObjects);
             }
         }
         
