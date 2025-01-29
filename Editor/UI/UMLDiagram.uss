@@ -29,8 +29,8 @@
     background-color: #393938;
     border-width: 0px;
     background-image: url('resources/collapse-button-down.png');
-    height: 10px;
-    width: 20px;
+    height: 35%;
+    width: 7%;
 }
 
 .collapse-button__up {
@@ -39,8 +39,8 @@
     background-color: #393938;
     border-width: 0px;
     background-image: url('resources/collapse-button-up.png');
-    height: 10px;
-    width: 20px;
+    height: 35%;
+    width: 7%;
 }
 
 /* Base Object styling */
