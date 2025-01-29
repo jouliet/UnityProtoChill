@@ -150,12 +150,15 @@ namespace UMLClassDiag
                 methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
 
-            // Bouton d'action
-            var generateButton = new Button(() => GenerateObject(obj)) { text = "Generate" };
-            umlNode.Add(generateButton);
+            //var generateButton = new Button(() => GenerateObject(root)) { text = "Generate" };
+            //umlNode.Add(generateButton);
+            var collapseButton = umlNode.Q<Button>("collapse-button");
+            var collapseContent = umlNode.Q<VisualElement>("uml-diagram-contents");
+            collapseButton.clicked +=  () => OnCollapseNode(collapseContent, collapseButton);
 
             nodeContainer.Add(umlNode);
 
+            // Add selection functionnality to node
             nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
             {
                 if (!isDragging) {
@@ -179,6 +182,7 @@ namespace UMLClassDiag
                 }
                 evt.StopPropagation();
             });
+
             canvas.Add(nodeContainer);
             
             // Mémoriser le nœud dessiné
@@ -234,6 +238,7 @@ namespace UMLClassDiag
                 }
             }
         }
+
         public void GenerateObject(BaseObject obj)
         {
             // Ajoutez la logique pour g�n�rer un objet � partir de `obj`.
@@ -242,6 +247,7 @@ namespace UMLClassDiag
             // Exemple d'appel d'une m�thode `Generate` sur l'objet
             obj.GenerateScript();  // Si vous avez une m�thode `Generate` sur votre classe `BaseObject`
         }
+
         private float CalculateTotalWidth(BaseObject node)
         {
             if (node.ComposedClasses.Count == 0)
@@ -435,6 +441,28 @@ namespace UMLClassDiag
         public BaseObject GetSelectedBaseObjectFromUML()
         {
             return selectedObject;
+        }
+
+        /// 
+        /// ANIMATIONS
+        /// 
+        ///
+        private void OnCollapseNode(VisualElement collapseContainer, Button collapseButton)
+        {
+            if (collapseContainer.style.display == DisplayStyle.Flex)
+            {
+                // Collapse the node
+                collapseContainer.style.display = DisplayStyle.None;
+                collapseButton.RemoveFromClassList("collapse-button__down");
+                collapseButton.AddToClassList("collapse-button__up");
+            }
+            else
+            {
+                // Expand the node
+                collapseContainer.style.display = DisplayStyle.Flex;
+                collapseButton.RemoveFromClassList("collapse-button__up");
+                collapseButton.AddToClassList("collapse-button__down");
+            }
         }
     }
 }
