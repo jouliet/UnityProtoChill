@@ -4,10 +4,14 @@
             <!-- UML Diagram is dynamically addes here -->
         </ui:VisualElement>
 
-        <ui:VisualElement name="overlay-container" style="position: absolute; top: 0px; left: 0px;">
-            <ui:Button name="zoom-in-button" style="top: 5px; left: 5px; background-color: red;" text="+"/>
-            <ui:Button name="zoom-out-button" style="top: 10px; left: 5px; background-color: blue;" text="-"/>
-            <ui:Button name="refresh-button" style="top: 50px; left: 5px;" text="R"/>
+        <ui:VisualElement name="overlay-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;">
+            <ui:Button name="refresh-button" class="refresh-button" style="position: absolute; top: 5px; left: 5px; pointer-events: auto;">
+                <ui:Image name="refresh-icon" class="refresh-icon" />
+            </ui:Button>
+            <ui:VisualElement style="position: absolute; top: 7px; right: 5px; pointer-events: auto;">
+                <ui:Button name="zoom-in-button" class="zoom-button" text="+"/>
+                <ui:Button name="zoom-out-button" class="zoom-button" style="margin-top: 3px;" text="-"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

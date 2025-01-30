@@ -46,6 +46,7 @@ namespace UMLClassDiag
                 LoadUML();
             }
         }
+
         public void ReloadDiagram(List<BaseObject> baseObjects)
         {
             canvas.Clear();
@@ -69,8 +70,10 @@ namespace UMLClassDiag
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
             umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
             var windowVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uxml");
+            var windowStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uss");
 
             var root = windowVisualTree.CloneTree();
+            root.styleSheets.Add(windowStyleSheet);
             rootVisualElement.Clear();
             rootVisualElement.Add(root);
 
@@ -177,7 +180,6 @@ namespace UMLClassDiag
                         nodeContainer.AddToClassList("uml-diagram__selected");
                         selectedNode = nodeContainer;
                         OnSelectNode(obj);
-                        
                     }
                 }
                 evt.StopPropagation();
@@ -194,7 +196,6 @@ namespace UMLClassDiag
             float childX = x; // Position horizontale initiale pour les enfants
             foreach (var child in obj.ComposedClasses)
             {
-                
                 if (!drawnNodes.Contains(child))
                 {
                     _DrawNode(child, childX, childY);
@@ -209,6 +210,7 @@ namespace UMLClassDiag
                 DrawConnections();
             });
         }
+
         public void DrawConnections()
         {
             if (nodeElements == null)

@@ -1,0 +1,24 @@
+.zoom-button {
+	background-color: white;
+	font-size: 16px;
+    -unity-font-style: bold;
+    color: black;
+	border-width: 0px;
+}
+
+.refresh-button {
+	background-color: black;
+	border-width: 1px;
+	border-color: white;
+	height: 35px;
+    width: 35px;
+}
+
+.refresh-icon {
+    width: 100%;
+    height: 100%;
+    background-image: url('resources/refresh-button.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
