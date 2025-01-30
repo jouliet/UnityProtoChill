@@ -18,71 +18,14 @@ namespace UnityPusher
 {
 
 public class GameObjectCreator : GenerativeProcess{
-    private static string prefabPath = "Assets/Prefabs";
+    public static string prefabPath = "Assets/Prefabs";
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
-    private static string prefabJsonStructure = 
-    @"You are a Json Writer. You will follow this exact format with every value in between quotes :
-    {
-      ""gameObjects"": [
-        {
-          ""name"": ""string (nom du GameObject)"",
-          ""tag"": ""string (tag du GameObject ou 'Untagged')"",
-          ""layer"": ""string (layer du GameObject ou 'Default')"",
-          ""components"": [
-            {
-              ""type"": ""string (nom du composant, ex: Transform, Rigidbody, Script)"",
-              ""properties"": {
-                ""property1"": ""value1 (clé-valeurs spécifiques au composant)"",
-                ""property2"": ""value2""
-              }
-            }
-            
-          ]
+
+    public static void CreateAllGameObjects(){
+        foreach(string goName in GameObjectNameList){
+            CreateGameObjectWithName(goName);
         }
-      ]
-    }
-    Float values format exemple : 10.5
-    For type = Script, there is always a properties ""Name"" who must be an existing script name" + "\n" +
-    "Don't hesitate to add boxCollider or rigidbody components if necessary.\n";
-    
-    private static string inputToCreatePrefabs = 
-    "Make a list of the game objects that are needed to execute the scripts presented in the UML below. Remember that the script names must be coherent with the UML scripts. \n";
-    private static string generalInputForPrefabs;
-
-    public GameObjectCreator(){
-        UIManager.OnGenerateGameObjectEvent += OnGenerateGameObject;
-        UIManager.OnGenerateGameObjectListEvent += GenerateGOs;
-        // Debug.Log("GameObject process initialized.");
-    }
-
-    ~GameObjectCreator(){
-        UIManager.OnGenerateGameObjectEvent -= OnGenerateGameObject;
-        UIManager.OnGenerateGameObjectListEvent -= GenerateGOs;
-    }
-
-
-    public static void GenerateGOs(){
-        //Abonné à son event
-        if (string.IsNullOrEmpty(jsonScripts)){
-            throw new Exception("Generate UML for scripts before generate GO list.");
-        }
-
-        generalInputForPrefabs = prefabJsonStructure + inputToCreatePrefabs + jsonScripts;
-
-        if (gptGenerator == null){
-            Debug.Log("No instance of gptGenerator");
-            return;
-        }
-
-        gptGenerator.GenerateFromText(generalInputForPrefabs, (response) =>
-        {
-            jsonGOs = response;
-            SaveGOJson(jsonGOs);
-            Debug.Log("Generated Prefabs JSON: \n" + jsonGOs);
-            JsonToDictionary(jsonGOs);
-            StockEveryGOsInList();
-        });
     }
 
     public void OnGenerateGameObject(string GOname){
@@ -92,6 +35,7 @@ public class GameObjectCreator : GenerativeProcess{
     }
 
     public static void JsonToDictionary(string json){
+        jsonGOs = json;
         if (string.IsNullOrEmpty(jsonGOs)){
             throw new Exception("Cannot create GO Dictionnary without GO Json: GOJson is Empty");
         }
@@ -103,7 +47,7 @@ public class GameObjectCreator : GenerativeProcess{
             throw new Exception("Dictionary of GameObjects no defined: Unable to make GameObjectList");
         }
 
-        if (jsonDictGOs.ContainsKey("gameObjects") && jsonDictGOs["gameObjects"] is List<object> gameObjects)
+        if (jsonDictGOs.ContainsKey("GameObjects") && jsonDictGOs["GameObjects"] is List<object> gameObjects)
         {
             foreach (var gameObject in gameObjects)
             {
@@ -127,7 +71,7 @@ public class GameObjectCreator : GenerativeProcess{
             throw new Exception("Dictionary of GameObjects no defined: Unable to create GameObject");
         }
 
-        if (jsonDictGOs.ContainsKey("gameObjects") && jsonDictGOs["gameObjects"] is List<object> gameObjects)
+        if (jsonDictGOs.ContainsKey("GameObjects") && jsonDictGOs["GameObjects"] is List<object> gameObjects)
         {
             foreach (var gameObject in gameObjects)
             {
@@ -144,7 +88,7 @@ public class GameObjectCreator : GenerativeProcess{
     }
 
     public static void CreateEveryGameObjects(Dictionary<string, object> jsonDict){
-        if (jsonDict.ContainsKey("gameObjects") && jsonDict["gameObjects"] is List<object> gameObjects)
+        if (jsonDict.ContainsKey("GameObjects") && jsonDict["GameObjects"] is List<object> gameObjects)
         {
             foreach (var gameObject in gameObjects)
             {
@@ -199,7 +143,11 @@ public class GameObjectCreator : GenerativeProcess{
                     if  (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict){
                        if (propertiesDict.ContainsKey("Name") && propertiesDict["Name"] is string name){
                             componentType = Type.GetType($"UnityEngine.{name}, UnityEngine") ?? Type.GetType($"{name}, Assembly-CSharp");
+                            // Debug.Log("Ajout du gameObject " + go.name + " à la liste GameObjectAttachedTo au baseObject " + name);
+                            // BaseObject bo = JsonMapper.TrackBaseObjectByName(name);
+                            // bo.GameObjectAttachedTo.Add(go.name);
                        }
+
                     }
                 }
                 
@@ -223,13 +171,14 @@ public class GameObjectCreator : GenerativeProcess{
                             AddFieldsToComponent(propertiesDict, component, componentType);
                         }
                     }
-                }else
+                }else if (type != "Script")
                 {
                     Debug.LogWarning($"Composant non reconnu : {type}");
                 }
             }
         }
     }
+    
 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)
@@ -264,7 +213,7 @@ public class GameObjectCreator : GenerativeProcess{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
             }catch (Exception ex){
-                Debug.LogWarning("Exeption for property value : " + kvp.Value + " with asked type: " + propertyInfo.PropertyType + "\nExeption : " + ex);
+                Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
             }
             
         }

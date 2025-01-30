@@ -16,7 +16,6 @@ namespace UMLClassDiag
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
 
-        private BaseObject rootObject;
         private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
@@ -27,7 +26,7 @@ namespace UMLClassDiag
         private Vector2 dragStart;
         private bool isDragging;
         private VisualElement canvas;
-        private float canvasWidth = 1000f;
+        //private float canvasWidth = 1000f;
         // private float canvasHeight = 1000f;
 
         private VisualElement selectedNode;
@@ -56,7 +55,7 @@ namespace UMLClassDiag
             else
             {
                 this.baseObjects = baseObjects;
-                // DrawNode(rootObject, canvasWidth / 2, 0f);
+                nodeElements.Clear();
                 DrawNetwork();
             }
         }
@@ -82,10 +81,6 @@ namespace UMLClassDiag
             //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
 
-            // if (rootObject != null)
-            // {
-            //     DrawNode(rootObject, canvasWidth / 2, 0f);
-            // }
             DrawNetwork();
 
 
@@ -111,19 +106,19 @@ namespace UMLClassDiag
             float currentX = 50f; // Position initiale pour les nœuds
             float currentY = 50f;
             drawnNodes.Clear();
-            
+
             foreach (var baseObject in baseObjects)
             {
                 if (!drawnNodes.Contains(baseObject))
                 {
-                    _DrawNode(baseObject, currentX, currentY);
+                    DrawNode(baseObject, currentX, currentY);
                     currentX += width + offset; // Avancer horizontalement pour le prochain nœud
                 }
             }
             DrawConnections();
         }
 
-        public void _DrawNode(BaseObject obj, float x, float y)
+        public void DrawNode(BaseObject obj, float x, float y)
         {
             if (drawnNodes.Contains(obj)) return; // Ne pas redessiner un nœud déjà affiché
 
@@ -135,6 +130,7 @@ namespace UMLClassDiag
             // Créer et configurer le nœud
             var umlNode = umlVisualTree.CloneTree();
             umlNode.Q<Label>("base-object").text = obj.Name;
+
 
             // Ajouter les attributs
             var attributesContainer = umlNode.Q<VisualElement>("attributes");
@@ -150,8 +146,8 @@ namespace UMLClassDiag
                 methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
 
-            //var generateButton = new Button(() => GenerateObject(root)) { text = "Generate" };
-            //umlNode.Add(generateButton);
+            var generateButton = new Button(() => GenerateObject(obj)) { text = "Generate" };
+            umlNode.Add(generateButton);
             var collapseButton = umlNode.Q<Button>("collapse-button");
             var collapseContent = umlNode.Q<VisualElement>("uml-diagram-contents");
             collapseButton.clicked +=  () => OnCollapseNode(collapseContent, collapseButton);
@@ -197,7 +193,7 @@ namespace UMLClassDiag
                 
                 if (!drawnNodes.Contains(child))
                 {
-                    _DrawNode(child, childX, childY);
+                    DrawNode(child, childX, childY);
                     childX += width + offset; // Avancer horizontalement pour chaque enfant
                 }
             }
@@ -242,7 +238,7 @@ namespace UMLClassDiag
         public void GenerateObject(BaseObject obj)
         {
             // Ajoutez la logique pour g�n�rer un objet � partir de `obj`.
-            Debug.Log($"GenerateObject called for {obj.Name}");
+            Debug.Log($"GenerateScript called for {obj.Name}");
 
             // Exemple d'appel d'une m�thode `Generate` sur l'objet
             obj.GenerateScript();  // Si vous avez une m�thode `Generate` sur votre classe `BaseObject`
@@ -297,7 +293,7 @@ namespace UMLClassDiag
             canvas.RegisterCallback<MouseDownEvent>(OnMouseDown);
             canvas.RegisterCallback<MouseMoveEvent>(OnMouseMove);
             canvas.RegisterCallback<MouseUpEvent>(OnMouseUp);
-            canvas.RegisterCallback<WheelEvent>(OnMouseWheel);
+            canvas.RegisterCallback<WheelEvent>(OnMouseWheel);  
         }
 
         private void OnMouseDown(MouseDownEvent evt)
@@ -414,7 +410,7 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
-            LoadUML();
+            //LoadUML();
             var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
             if (jsonFile != null)
             {

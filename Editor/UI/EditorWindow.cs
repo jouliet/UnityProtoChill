@@ -51,7 +51,6 @@ Never assume a method, class or function exists without explicitly seeing it in 
 
     if (ObjectResearch.AllBaseObjects.Count == 0){
         LoadUML();
-        LoadGOJson();
     }
 
     // Titre

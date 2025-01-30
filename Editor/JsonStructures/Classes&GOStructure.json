@@ -1,5 +1,4 @@
 {
-    "Classes&GOs": {
       "Classes": [
         {
         "Name": "Script1",
@@ -55,8 +54,7 @@
         "ComposedClasses": "null",
         "ParentClass": "null"
         }
-        ]
-    },
+        ],
     "GameObjects": [
         {
         "name": "string (nom du GameObject)",

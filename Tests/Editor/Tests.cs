@@ -164,7 +164,7 @@ public class UMLViewTest
         }
         string jsonString = jsonFile.text;
         Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-        BaseObject root = JsonMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
+        //BaseObject root = JsonMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["Root"]);
         //UMLDiagramWindow.ShowDiagram(root);
     }
 

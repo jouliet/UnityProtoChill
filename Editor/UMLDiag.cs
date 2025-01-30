@@ -1,18 +1,15 @@
-using UnityEditor;
 using UnityEngine;
 using static JsonParser;
 using System.Collections.Generic;
-using ChatGPTWrapper;
 using UMLClassDiag;
 using static SaverLoader;
 using UnityPusher;
 using ChatClass;
-using static MyEditorWindow;
 using System.IO;
 public class UMLDiag : GenerativeProcess
 {
     private static UMLDiag _instance;
-    private static string umlJsonStructurePath = "Packages/com.jin.protochill/Editor/JsonStructures/UMLStructure.json";
+    private static string classesAndGOJsonStructurePath = "Packages/com.jin.protochill/Editor/JsonStructures/Classes&GOStructure.json";
     public static UMLDiag Instance
     {
         get
@@ -33,7 +30,7 @@ public class UMLDiag : GenerativeProcess
 
 
         ChatWindow.OnSubmitText += OnSubmit;
-        UIManager.OnGenerateScriptEvent += OnGenerateScript;
+        //UIManager.OnGenerateScriptEvent += OnGenerateScript;
     }
 
 
@@ -53,14 +50,14 @@ public class UMLDiag : GenerativeProcess
     private void Cleanup()
     {
         ChatWindow.OnSubmitText -= OnSubmit;
-        UIManager.OnGenerateScriptEvent -= OnGenerateScript;
+        //UIManager.OnGenerateScriptEvent -= OnGenerateScript;
         Debug.Log("UMLDiag events unsubscribed.");
     }
 
     public void OnSubmit(string input)
     {
         Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
-        GenerateUML(input);
+        GenerateClassesandGOs(input);
     }
 
     public void OnGenerateScript(BaseObject root){
@@ -68,17 +65,27 @@ public class UMLDiag : GenerativeProcess
         GenerateScript(root);
     }
 
+    private string classesAndGOJsonStructure = 
+    "You are a Json Writer. You will follow this exact format with every value in between quotes : \n" +
+    File.ReadAllText(classesAndGOJsonStructurePath);
+    private string separationRequest = "The UML part is on the 'Classes' node and the 'GameObjects' part is on the GameObjects node.";
+    private string classesRequest = "For the Classes part: \n" +
+    "Composed Classes are the classes used by the classe in question. \n" +
+    "Classes with the most composed classes should be at the top of the list.";
+    private string goRequests = 
+    "For the GameObject part : \n" +
+    "Float values format exemple : 10.5 \n" +
+    "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
+    "Don't hesitate to add boxCollider, rigidbody or MeshFilter (with MeshRenderer) components if necessary.\n";
 
-    private string umlJsonStructure = 
-    "You love object abstraction and are a big time JSON user. You will follow this exact format : \n" + File.ReadAllText(umlJsonStructurePath);
+    private static string inputToCreatePrefabs = 
+    "Remember that the script names must be coherent with the UML scripts. \n";
 
-
-    private void GenerateUML(string input)
+    private void GenerateClassesandGOs(string input)
     {
-      
-        input = umlJsonStructure + input;
+        input = input + classesAndGOJsonStructure + separationRequest + classesRequest +  goRequests + inputToCreatePrefabs;
         //BaseObject root;
-        List<BaseObject> baseObjects;
+        List<BaseObject> baseObjects = new List<BaseObject>();
         if (gptGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -87,7 +94,7 @@ public class UMLDiag : GenerativeProcess
         {
             jsonScripts = response;
             SaveUML(jsonScripts);
-            Debug.Log("Generated UML JSON: " + jsonScripts);
+            Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
@@ -102,6 +109,13 @@ public class UMLDiag : GenerativeProcess
             }
             umlDiagramWindow.ReloadDiagram(baseObjects); 
 
+            if (GameObjectCreator.GameObjectNameList != null){
+                GameObjectCreator.GameObjectNameList.Clear();
+            }
+
+            GameObjectCreator.JsonToDictionary(jsonScripts);
+            GameObjectCreator.StockEveryGOsInList();
+            GameObjectCreator.CreateAllGameObjects();
         });
     }
 

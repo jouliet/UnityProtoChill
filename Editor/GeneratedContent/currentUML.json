@@ -1,158 +1,32 @@
 ```user
-To create a shoot'em up game system, I have designed a UML diagram in JSON format. The system includes classes for the player, enemies, bullets, and game management. Each class has attributes, methods, and relationships with other classes. The player can shoot bullets, enemies can move and take damage, and the game manager handles the overall game logic. Below is the JSON representation of the UML.
+I have created a UML diagram and a GameObject list for a tower defense game. The UML diagram includes classes with their attributes, methods, composed classes, and parent classes. The GameObject list includes GameObjects with their tags, layers, and components. The structure adheres to the specified format, ensuring coherence between the UML scripts and GameObject components.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "Player",
-            "Attributes": [
-                {
-                    "Name": "Health",
-                    "Type": "int",
-                    "DefaultValue": "100"
-                },
-                {
-                    "Name": "Speed",
-                    "Type": "float",
-                    "DefaultValue": "5.0"
-                },
-                {
-                    "Name": "Position",
-                    "Type": "Vector3",
-                    "DefaultValue": "Vector3.zero"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Move",
-                    "ReturnType": "void",
-                    "Parameters": [
-                        {
-                            "Name": "direction",
-                            "Type": "Vector3",
-                            "DefaultValue": "Vector3.zero"
-                        }
-                    ]
-                },
-                {
-                    "Name": "Shoot",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "TakeDamage",
-                    "ReturnType": "void",
-                    "Parameters": [
-                        {
-                            "Name": "damage",
-                            "Type": "int",
-                            "DefaultValue": "0"
-                        }
-                    ]
-                }
-            ],
-            "ComposedClasses": ["Bullet"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "Enemy",
-            "Attributes": [
-                {
-                    "Name": "Health",
-                    "Type": "int",
-                    "DefaultValue": "50"
-                },
-                {
-                    "Name": "Speed",
-                    "Type": "float",
-                    "DefaultValue": "3.0"
-                },
-                {
-                    "Name": "Position",
-                    "Type": "Vector3",
-                    "DefaultValue": "Vector3.zero"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Move",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "TakeDamage",
-                    "ReturnType": "void",
-                    "Parameters": [
-                        {
-                            "Name": "damage",
-                            "Type": "int",
-                            "DefaultValue": "0"
-                        }
-                    ]
-                }
-            ],
-            "ComposedClasses": "null",
-            "ParentClass": "null"
-        },
-        {
-            "Name": "Bullet",
-            "Attributes": [
-                {
-                    "Name": "Speed",
-                    "Type": "float",
-                    "DefaultValue": "10.0"
-                },
-                {
-                    "Name": "Damage",
-                    "Type": "int",
-                    "DefaultValue": "10"
-                },
-                {
-                    "Name": "Position",
-                    "Type": "Vector3",
-                    "DefaultValue": "Vector3.zero"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Move",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "OnCollision",
-                    "ReturnType": "void",
-                    "Parameters": [
-                        {
-                            "Name": "other",
-                            "Type": "GameObject",
-                            "DefaultValue": "null"
-                        }
-                    ]
-                }
-            ],
-            "ComposedClasses": "null",
-            "ParentClass": "null"
-        },
-        {
             "Name": "GameManager",
             "Attributes": [
                 {
-                    "Name": "Score",
+                    "Name": "currentWave",
                     "Type": "int",
                     "DefaultValue": "0"
                 },
                 {
-                    "Name": "IsGameOver",
-                    "Type": "bool",
-                    "DefaultValue": "false"
+                    "Name": "playerHealth",
+                    "Type": "int",
+                    "DefaultValue": "100"
+                },
+                {
+                    "Name": "currency",
+                    "Type": "int",
+                    "DefaultValue": "50"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "StartGame",
+                    "Name": "StartWave",
                     "ReturnType": "void",
                     "Parameters": []
                 },
@@ -160,21 +34,191 @@ To create a shoot'em up game system, I have designed a UML diagram in JSON forma
                     "Name": "EndGame",
                     "ReturnType": "void",
                     "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["EnemySpawner", "Tower", "Enemy"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "EnemySpawner",
+            "Attributes": [
+                {
+                    "Name": "spawnRate",
+                    "Type": "float",
+                    "DefaultValue": "2.0"
                 },
                 {
-                    "Name": "UpdateScore",
+                    "Name": "enemyPrefab",
+                    "Type": "GameObject",
+                    "DefaultValue": "null"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "SpawnEnemy",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["Enemy"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Tower",
+            "Attributes": [
+                {
+                    "Name": "damage",
+                    "Type": "int",
+                    "DefaultValue": "10"
+                },
+                {
+                    "Name": "range",
+                    "Type": "float",
+                    "DefaultValue": "5.0"
+                },
+                {
+                    "Name": "fireRate",
+                    "Type": "float",
+                    "DefaultValue": "1.0"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Shoot",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "Upgrade",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["Enemy"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Enemy",
+            "Attributes": [
+                {
+                    "Name": "health",
+                    "Type": "int",
+                    "DefaultValue": "20"
+                },
+                {
+                    "Name": "speed",
+                    "Type": "float",
+                    "DefaultValue": "2.5"
+                },
+                {
+                    "Name": "reward",
+                    "Type": "int",
+                    "DefaultValue": "10"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "TakeDamage",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "points",
+                            "Name": "amount",
                             "Type": "int",
                             "DefaultValue": "0"
                         }
                     ]
+                },
+                {
+                    "Name": "Die",
+                    "ReturnType": "void",
+                    "Parameters": []
                 }
             ],
-            "ComposedClasses": ["Player", "Enemy", "Bullet"],
+            "ComposedClasses": "null",
             "ParentClass": "null"
+        }
+    ],
+    "GameObjects": [
+        {
+            "name": "GameManager",
+            "tag": "GameController",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "GameManager"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "EnemySpawner",
+            "tag": "Spawner",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "EnemySpawner"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Tower",
+            "tag": "Tower",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
+                {
+                    "type": "BoxCollider",
+                    "properties": {
+                        "isTrigger": "true"
+                    }
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "Tower"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Enemy",
+            "tag": "Enemy",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
+                {
+                    "type": "Rigidbody",
+                    "properties": {
+                        "useGravity": "false",
+                        "isKinematic": "true"
+                    }
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "Enemy"
+                    }
+                }
+            ]
         }
     ]
 }

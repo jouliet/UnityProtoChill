@@ -10,6 +10,9 @@ using System.Linq;
 using System;
 using Unity.VisualScripting.YamlDotNet.Core.Events;
 using static JsonParser;
+using UnityPusher;
+using Unity.VisualScripting;
+
 namespace UMLClassDiag
 {
 public class Attribute
@@ -68,26 +71,16 @@ public class BaseObject
     public List<Method> Methods { get; set; } = new List<Method>();
     public List<BaseObject> ComposedClasses { get; set; } = new List<BaseObject>();
     public BaseObject ParentClass { get; set; }
-
-    private FastUnityPusher _fastUnityPusher = new FastUnityPusher();
+    public List<string> GameObjectAttachedTo { get; set; } = new List<string>();
 
     // Appelé par UMLDiag ligne 110
     public void GenerateScript(){
-
-        
         GenerateScriptbis();
         // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
         //Debug.Log("oui");
     }
-    
-    public void Push(){
-        // C'est sale mais ça marche
-        _fastUnityPusher.CreateGameObjectAtZerosFromBaseObject(this);
-    }
-    
-    
-    
+      
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
     private void GenerateScriptbis()
     {
@@ -103,7 +96,6 @@ Never assume a method, class or function exists unless specified in the uml. Rel
         {
             Debug.Log("Generated class: " + response);
             WriteScriptFile(GetScript(response));
- 
         });
     }
     private void WriteScriptFile(string content)
@@ -129,6 +121,40 @@ Never assume a method, class or function exists unless specified in the uml. Rel
         //LoadUML();
         #endif
     }
+
+
+    public static void AddScriptToGameObject(string prefabPath, string scriptName)
+    {
+        // Charger le prefab
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        if (prefab == null)
+        {
+            //Debug.LogError("Prefab introuvable : " + prefabPath);
+            return;
+        }
+
+        // Obtenir le type du script
+        Type scriptType = Type.GetType($"{scriptName}, Assembly-CSharp");
+        if (scriptType == null)
+        {
+            //Debug.LogError("Script introuvable : " + scriptName);
+            return;
+        }
+
+        // Instancier temporairement le prefab pour modifier ses composants
+        GameObject tempInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+        if (tempInstance.GetComponent(scriptType) == null) // Éviter les doublons
+        {
+            tempInstance.AddComponent(scriptType);
+        }
+
+
+        // Appliquer les modifications au prefab
+        PrefabUtility.SaveAsPrefabAsset(tempInstance, prefabPath);
+        GameObject.DestroyImmediate(tempInstance); // Nettoyage
+
+        Debug.Log($"Script {scriptName} ajouté au prefab {prefabPath}.");
+    }
     
     private string ExtractCSharpCode(string input)
     {
@@ -143,6 +169,7 @@ Never assume a method, class or function exists unless specified in the uml. Rel
         string result = "";
         return result;
     }
+    
     public override string ToString()
     {
         //string result = $"BaseObject : {Name}\n";
@@ -174,7 +201,10 @@ Never assume a method, class or function exists unless specified in the uml. Rel
 }
 
 public class JsonMapper{
+    // List of Dictionary object of classes
     public static List<object> Classes;
+
+    // List of baseobjects classes
     public static List<BaseObject> BaseObjects;
     public static BaseObject TrackBaseObjectByName(string className){
         foreach (BaseObject bo in BaseObjects){
@@ -189,13 +219,16 @@ public class JsonMapper{
         if (baseObject != null){
             return baseObject;
         }
-        throw new Exception("La classe " + className  + " n'existe pas.");
+        if (className != "null")
+        {
+            Debug.LogError("La classe " + className  + " n'existe pas.");
+        }
+        
+        return null;
     }
 
     public static List<BaseObject> MapAllBaseObjects(Dictionary<string, object> jsonDict){
-        if (BaseObjects == null){
-            BaseObjects = new List<BaseObject>();
-        }
+        BaseObjects = new List<BaseObject>();
         
         BaseObject bo;
         if (jsonDict == null){
@@ -211,7 +244,13 @@ public class JsonMapper{
             {
                 if (_class is Dictionary<string, object> classDict)
                 {
-                    bo = MapToBaseObject(classDict);
+                    bo = MapToBaseObject(classDict, jsonDict);
+
+                    foreach (string goName in bo.GameObjectAttachedTo)
+                    {
+                        // Debug.Log("Le script " + bo.Name + "s'ajoute au gameobject " + goName);
+                        BaseObject.AddScriptToGameObject(GameObjectCreator.prefabPath + "/" + goName + ".prefab", bo.Name);
+                    }
                 }
             }
             AddComposedClasses(classes);
@@ -230,26 +269,61 @@ public class JsonMapper{
                 string className = _classDict.ContainsKey("Name") ? _classDict["Name"].ToString() : string.Empty;
                 BaseObject bo = TrackBaseObjectByName(className);
                 if (bo == null){
-                    throw new Exception("la classe " + className + " n'existe pas." );
+                    throw new Exception("La classe " + className + " n'existe pas." );
                 }
                 bo.ComposedClasses = MapComposedClasses(_classDict);
             }
         }
     }
 
-    public static BaseObject MapToBaseObject(Dictionary<string, object> jsonDict)
+    public static BaseObject MapToBaseObject(Dictionary<string, object> classDict, Dictionary<string,object> jsonDict)
     {
         var baseObject = new BaseObject
         {
-            Name = jsonDict.ContainsKey("Name") ? jsonDict["Name"].ToString() : string.Empty,
-            Attributes = MapAttributes(jsonDict),
-            Methods = MapMethods(jsonDict),
+            Name = classDict.ContainsKey("Name") ? classDict["Name"].ToString() : string.Empty,
+            Attributes = MapAttributes(classDict),
+            Methods = MapMethods(classDict),
             // Les classes composées seront ajoutées après. Si on le fait tout de suite, 
             // ca fait une boucle infini.
         };
+        baseObject.GameObjectAttachedTo = MapGameObjectAttachedTo(jsonDict, baseObject.Name);
+
         BaseObjects.Add(baseObject);
     
         return baseObject;
+    }
+
+    public static List<string> MapGameObjectAttachedTo(Dictionary<string, object> jsonDict, string boname){
+        List<string> list = new List<string>();
+        if (jsonDict.ContainsKey("GameObjects") && jsonDict["GameObjects"] is List<object> classes)
+        {
+            foreach(object obj in classes)
+            {
+                if (obj is Dictionary<string,object> gameObjectDict){
+                    if (gameObjectDict.ContainsKey("components") && gameObjectDict["components"] is List<object> componentList){
+                        foreach (object component in componentList){
+                            if (component is Dictionary<string,object> componentDict){
+                                if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string,object> propertiesDict)
+                                {
+                                    if (propertiesDict.ContainsKey("Name") && componentDict["type"] is string type)
+                                    {
+                                        string scriptName = propertiesDict["Name"].ToString();
+                                        if (scriptName == boname && type == "Script")
+                                        {
+                                            string goname = gameObjectDict["name"].ToString();
+                                            //Debug.Log("Le gameobject " + goname + " est ajouté au baseobject " + boname);
+                                            list.Add(goname);
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return list;
     }
 
     private static List<Attribute> MapAttributes(Dictionary<string, object> jsonDict)
@@ -311,6 +385,9 @@ public class JsonMapper{
                 if (composedClass is string composedClassName)
                 {
                     var composedClassObject = MapPreciseBaseObject(Classes, composedClassName);
+                    if (composedClassObject == null){
+                        continue;
+                    }
                     composedClassesList.Add(composedClassObject);
                 }
             }
