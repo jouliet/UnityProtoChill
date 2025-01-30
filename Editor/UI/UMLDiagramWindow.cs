@@ -57,7 +57,6 @@ namespace UMLClassDiag
             else
             {
                 this.baseObjects = baseObjects;
-                // DrawNode(rootObject, canvasWidth / 2, 0f);
                 DrawNetwork();
             }
         }
@@ -88,10 +87,6 @@ namespace UMLClassDiag
             //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
 
-            // if (rootObject != null)
-            // {
-            //     DrawNode(rootObject, canvasWidth / 2, 0f);
-            // }
             DrawNetwork();
 
 
@@ -122,14 +117,14 @@ namespace UMLClassDiag
             {
                 if (!drawnNodes.Contains(baseObject))
                 {
-                    _DrawNode(baseObject, currentX, currentY);
+                    DrawNode(baseObject, currentX, currentY);
                     currentX += width + offset; // Avancer horizontalement pour le prochain nœud
                 }
             }
             DrawConnections();
         }
 
-        public void _DrawNode(BaseObject obj, float x, float y)
+        public void DrawNode(BaseObject obj, float x, float y)
         {
             if (drawnNodes.Contains(obj)) return; // Ne pas redessiner un nœud déjà affiché
 
@@ -201,7 +196,7 @@ namespace UMLClassDiag
             {
                 if (!drawnNodes.Contains(child))
                 {
-                    _DrawNode(child, childX, childY);
+                    DrawNode(child, childX, childY);
                     childX += width + offset; // Avancer horizontalement pour chaque enfant
                 }
             }
@@ -229,28 +224,70 @@ namespace UMLClassDiag
                 {
                     if (nodeElements.TryGetValue(child, out var childNode))
                     {
-                        // Récupérer les positions et dimensions directement des nœuds
-                        float parentX = parentNode.resolvedStyle.left + parentNode.resolvedStyle.width / 2;
-                        float parentY = parentNode.resolvedStyle.top + parentNode.resolvedStyle.height;
+                        List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
+                        List<Vector2> childAnchors = FindAnchorPoints(childNode);
+                        List<Vector2> lineCoordinates = FindBestConnexion(parentAnchors, childAnchors);
 
-                        float childX = childNode.resolvedStyle.left + childNode.resolvedStyle.width / 2;
-                        float childY = childNode.resolvedStyle.top;
-
-                        
-                        // Dessiner une ligne entre le parent et l'enfant
-                        DrawLine(childX, childY, parentX, parentY);
+                        DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
                     }
                 }
             }
         }
 
-        public void GenerateObject(BaseObject obj)
+        private List<Vector2> FindAnchorPoints(VisualElement node)
         {
-            // Ajoutez la logique pour g�n�rer un objet � partir de `obj`.
+            List<Vector2> anchorPoints = new List<Vector2>();
+
+            // top anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top));
+            // left anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            // right anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            // bottom anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
+
+            return anchorPoints;
+        }
+
+        private List<Vector2> FindBestConnexion(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
+        {
+            List<Vector2> anchors = new List<Vector2> { Vector2.zero, Vector2.zero };
+
+            float length = float.MaxValue;
+            var center = new Vector2(anchorsChild[0].x, anchorsChild[2].y);
+
+            for (int i = 0; i < anchorsParent.Count; i++)
+            {
+                float dx = center.x - anchorsParent[i].x;
+                float dy = center.y - anchorsParent[i].y;
+                if (length > Mathf.Sqrt(dx * dx + dy * dy))
+                {
+                    length = Mathf.Sqrt(dx * dx + dy * dy);
+                    anchors[0] = anchorsParent[i];
+                }
+            }
+
+            length = float.MaxValue;
+            for (int i = 0; i < anchorsChild.Count; i++)
+            {
+                float dx = anchorsChild[i].x - anchors[0].x;
+                float dy = anchorsChild[i].y - anchors[0].y;
+                if (length > Mathf.Sqrt(dx * dx + dy * dy))
+                {
+                    length = Mathf.Sqrt(dx * dx + dy * dy);
+                    anchors[1] = anchorsChild[i];
+                }
+            }
+
+            return anchors;
+        }
+
+        private void GenerateObject(BaseObject obj)
+        {
             Debug.Log($"GenerateObject called for {obj.Name}");
 
-            // Exemple d'appel d'une m�thode `Generate` sur l'objet
-            obj.GenerateScript();  // Si vous avez une m�thode `Generate` sur votre classe `BaseObject`
+            obj.GenerateScript();
         }
 
         private float CalculateTotalWidth(BaseObject node)
@@ -420,16 +457,6 @@ namespace UMLClassDiag
         private void OnRefreshtButtonClick()
         {
             LoadUML();
-            var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
-            if (jsonFile != null)
-            {
-                string jsonString = jsonFile.text;
-                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-                ObjectResearch.CleanUp();
-                List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
-                GenerativeProcess.SetJsonScripts(jsonString);
-                ReloadDiagram(baseObjects);
-            }
         }
         
         /// 
