@@ -1,135 +1,130 @@
 ```user
-I have created a UML diagram and a GameObject list for a tower defense game. The UML diagram includes classes with their attributes, methods, composed classes, and parent classes. The GameObject list includes GameObjects with their tags, layers, and components. The structure adheres to the specified format, ensuring coherence between the UML scripts and GameObject components.
+To create a platformer game system, I have designed a UML diagram with classes and their relationships, as well as a list of GameObjects with their respective components. The UML includes essential scripts for player movement, enemy behavior, platform interaction, and game management. The GameObjects include a player, platforms, enemies, and a game manager, each with appropriate components like Rigidbody, BoxCollider, and custom scripts. The structure ensures coherence between the UML and GameObjects.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "GameManager",
+            "Name": "PlayerController",
             "Attributes": [
                 {
-                    "Name": "currentWave",
-                    "Type": "int",
-                    "DefaultValue": "0"
-                },
-                {
-                    "Name": "playerHealth",
-                    "Type": "int",
-                    "DefaultValue": "100"
-                },
-                {
-                    "Name": "currency",
-                    "Type": "int",
-                    "DefaultValue": "50"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "StartWave",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "EndGame",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["EnemySpawner", "Tower", "Enemy"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "EnemySpawner",
-            "Attributes": [
-                {
-                    "Name": "spawnRate",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "enemyPrefab",
-                    "Type": "GameObject",
-                    "DefaultValue": "null"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "SpawnEnemy",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["Enemy"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "Tower",
-            "Attributes": [
-                {
-                    "Name": "damage",
-                    "Type": "int",
-                    "DefaultValue": "10"
-                },
-                {
-                    "Name": "range",
+                    "Name": "speed",
                     "Type": "float",
                     "DefaultValue": "5.0"
                 },
                 {
-                    "Name": "fireRate",
+                    "Name": "jumpForce",
                     "Type": "float",
-                    "DefaultValue": "1.0"
+                    "DefaultValue": "10.0"
+                },
+                {
+                    "Name": "isGrounded",
+                    "Type": "bool",
+                    "DefaultValue": "false"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "Shoot",
+                    "Name": "Move",
                     "ReturnType": "void",
                     "Parameters": []
                 },
                 {
-                    "Name": "Upgrade",
+                    "Name": "Jump",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "CheckGround",
                     "ReturnType": "void",
                     "Parameters": []
                 }
             ],
-            "ComposedClasses": ["Enemy"],
+            "ComposedClasses": ["GameManager"],
             "ParentClass": "null"
         },
         {
-            "Name": "Enemy",
+            "Name": "EnemyAI",
             "Attributes": [
-                {
-                    "Name": "health",
-                    "Type": "int",
-                    "DefaultValue": "20"
-                },
                 {
                     "Name": "speed",
                     "Type": "float",
-                    "DefaultValue": "2.5"
+                    "DefaultValue": "2.0"
                 },
                 {
-                    "Name": "reward",
-                    "Type": "int",
-                    "DefaultValue": "10"
+                    "Name": "isMovingRight",
+                    "Type": "bool",
+                    "DefaultValue": "true"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "TakeDamage",
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "FlipDirection",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["GameManager"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Platform",
+            "Attributes": [
+                {
+                    "Name": "isMoving",
+                    "Type": "bool",
+                    "DefaultValue": "false"
+                },
+                {
+                    "Name": "moveSpeed",
+                    "Type": "float",
+                    "DefaultValue": "2.0"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "MovePlatform",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": "null",
+            "ParentClass": "null"
+        },
+        {
+            "Name": "GameManager",
+            "Attributes": [
+                {
+                    "Name": "score",
+                    "Type": "int",
+                    "DefaultValue": "0"
+                },
+                {
+                    "Name": "lives",
+                    "Type": "int",
+                    "DefaultValue": "3"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "AddScore",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "amount",
+                            "Name": "points",
                             "Type": "int",
                             "DefaultValue": "0"
                         }
                     ]
                 },
                 {
-                    "Name": "Die",
+                    "Name": "LoseLife",
                     "ReturnType": "void",
                     "Parameters": []
                 }
@@ -140,8 +135,8 @@ I have created a UML diagram and a GameObject list for a tower defense game. The
     ],
     "GameObjects": [
         {
-            "name": "GameManager",
-            "tag": "GameController",
+            "name": "Player",
+            "tag": "Player",
             "layer": "Default",
             "components": [
                 {
@@ -149,49 +144,23 @@ I have created a UML diagram and a GameObject list for a tower defense game. The
                     "properties": {}
                 },
                 {
-                    "type": "Script",
+                    "type": "Rigidbody",
                     "properties": {
-                        "Name": "GameManager"
+                        "mass": "1.0",
+                        "drag": "0.0",
+                        "useGravity": "true"
                     }
-                }
-            ]
-        },
-        {
-            "name": "EnemySpawner",
-            "tag": "Spawner",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {}
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "EnemySpawner"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Tower",
-            "tag": "Tower",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {}
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "isTrigger": "true"
+                        "isTrigger": "false"
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
-                        "Name": "Tower"
+                        "Name": "PlayerController"
                     }
                 }
             ]
@@ -208,14 +177,57 @@ I have created a UML diagram and a GameObject list for a tower defense game. The
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "useGravity": "false",
-                        "isKinematic": "true"
+                        "mass": "1.0",
+                        "drag": "0.0",
+                        "useGravity": "true"
+                    }
+                },
+                {
+                    "type": "BoxCollider",
+                    "properties": {
+                        "isTrigger": "false"
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
-                        "Name": "Enemy"
+                        "Name": "EnemyAI"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Platform",
+            "tag": "Platform",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
+                {
+                    "type": "BoxCollider",
+                    "properties": {
+                        "isTrigger": "false"
+                    }
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "Platform"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "GameManager",
+            "tag": "GameController",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "GameManager"
                     }
                 }
             ]

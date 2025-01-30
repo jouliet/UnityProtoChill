@@ -28,12 +28,6 @@ public class GameObjectCreator : GenerativeProcess{
         }
     }
 
-    public void OnGenerateGameObject(string GOname){
-        //Abonnée à son event
-        CreateGameObjectWithName(GOname);
-        Debug.Log("Generation GameObject : " + GOname);
-    }
-
     public static void JsonToDictionary(string json){
         jsonGOs = json;
         if (string.IsNullOrEmpty(jsonGOs)){
@@ -126,8 +120,9 @@ public class GameObjectCreator : GenerativeProcess{
             Debug.Log("Dossier créé : " + prefabPath);
         }
         // Sauvegarder le GameObject en tant que prefab
-        PrefabUtility.SaveAsPrefabAsset(go, prefabPath + "/" + _name + ".prefab");
-
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(go, prefabPath + "/" + _name + ".prefab");
+        GameObject.DestroyImmediate(go);
+        PrefabUtility.InstantiatePrefab(prefab);
     }
 
     public static void AddComponentsToGO(List<object> components, GameObject go){
@@ -178,7 +173,7 @@ public class GameObjectCreator : GenerativeProcess{
             }
         }
     }
-    
+
 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)
