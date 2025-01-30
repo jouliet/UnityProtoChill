@@ -125,7 +125,6 @@ namespace UMLClassDiag
         }
 
         public void DrawNode(BaseObject obj, float x, float y)
-        public void DrawNode(BaseObject obj, float x, float y)
         {
             if (drawnNodes.Contains(obj)) return; // Ne pas redessiner un nœud déjà affiché
 
