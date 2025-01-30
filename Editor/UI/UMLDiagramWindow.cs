@@ -45,6 +45,7 @@ namespace UMLClassDiag
                 LoadUML();
             }
         }
+
         public void ReloadDiagram(List<BaseObject> baseObjects)
         {
             canvas.Clear();
@@ -68,10 +69,15 @@ namespace UMLClassDiag
             umlVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uxml");
             umlStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLDiagram.uss");
             var windowVisualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uxml");
+            var windowStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.jin.protochill/Editor/UI/UMLWindow.uss");
 
             var root = windowVisualTree.CloneTree();
+            root.styleSheets.Add(windowStyleSheet);
             rootVisualElement.Clear();
             rootVisualElement.Add(root);
+
+            var overlayContainer = root.Q<VisualElement>("overlay-container");
+            overlayContainer.pickingMode = PickingMode.Ignore;
 
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
@@ -118,6 +124,7 @@ namespace UMLClassDiag
             DrawConnections();
         }
 
+        public void DrawNode(BaseObject obj, float x, float y)
         public void DrawNode(BaseObject obj, float x, float y)
         {
             if (drawnNodes.Contains(obj)) return; // Ne pas redessiner un nœud déjà affiché
@@ -173,7 +180,6 @@ namespace UMLClassDiag
                         nodeContainer.AddToClassList("uml-diagram__selected");
                         selectedNode = nodeContainer;
                         OnSelectNode(obj);
-                        
                     }
                 }
                 evt.StopPropagation();
@@ -190,7 +196,6 @@ namespace UMLClassDiag
             float childX = x; // Position horizontale initiale pour les enfants
             foreach (var child in obj.ComposedClasses)
             {
-                
                 if (!drawnNodes.Contains(child))
                 {
                     DrawNode(child, childX, childY);
@@ -205,6 +210,7 @@ namespace UMLClassDiag
                 DrawConnections();
             });
         }
+
         public void DrawConnections()
         {
             if (nodeElements == null)
@@ -220,28 +226,70 @@ namespace UMLClassDiag
                 {
                     if (nodeElements.TryGetValue(child, out var childNode))
                     {
-                        // Récupérer les positions et dimensions directement des nœuds
-                        float parentX = parentNode.resolvedStyle.left + parentNode.resolvedStyle.width / 2;
-                        float parentY = parentNode.resolvedStyle.top + parentNode.resolvedStyle.height;
+                        List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
+                        List<Vector2> childAnchors = FindAnchorPoints(childNode);
+                        List<Vector2> lineCoordinates = FindBestConnexion(parentAnchors, childAnchors);
 
-                        float childX = childNode.resolvedStyle.left + childNode.resolvedStyle.width / 2;
-                        float childY = childNode.resolvedStyle.top;
-
-                        
-                        // Dessiner une ligne entre le parent et l'enfant
-                        DrawLine(childX, childY, parentX, parentY);
+                        DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
                     }
                 }
             }
         }
 
-        public void GenerateObject(BaseObject obj)
+        private List<Vector2> FindAnchorPoints(VisualElement node)
         {
-            // Ajoutez la logique pour g�n�rer un objet � partir de `obj`.
-            Debug.Log($"GenerateScript called for {obj.Name}");
+            List<Vector2> anchorPoints = new List<Vector2>();
 
-            // Exemple d'appel d'une m�thode `Generate` sur l'objet
-            obj.GenerateScript();  // Si vous avez une m�thode `Generate` sur votre classe `BaseObject`
+            // top anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top));
+            // left anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            // right anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            // bottom anchor point
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
+
+            return anchorPoints;
+        }
+
+        private List<Vector2> FindBestConnexion(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
+        {
+            List<Vector2> anchors = new List<Vector2> { Vector2.zero, Vector2.zero };
+
+            float length = float.MaxValue;
+            var center = new Vector2(anchorsChild[0].x, anchorsChild[2].y);
+
+            for (int i = 0; i < anchorsParent.Count; i++)
+            {
+                float dx = center.x - anchorsParent[i].x;
+                float dy = center.y - anchorsParent[i].y;
+                if (length > Mathf.Sqrt(dx * dx + dy * dy))
+                {
+                    length = Mathf.Sqrt(dx * dx + dy * dy);
+                    anchors[0] = anchorsParent[i];
+                }
+            }
+
+            length = float.MaxValue;
+            for (int i = 0; i < anchorsChild.Count; i++)
+            {
+                float dx = anchorsChild[i].x - anchors[0].x;
+                float dy = anchorsChild[i].y - anchors[0].y;
+                if (length > Mathf.Sqrt(dx * dx + dy * dy))
+                {
+                    length = Mathf.Sqrt(dx * dx + dy * dy);
+                    anchors[1] = anchorsChild[i];
+                }
+            }
+
+            return anchors;
+        }
+
+        private void GenerateObject(BaseObject obj)
+        {
+            Debug.Log($"GenerateObject called for {obj.Name}");
+
+            obj.GenerateScript();
         }
 
         private float CalculateTotalWidth(BaseObject node)
@@ -274,7 +322,14 @@ namespace UMLClassDiag
             line.style.width = length;
             line.style.rotate = new StyleRotate(new Rotate(angle));
 
+            var arrow = new VisualElement();
+            arrow.AddToClassList("uml-arrow");
+            arrow.style.left = endpointX - 10f;
+            arrow.style.top = endpointY - 10f;
+            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
+
             canvas.Add(line);
+            canvas.Add(arrow);
         }
 
         private void Refresh()
