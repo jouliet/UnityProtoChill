@@ -320,7 +320,14 @@ namespace UMLClassDiag
             line.style.width = length;
             line.style.rotate = new StyleRotate(new Rotate(angle));
 
+            var arrow = new VisualElement();
+            arrow.AddToClassList("uml-arrow");
+            arrow.style.left = endpointX - 10f;
+            arrow.style.top = endpointY - 10f;
+            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
+
             canvas.Add(line);
+            canvas.Add(arrow);
         }
 
         private void Refresh()

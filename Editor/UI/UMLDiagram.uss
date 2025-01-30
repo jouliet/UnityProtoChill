@@ -71,10 +71,21 @@
     margin-left: 10px;
 }
 
-/* UML Lines */
+/* UML Connexions*/
 .uml-line {
     position: absolute;
     height: 2px;
     background-color: #ec9533;
     transform-origin: top left;
+}
+
+.uml-arrow {
+    width: 0;
+    height: 0;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-top-color: #ec9533;
+    border-width: 10px;
+    position: absolute;
+    transform-origin: center;
 }
