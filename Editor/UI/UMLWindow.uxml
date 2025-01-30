@@ -5,10 +5,10 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="overlay-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;">
-            <ui:Button name="refresh-button" class="refresh-button" style="position: absolute; top: 5px; left: 5px; pointer-events: auto;">
+            <ui:Button name="refresh-button" class="refresh-button" style="position: absolute; top: 5px; left: 5px; pointer-events: all;">
                 <ui:Image name="refresh-icon" class="refresh-icon" />
             </ui:Button>
-            <ui:VisualElement style="position: absolute; top: 7px; right: 5px; pointer-events: auto;">
+            <ui:VisualElement style="position: absolute; top: 7px; right: 5px; pointer-events: all;">
                 <ui:Button name="zoom-in-button" class="zoom-button" text="+"/>
                 <ui:Button name="zoom-out-button" class="zoom-button" style="margin-top: 3px;" text="-"/>
             </ui:VisualElement>

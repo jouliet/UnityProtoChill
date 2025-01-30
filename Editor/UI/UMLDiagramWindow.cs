@@ -77,6 +77,9 @@ namespace UMLClassDiag
             rootVisualElement.Clear();
             rootVisualElement.Add(root);
 
+            var overlayContainer = root.Q<VisualElement>("overlay-container");
+            overlayContainer.pickingMode = PickingMode.Ignore;
+
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
             //canvas.style.left = - canvasWidth / 2 + width; // Center display
