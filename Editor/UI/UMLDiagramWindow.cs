@@ -450,7 +450,7 @@ namespace UMLClassDiag
         //
         private float zoomScale = 1.0f;
         private const float zoomIncrement = 0.1f;
-        private const float minZoom = 0.5f;
+        private const float minZoom = 0.1f;
         private const float maxZoom = 2.0f;
 
         private void OnMouseWheel(WheelEvent evt)
