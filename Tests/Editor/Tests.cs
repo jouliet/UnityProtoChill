@@ -97,7 +97,7 @@ public class gptTest{
         });
     }
 
-    public void InitChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
+    public void InitChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt, float temperature)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -105,7 +105,7 @@ public class gptTest{
             return;
         }
 
-        _chatGPTConversation = new CustomChatGPTConversation(useProxy, proxyUri, apiKey, model, initialPrompt);
+        _chatGPTConversation = new CustomChatGPTConversation(useProxy, proxyUri, apiKey, model, initialPrompt, 0);
 
         Debug.Log("ChatGPTConversation initialized successfully.");
     }

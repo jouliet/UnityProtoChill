@@ -88,11 +88,11 @@ public class BaseObject
         string input = 
         "You are in Unity, write this c# class :" + this.Name + "as described in this json : " + this.ToString() + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
 Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
-        if (UMLDiag.gptGenerator == null){
+        if (GPTGenerator.Instance == null){
             Debug.Log("No instance of gptGenerator");
             return;
         }
-        UMLDiag.gptGenerator.GenerateFromText(input, (response) =>
+        GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             Debug.Log("Generated class: " + response);
             WriteScriptFile(GetScript(response));

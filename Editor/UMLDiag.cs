@@ -6,11 +6,12 @@ using static SaverLoader;
 using UnityPusher;
 using ChatClass;
 using System.IO;
+using ChatGPTWrapper;
 public class UMLDiag : GenerativeProcess
 {
     private static UMLDiag _instance;
     private static string classesAndGOJsonStructurePath = "Packages/com.jin.protochill/Editor/JsonStructures/Classes&GOStructure.json";
-    public static UMLDiag Instance
+    public static UMLDiag Instance 
     {
         get
         {
@@ -87,11 +88,11 @@ public class UMLDiag : GenerativeProcess
         input = input + classesAndGOJsonStructure + separationRequest + classesRequest +  goRequests + inputToCreatePrefabs;
         //BaseObject root;
         List<BaseObject> baseObjects = new List<BaseObject>();
-        if (gptGenerator == null){
+        if (GPTGenerator.Instance == null){
             Debug.Log("No instance of gptGenerator");
             return;
         }
-        gptGenerator.GenerateFromText(input, (response) =>
+        GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonScripts = response;
             SaveUML(jsonScripts);

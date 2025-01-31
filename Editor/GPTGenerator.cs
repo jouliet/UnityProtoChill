@@ -1,6 +1,6 @@
 //This GPTGenerator uses the GPT Wrapper originally used in hello world project ... So no langchain and use of events with some consideration 
 //for execution/data transfer time and API Key. The InitChatGPTConversation and GenerateFromText are called in UMLClass
-
+using UnityEditor;
 using UnityEngine;
 using System;
 using SettingsClass;
@@ -27,7 +27,7 @@ namespace ChatGPTWrapper
     }
 
     public UIManager uIManager;
-        public GPTGenerator()
+        private GPTGenerator()
         {
             SettingsWindow.OnInitializeGPTInformation += InitChatGPTConversation;
         }
@@ -36,31 +36,85 @@ namespace ChatGPTWrapper
         {
             SettingsWindow.OnInitializeGPTInformation -= InitChatGPTConversation;
         }
-        private CustomChatGPTConversation _chatGPTConversation;
+        public CustomChatGPTConversation _chatGPTConversation;
         
     
         // Init est Appelée par l'event de l'editor window auquel on s'est abonné
-        public void InitChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
-        {
-            if (string.IsNullOrWhiteSpace(apiKey))
+
+        public void InitChatGptConversationAsynchroneFriendly(
+            bool useProxy, 
+            string proxyUri, 
+            string apiKey, 
+            CustomChatGPTConversation.Model model, 
+            string initialPrompt, 
+            float temperature, 
+            Action onInitializedCallback)
             {
-                Debug.LogError("API key is required to initialize ChatGPTConversation.");
-                return;
+                if (_chatGPTConversation ==null){
+                    _chatGPTConversation = new CustomChatGPTConversation(useProxy, proxyUri, apiKey, model, initialPrompt, temperature);
+
+                    if (_chatGPTConversation != null)
+                    {
+                        onInitializedCallback?.Invoke();
+                    
+                    }
+                    else {
+                        Debug.LogError("GPT Settings have big troubles loading");
+                    }
+                }
             }
+ 
 
-            _chatGPTConversation = new CustomChatGPTConversation(useProxy, proxyUri, apiKey, model, initialPrompt);
+            public void InitChatGPTConversation(
+                bool useProxy, 
+                string proxyUri, 
+                string apiKey, 
+                CustomChatGPTConversation.Model model, 
+                string initialPrompt, 
+                float temperature)
+            {
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    Debug.LogError("API key is required to initialize ChatGPTConversation.");
+                    return; 
+                }  
 
-            Debug.Log("ChatGPTConversation initialized successfully. This does not mean the key is correct");
-        }
+                // Perform initialization of the chat conversation
+                _chatGPTConversation = new CustomChatGPTConversation(
+                    useProxy, proxyUri, apiKey, model, initialPrompt, temperature);
+
+                Debug.Log("ChatGPTConversation initialized successfully. This does not mean the key is correct");
+            }
 
         // Appelé par UML Diag
         public void GenerateFromText(string text, Action<string> onResponse)
         {
             if (_chatGPTConversation == null)
             {
-                Debug.LogError("ChatGPTConversation is not initialized. Call InitChatGPTConversation first.");
-                return;
+                Debug.LogError("ChatGPTConversation is not initialized. Trying to load user data...");
+                
+                GPTSettingsManager.LoadGPTSettings(() =>
+                {
+                    
+                    if (_chatGPTConversation != null){
+                        Debug.Log("Settings Loaded, now proceeding with GenerateFromText...");
+                        SendTextToChatGPT(text, onResponse);
+                    }
+                    else {
+                        Debug.LogWarning("Settings loading failed, you might wanna try manually entering your settings. En sommes, nul ici malgré la réussite des étapes précédentes");
+                    }
+                        
+                }); 
             }
+            else {
+                SendTextToChatGPT(text, onResponse);
+            }
+        }
+
+        private void SendTextToChatGPT(string text, Action<string> onResponse)
+        {
+            
+
 
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -74,8 +128,7 @@ namespace ChatGPTWrapper
             {
                 Debug.Log($"Message Sent: {text}");
                 Debug.Log($"Message Received: {response}");
-                
-                
+
                 //Triste mais pas trouvé mieux, le setter marche po for some reason (surement le lifecycle sus des editor windows)
                 uIManager = Resources.FindObjectsOfTypeAll<UIManager>().FirstOrDefault();
 
@@ -85,11 +138,8 @@ namespace ChatGPTWrapper
                 else{
                     Debug.Log("No uIManager");
                 }
-                
-
                 onResponse?.Invoke(response);
             });
-
         }
 
 
@@ -97,7 +147,9 @@ namespace ChatGPTWrapper
             uIManager = manager;
         }
 
-
+        public bool isGPTInitialized(){
+            return _chatGPTConversation!=null;
+        }
         
     }
 }
