@@ -19,7 +19,7 @@ namespace UMLClassDiag
         private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
-        private Dictionary<BaseObject, List<VisualElement>> connectionElements = new Dictionary<BaseObject, List<VisualElement>>();
+        private List<Connection> connections = new List<Connection> ();
 
         private float width = 300f; // width of nodes
         private float offset = 50f;
@@ -233,26 +233,37 @@ namespace UMLClassDiag
 
                         var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
 
-                        if (!connectionElements.ContainsKey(parentObject))
-                        {
-                            connectionElements[parentObject] = new List<VisualElement>();
-                        }
-                        connectionElements[parentObject].Add(line);
+                        connections.Add(new Connection(line, parentObject, child));
                     }
                 }
             }
         }
 
-        private void ClearConnection(BaseObject parentObject)
+        private List<BaseObject> ClearConnections(BaseObject obj)
         {
-            if (connectionElements.TryGetValue(parentObject, out var connections))
+            var connectionsToClear = new List<Connection>();
+            var parents = new List<BaseObject>();
+
+            foreach (var connection in connections)
             {
-                foreach (var connection in connections)
+                if (connection.Start == obj)
                 {
-                    connection.RemoveFromHierarchy();
+                    connection.Arrow.RemoveFromHierarchy();
+                    connectionsToClear.Add(connection);
                 }
-                connectionElements[parentObject].Clear();
+                if (connection.End == obj)
+                {
+                    connection.Arrow.RemoveFromHierarchy();
+                    connectionsToClear.Add(connection);
+                    parents.Add(connection.Start);
+                }
             }
+            foreach (var connection in connectionsToClear)
+            {
+                connections.Remove(connection);
+            }
+
+            return parents;
         }
 
         private VisualElement DrawLine(float endpointX, float endpointY, float originX, float originY)
@@ -269,16 +280,18 @@ namespace UMLClassDiag
             line.style.width = length;
             line.style.rotate = new StyleRotate(new Rotate(angle));
 
-            var arrow = new VisualElement();
-            arrow.AddToClassList("uml-arrow");
-            arrow.style.left = endpointX - 10f;
-            arrow.style.top = endpointY - 10f;
-            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
+            var arrowPointer = new VisualElement();
+            arrowPointer.AddToClassList("uml-arrow");
+            arrowPointer.style.left = endpointX - 10f;
+            arrowPointer.style.top = endpointY - 10f;
+            arrowPointer.style.rotate = new StyleRotate(new Rotate(angle - 90));
 
-            canvas.Add(line);
+            var arrow = new VisualElement();
+            arrow.Add(line);
+            arrow.Add(arrowPointer);
             canvas.Add(arrow);
 
-            return line;
+            return arrow;
         }
 
         private List<Vector2> FindAnchorPoints(VisualElement node)
@@ -499,8 +512,9 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
-            //LoadUML();
-            var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
+            LoadUML();
+            ReloadDiagram(baseObjects);
+            /*var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
             if (jsonFile != null)
             {
                 string jsonString = jsonFile.text;
@@ -509,7 +523,7 @@ namespace UMLClassDiag
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 GenerativeProcess.SetJsonScripts(jsonString);
                 ReloadDiagram(baseObjects);
-            }
+            }*/
         }
         
         /// 
@@ -549,7 +563,8 @@ namespace UMLClassDiag
                 collapseButton.AddToClassList("collapse-button__down");
             }
 
-            ClearConnection(obj);
+            var parents = ClearConnections(obj);
+
             objContainer.schedule.Execute(() =>
             {
                 foreach (var child in obj.ComposedClasses)
@@ -562,9 +577,23 @@ namespace UMLClassDiag
 
                         var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
 
-                        connectionElements[obj].Add(line);
+                        connections.Add( new Connection(line, obj, child) );
                     }
                 }
+                foreach (var parent in parents)
+                {
+                    if (nodeElements.TryGetValue(parent, out var parentNode))
+                    {
+                        List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
+                        List<Vector2> childAnchors = FindAnchorPoints(objContainer);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
+
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        connections.Add(new Connection(line, parent, obj) );
+                    }
+                }
+
                 canvas.MarkDirtyRepaint();
             });
         }
@@ -574,6 +603,20 @@ namespace UMLClassDiag
             Debug.Log($"GenerateObject called for {obj.Name}");
 
             obj.GenerateScript();
+        }
+    }
+
+    public struct Connection
+    {
+        public VisualElement Arrow { get; }
+        public BaseObject Start { get; }
+        public BaseObject End { get; }
+
+        public Connection(VisualElement arrow, BaseObject start, BaseObject end)
+        {
+            Arrow = arrow;
+            Start = start;
+            End = end;
         }
     }
 }

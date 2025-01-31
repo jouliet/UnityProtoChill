@@ -1,61 +1,27 @@
 ```user
-I have created a UML structure for the platformer game system, including the necessary classes and their relationships. Additionally, I have designed a GameObject list with appropriate components, such as Transform, MeshFilter, MeshRenderer, BoxCollider, and Rigidbody, to represent the player, enemy, checkpoints, and other elements in the game. The scripts and GameObjects are coherent and follow the requested format.
+I have created a UML structure for the platformer game system, including classes for the player, enemies, bullets, and game management. Additionally, I have provided a GameObject list with appropriate components such as Transform, MeshFilter, MeshRenderer, Rigidbody, and BoxCollider. The scripts in the GameObject list correspond to the UML structure, ensuring consistency.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "EnemyPatrol",
-            "Attributes": [
-                {
-                    "Name": "checkpointA",
-                    "Type": "Vector3",
-                    "DefaultValue": "null"
-                },
-                {
-                    "Name": "checkpointB",
-                    "Type": "Vector3",
-                    "DefaultValue": "null"
-                },
-                {
-                    "Name": "speed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "isAlive",
-                    "Type": "bool",
-                    "DefaultValue": "true"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Patrol",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "Die",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["PlayerController"],
-            "ParentClass": "null"
-        },
-        {
             "Name": "PlayerController",
             "Attributes": [
                 {
-                    "Name": "jumpForce",
+                    "Name": "speed",
                     "Type": "float",
                     "DefaultValue": "5.0"
                 },
                 {
-                    "Name": "isGrounded",
-                    "Type": "bool",
-                    "DefaultValue": "true"
+                    "Name": "jumpForce",
+                    "Type": "float",
+                    "DefaultValue": "10.0"
+                },
+                {
+                    "Name": "bulletPrefab",
+                    "Type": "GameObject",
+                    "DefaultValue": "null"
                 }
             ],
             "Methods": [
@@ -70,7 +36,71 @@ I have created a UML structure for the platformer game system, including the nec
                     "Parameters": []
                 },
                 {
-                    "Name": "OnCollisionEnter",
+                    "Name": "Shoot",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["Bullet"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Enemy",
+            "Attributes": [
+                {
+                    "Name": "health",
+                    "Type": "int",
+                    "DefaultValue": "3"
+                },
+                {
+                    "Name": "speed",
+                    "Type": "float",
+                    "DefaultValue": "2.0"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "TakeDamage",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "damage",
+                            "Type": "int",
+                            "DefaultValue": "1"
+                        }
+                    ]
+                }
+            ],
+            "ComposedClasses": "null",
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Bullet",
+            "Attributes": [
+                {
+                    "Name": "speed",
+                    "Type": "float",
+                    "DefaultValue": "10.0"
+                },
+                {
+                    "Name": "damage",
+                    "Type": "int",
+                    "DefaultValue": "1"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Move",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "OnCollision",
                     "ReturnType": "void",
                     "Parameters": [
                         {
@@ -83,6 +113,41 @@ I have created a UML structure for the platformer game system, including the nec
             ],
             "ComposedClasses": "null",
             "ParentClass": "null"
+        },
+        {
+            "Name": "GameManager",
+            "Attributes": [
+                {
+                    "Name": "score",
+                    "Type": "int",
+                    "DefaultValue": "0"
+                },
+                {
+                    "Name": "player",
+                    "Type": "GameObject",
+                    "DefaultValue": "null"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "UpdateScore",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "points",
+                            "Type": "int",
+                            "DefaultValue": "0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "RestartGame",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["PlayerController", "Enemy"],
+            "ParentClass": "null"
         }
     ],
     "GameObjects": [
@@ -94,42 +159,28 @@ I have created a UML structure for the platformer game system, including the nec
                 {
                     "type": "Transform",
                     "properties": {
-                        "position": ["0", "1", "0"],
+                        "position": ["0", "0", "0"],
                         "localScale": ["1", "1", "1"]
                     }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "angularDrag": "0.05",
-                        "useGravity": "true",
-                        "isKinematic": "false"
+                        "mass": "1.0",
+                        "drag": "0.0",
+                        "useGravity": "true"
                     }
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "size": ["1", "1", "1"]
+                        "size": ["1", "2", "1"]
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
                         "Name": "PlayerController"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
                     }
                 }
             ]
@@ -142,94 +193,75 @@ I have created a UML structure for the platformer game system, including the nec
                 {
                     "type": "Transform",
                     "properties": {
-                        "position": ["5", "1", "0"],
+                        "position": ["5", "0", "0"],
                         "localScale": ["1", "1", "1"]
                     }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "angularDrag": "0.05",
-                        "useGravity": "true",
-                        "isKinematic": "false"
+                        "mass": "1.0",
+                        "drag": "0.0",
+                        "useGravity": "true"
                     }
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "size": ["1", "1", "1"]
+                        "size": ["1", "2", "1"]
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
-                        "Name": "EnemyPatrol"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
+                        "Name": "Enemy"
                     }
                 }
             ]
         },
         {
-            "name": "CheckpointA",
-            "tag": "Untagged",
+            "name": "Bullet",
+            "tag": "Bullet",
             "layer": "Default",
             "components": [
                 {
                     "type": "Transform",
                     "properties": {
-                        "position": ["3", "0", "0"],
-                        "localScale": ["0.5", "0.5", "0.5"]
+                        "position": ["0", "0", "0"],
+                        "localScale": ["0.2", "0.2", "0.2"]
                     }
                 },
                 {
-                    "type": "MeshFilter",
+                    "type": "Rigidbody",
                     "properties": {
-                        "mesh": "Sphere"
+                        "mass": "0.1",
+                        "drag": "0.0",
+                        "useGravity": "false"
                     }
                 },
                 {
-                    "type": "MeshRenderer",
+                    "type": "BoxCollider",
                     "properties": {
-                        "material": "Sprites-Default"
+                        "size": ["0.2", "0.2", "0.2"]
+                    }
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "Bullet"
                     }
                 }
             ]
         },
         {
-            "name": "CheckpointB",
-            "tag": "Untagged",
+            "name": "GameManager",
+            "tag": "Manager",
             "layer": "Default",
             "components": [
                 {
-                    "type": "Transform",
+                    "type": "Script",
                     "properties": {
-                        "position": ["7", "0", "0"],
-                        "localScale": ["0.5", "0.5", "0.5"]
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Sphere"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
+                        "Name": "GameManager"
                     }
                 }
             ]
