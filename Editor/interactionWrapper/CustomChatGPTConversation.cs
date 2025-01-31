@@ -27,10 +27,11 @@ namespace ChatGPTWrapper
         private string _lastChatGPTMsg;
 
         // private string _chatbotName = "ChatGPT";
-        private string _initialPrompt = "You understand how The component pattern works. You are a game developer specialized in Unity. You will be asked to write jsons which you will put in json markers (```json ... ```). Always make a summary of your answers and put it in 'user' markers (```user ... ```). Only ever include 1 json and 1 user summary per answer";
+        private string _initialPrompt = "You are a game developer specialized in Unity. You will be asked to write jsons which you will put in json markers (```json ... ```). Always make a summary of your answers and put it in 'user' markers (```user ... ```). Only ever include at most 1 json and 1 user summary per answer. If you are tasked to write a script, put it in ```csharp ... ``` markers. ";
 
-        public CustomChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt)
+        public CustomChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt, float temperature)
         {
+            _temperature = temperature;
             _useProxy = useProxy;
             _proxyUri = proxyUri;
             _apiKey = apiKey;

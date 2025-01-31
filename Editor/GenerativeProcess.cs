@@ -12,7 +12,6 @@ public abstract class GenerativeProcess
     //Actuellement Idem pour OnGenerateScript qui est géré dans la même editor window et avec la même initialisation de gpt par convéniance
 
     //l'intance de GPTGenerator est gérée à ce niveau
-    public static GPTGenerator gptGenerator;
     protected static string jsonScripts;
     protected static string jsonGOs;
     public static void SetJsonScripts(string json){
@@ -28,10 +27,6 @@ public abstract class GenerativeProcess
     // Generative process est abonné à l'editor window
     public GenerativeProcess()
     {
-        if (gptGenerator == null)
-        {
-            gptGenerator = new GPTGenerator();
-        }
         // MyEditorWindow.OnSubmitText += OnSubmit;
         // MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
         // gptGenerator = new GPTGenerator();

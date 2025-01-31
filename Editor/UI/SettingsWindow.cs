@@ -9,15 +9,13 @@ namespace SettingsClass
 
     public class SettingsWindow : EditorWindow
     {
-        public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string> OnInitializeGPTInformation;
+        public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string, float> OnInitializeGPTInformation;
         private bool useProxy;
         private string proxyUri = "";
         private string apiKey = "";
+        private float temperature;
         private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT4;
-        private string initialPrompt = @"
-You are both an oriented object and gameobject oriented beast. You only use functions defined in the json or native to Unity.
-Never assume a method, class or function exists without explicitly seeing it in the UML diagram you are presented. When building said diagram always be exhaustive with the links between classes and always prefer making them go both ways";
-
+        private string initialPrompt;
         private Vector2 topScrollPosition;
 
         public static void ShowWindow()
@@ -46,12 +44,13 @@ Never assume a method, class or function exists without explicitly seeing it in 
             }
             selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
-            GUILayout.Label("Initial Prompt", EditorStyles.label);
-            topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
-            initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
-            GUILayout.EndScrollView();
+            // GUILayout.Label("Initial Prompt", EditorStyles.label);
+            // topScrollPosition = GUILayout.BeginScrollView(topScrollPosition, GUILayout.Height(90));
+            // initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
+            // GUILayout.EndScrollView();
 
             GUILayout.Space(15);
+            temperature = EditorGUILayout.Slider("Temperature", temperature, 0f, 2f);
 
             // Bouton INIT GPT
             if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
@@ -68,7 +67,10 @@ Never assume a method, class or function exists without explicitly seeing it in 
         {
             // Le seul abonn� est l'instance de GPTGenerator, elle m�me instanci�e dans le constructeur de Generative process. On 
             // instancie donc Un GPTGenerator et un CustomChatGPTConversation par generative process. 
-            OnInitializeGPTInformation?.Invoke(useProxy, proxyUri, apiKey, selectedModel, initialPrompt);
+            OnInitializeGPTInformation?.Invoke(useProxy, proxyUri, apiKey, selectedModel, initialPrompt, temperature);
+            
+            // La sauvegarde se fait dans l'UI coming soon l'option pour ne pas le faire lolelol (infâme mais Michel posera la question 100u)
+            GPTSettingsManager.SaveGPTSettings(useProxy, proxyUri, apiKey, selectedModel, initialPrompt, temperature);
         }
     }
 
