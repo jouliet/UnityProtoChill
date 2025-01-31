@@ -19,6 +19,7 @@ namespace UMLClassDiag
         private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
+        private Dictionary<BaseObject, List<VisualElement>> connectionElements = new Dictionary<BaseObject, List<VisualElement>>();
 
         private float width = 300f; // width of nodes
         private float offset = 50f;
@@ -164,7 +165,7 @@ namespace UMLClassDiag
             umlNode.Add(generateButton);
             var collapseButton = umlNode.Q<Button>("collapse-button");
             var collapseContent = umlNode.Q<VisualElement>("uml-diagram-contents");
-            collapseButton.clicked +=  () => OnCollapseNode(collapseContent, collapseButton);
+            collapseButton.clicked +=  () => OnCollapseNode(obj, nodeContainer, collapseContent, collapseButton);
 
             nodeContainer.Add(umlNode);
 
@@ -209,13 +210,6 @@ namespace UMLClassDiag
                     childX += width + offset; // Avancer horizontalement pour chaque enfant
                 }
             }
-
-
-             // Planifier les connexions après le rendu
-            /*nodeContainer.schedule.Execute(() =>
-            {
-                DrawConnections();
-            });*/
         }
 
         public void DrawConnections()
@@ -235,15 +229,33 @@ namespace UMLClassDiag
                     {
                         List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
                         List<Vector2> childAnchors = FindAnchorPoints(childNode);
-                        List<Vector2> lineCoordinates = FindBestConnexion(parentAnchors, childAnchors);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
 
-                        DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        if (!connectionElements.ContainsKey(parentObject))
+                        {
+                            connectionElements[parentObject] = new List<VisualElement>();
+                        }
+                        connectionElements[parentObject].Add(line);
                     }
                 }
             }
         }
 
-        private void DrawLine(float endpointX, float endpointY, float originX, float originY)
+        private void ClearConnection(BaseObject parentObject)
+        {
+            if (connectionElements.TryGetValue(parentObject, out var connections))
+            {
+                foreach (var connection in connections)
+                {
+                    connection.RemoveFromHierarchy();
+                }
+                connectionElements[parentObject].Clear();
+            }
+        }
+
+        private VisualElement DrawLine(float endpointX, float endpointY, float originX, float originY)
         {
             float dx = endpointX - originX;
             float dy = endpointY - originY;
@@ -265,6 +277,8 @@ namespace UMLClassDiag
 
             canvas.Add(line);
             canvas.Add(arrow);
+
+            return line;
         }
 
         private List<Vector2> FindAnchorPoints(VisualElement node)
@@ -272,18 +286,18 @@ namespace UMLClassDiag
             List<Vector2> anchorPoints = new List<Vector2>();
 
             // top anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width / 2, node.resolvedStyle.top));
             // left anchor point
             anchorPoints.Add(new Vector2(node.resolvedStyle.left, node.resolvedStyle.top + node.resolvedStyle.height / 2));
             // right anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
             // bottom anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
 
             return anchorPoints;
         }
 
-        private List<Vector2> FindBestConnexion(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
+        private List<Vector2> FindBestConnection(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
         {
             List<Vector2> anchors = new List<Vector2> { Vector2.zero, Vector2.zero };
 
@@ -518,7 +532,7 @@ namespace UMLClassDiag
         /// ANIMATIONS
         /// 
         ///
-        private void OnCollapseNode(VisualElement collapseContainer, Button collapseButton)
+        private void OnCollapseNode(BaseObject obj, VisualElement objContainer, VisualElement collapseContainer, Button collapseButton)
         {
             if (collapseContainer.style.display == DisplayStyle.Flex)
             {
@@ -534,6 +548,25 @@ namespace UMLClassDiag
                 collapseButton.RemoveFromClassList("collapse-button__up");
                 collapseButton.AddToClassList("collapse-button__down");
             }
+
+            ClearConnection(obj);
+            objContainer.schedule.Execute(() =>
+            {
+                foreach (var child in obj.ComposedClasses)
+                {
+                    if (nodeElements.TryGetValue(child, out var childNode))
+                    {
+                        List<Vector2> parentAnchors = FindAnchorPoints(objContainer);
+                        List<Vector2> childAnchors = FindAnchorPoints(childNode);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
+
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        connectionElements[obj].Add(line);
+                    }
+                }
+                canvas.MarkDirtyRepaint();
+            });
         }
 
         private void OnGenerateObject(BaseObject obj)
