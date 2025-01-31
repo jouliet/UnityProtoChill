@@ -27,8 +27,6 @@ namespace UMLClassDiag
         private Vector2 dragStart;
         private bool isDragging;
         private VisualElement canvas;
-        //private float canvasWidth = 1000f;
-        // private float canvasHeight = 1000f;
 
         private VisualElement selectedNode;
         private BaseObject selectedObject;
@@ -82,11 +80,9 @@ namespace UMLClassDiag
 
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
-            //canvas.style.left = - canvasWidth / 2 + width; // Center display
-            //canvas.style.top = 0f;
-            //canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
-            //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
+            canvas.style.flexGrow = 0;
+            canvas.style.flexShrink = 0;
 
             canvas.schedule.Execute(() =>
             {
@@ -128,9 +124,9 @@ namespace UMLClassDiag
 
             canvas.schedule.Execute(() =>
             {
-                DrawConnections();
                 AdjustCanvasSize();
-            });
+                DrawConnections();
+            }).ExecuteLater(100);
         }
 
         public void DrawNode(BaseObject obj, float x, float y)
@@ -217,6 +213,7 @@ namespace UMLClassDiag
             if (nodeElements == null)
             {
                 Debug.LogWarning("La liste nodeElements est null donc impossible de dessiner les liens.");
+                return;
             }
             foreach (var kvp in nodeElements)
             {
@@ -232,7 +229,6 @@ namespace UMLClassDiag
                         List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
 
                         var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
-
                         connections.Add(new Connection(line, parentObject, child));
                     }
                 }
