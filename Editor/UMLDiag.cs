@@ -76,7 +76,8 @@ public class UMLDiag : GenerativeProcess
     "For the GameObject part : \n" +
     "Float values format exemple : 10.5 \n" +
     "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
-    "Don't hesitate to add boxCollider, rigidbody or MeshFilter (with MeshRenderer) components if necessary.\n";
+    "Don't hesitate to add boxCollider or rigidbody components if necessary.\n" +
+    "You must add  MeshFilter (with MeshRenderer) component on almost game objects.";
 
     private static string inputToCreatePrefabs = 
     "Remember that the script names must be coherent with the UML scripts. \n";

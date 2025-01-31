@@ -11,6 +11,7 @@ using static SaverLoader;
 using Unity.VisualScripting;
 using System.Globalization;
 using System.Security.Permissions;
+using UnityEngine.UI;
 
 
 
@@ -197,12 +198,19 @@ public class GameObjectCreator : GenerativeProcess{
                     if (propertyType == typeof(float) || propertyType == typeof(Single))
                     {
                         value = Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                        propertyInfo.SetValue(component, value);
+                    }else if (kvp.Key == "mesh"){
+                        SetMeshFilterFromString((string)kvp.Value, (MeshFilter)component);
+                    }else if (kvp.Key == "material"){
+                        // Ici la kvp.Value ne change rien car on applique un material par default
+                        SetMeshRendererFromString((MeshRenderer)component);
                     }
                     else
                     {
                         value = Convert.ChangeType(value, propertyType);
+                        propertyInfo.SetValue(component, value);
                     }
-                    propertyInfo.SetValue(component, value);
+                    
                     //Debug.LogException(ex);
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
@@ -213,6 +221,31 @@ public class GameObjectCreator : GenerativeProcess{
             
         }
     }
+
+    public static void SetMeshFilterFromString(string primitiveTypeName, MeshFilter meshFilter)
+    {
+        if (Enum.TryParse(primitiveTypeName, out PrimitiveType primitiveType))
+        {
+            GameObject temp = GameObject.CreatePrimitive(primitiveType);
+            meshFilter.mesh = temp.GetComponent<MeshFilter>().sharedMesh;
+        }
+        else
+        {
+            Debug.LogError($"PrimitiveType '{primitiveTypeName}' invalide.");
+        }
+    }
+
+
+    public static void SetMeshRendererFromString(MeshRenderer meshRenderer)
+    {
+      
+        //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
+        Material DefaultMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+
+        DefaultMaterial.SetInt("_Smoothness", 0);
+        meshRenderer.material = DefaultMaterial;
+    }
+
 
     public static void AddFieldsToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)

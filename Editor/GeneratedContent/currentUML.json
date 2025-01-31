@@ -1,5 +1,5 @@
 ```user
-To create a platformer game system, I have designed a UML diagram with classes and their relationships, as well as a list of GameObjects with their respective components. The UML includes essential scripts for player movement, enemy behavior, platform interaction, and game management. The GameObjects include a player, platforms, enemies, and a game manager, each with appropriate components like Rigidbody, BoxCollider, and custom scripts. The structure ensures coherence between the UML and GameObjects.
+To create a platformer game system, I have designed a UML diagram with classes and their relationships, as well as a list of GameObjects with their respective components. The UML includes essential scripts for player movement, enemy behavior, platform mechanics, and game management. The GameObjects include a player, platforms, enemies, and a game manager, each with appropriate components like Rigidbody, BoxCollider, and MeshRenderer. The scripts are linked to the GameObjects where necessary, ensuring coherence between the UML and GameObjects.
 ```
 
 ```json
@@ -53,9 +53,9 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "DefaultValue": "2.0"
                 },
                 {
-                    "Name": "isMovingRight",
-                    "Type": "bool",
-                    "DefaultValue": "true"
+                    "Name": "direction",
+                    "Type": "int",
+                    "DefaultValue": "1"
                 }
             ],
             "Methods": [
@@ -65,7 +65,7 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "Parameters": []
                 },
                 {
-                    "Name": "FlipDirection",
+                    "Name": "ChangeDirection",
                     "ReturnType": "void",
                     "Parameters": []
                 }
@@ -148,19 +148,33 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "properties": {
                         "mass": "1.0",
                         "drag": "0.0",
-                        "useGravity": "true"
+                        "angularDrag": "0.05",
+                        "useGravity": "true",
+                        "isKinematic": "false"
                     }
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "isTrigger": "false"
+                        "size": "1.0, 2.0, 1.0"
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
                         "Name": "PlayerController"
+                    }
+                },
+                {
+                    "type": "MeshFilter",
+                    "properties": {
+                        "mesh": "Cube"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Sprites-Default"
                     }
                 }
             ]
@@ -179,19 +193,33 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "properties": {
                         "mass": "1.0",
                         "drag": "0.0",
-                        "useGravity": "true"
+                        "angularDrag": "0.05",
+                        "useGravity": "true",
+                        "isKinematic": "false"
                     }
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "isTrigger": "false"
+                        "size": "1.0, 1.0, 1.0"
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
                         "Name": "EnemyAI"
+                    }
+                },
+                {
+                    "type": "MeshFilter",
+                    "properties": {
+                        "mesh": "Cube"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Sprites-Default"
                     }
                 }
             ]
@@ -208,7 +236,7 @@ To create a platformer game system, I have designed a UML diagram with classes a
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "isTrigger": "false"
+                        "size": "3.0, 0.5, 1.0"
                     }
                 },
                 {
@@ -216,14 +244,30 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "properties": {
                         "Name": "Platform"
                     }
+                },
+                {
+                    "type": "MeshFilter",
+                    "properties": {
+                        "mesh": "Cube"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Sprites-Default"
+                    }
                 }
             ]
         },
         {
             "name": "GameManager",
-            "tag": "GameController",
+            "tag": "Untagged",
             "layer": "Default",
             "components": [
+                {
+                    "type": "Transform",
+                    "properties": {}
+                },
                 {
                     "type": "Script",
                     "properties": {
