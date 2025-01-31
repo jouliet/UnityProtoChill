@@ -69,6 +69,13 @@
                 }
             },
             {
+                "type": "Transform",
+                "properties": {
+                    "position": ["0","0","0"],
+                    "localScale": ["1","1","1"]
+                }
+            },
+            {
                 "type": "MeshFilter",
                 "properties": {
                     "mesh": "Cube (or Capsule, Cylinder, Plane, Sphere)"

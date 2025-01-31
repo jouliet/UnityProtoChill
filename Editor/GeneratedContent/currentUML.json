@@ -1,27 +1,61 @@
 ```user
-To create a platformer game system, I have designed a UML diagram with classes and their relationships, as well as a list of GameObjects with their respective components. The UML includes essential scripts for player movement, enemy behavior, platform mechanics, and game management. The GameObjects include a player, platforms, enemies, and a game manager, each with appropriate components like Rigidbody, BoxCollider, and MeshRenderer. The scripts are linked to the GameObjects where necessary, ensuring coherence between the UML and GameObjects.
+I have created a UML structure for the platformer game system, including the necessary classes and their relationships. Additionally, I have designed a GameObject list with appropriate components, such as Transform, MeshFilter, MeshRenderer, BoxCollider, and Rigidbody, to represent the player, enemy, checkpoints, and other elements in the game. The scripts and GameObjects are coherent and follow the requested format.
 ```
 
 ```json
 {
     "Classes": [
         {
+            "Name": "EnemyPatrol",
+            "Attributes": [
+                {
+                    "Name": "checkpointA",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
+                },
+                {
+                    "Name": "checkpointB",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
+                },
+                {
+                    "Name": "speed",
+                    "Type": "float",
+                    "DefaultValue": "2.0"
+                },
+                {
+                    "Name": "isAlive",
+                    "Type": "bool",
+                    "DefaultValue": "true"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Patrol",
+                    "ReturnType": "void",
+                    "Parameters": []
+                },
+                {
+                    "Name": "Die",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["PlayerController"],
+            "ParentClass": "null"
+        },
+        {
             "Name": "PlayerController",
             "Attributes": [
                 {
-                    "Name": "speed",
+                    "Name": "jumpForce",
                     "Type": "float",
                     "DefaultValue": "5.0"
                 },
                 {
-                    "Name": "jumpForce",
-                    "Type": "float",
-                    "DefaultValue": "10.0"
-                },
-                {
                     "Name": "isGrounded",
                     "Type": "bool",
-                    "DefaultValue": "false"
+                    "DefaultValue": "true"
                 }
             ],
             "Methods": [
@@ -36,97 +70,15 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "Parameters": []
                 },
                 {
-                    "Name": "CheckGround",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["GameManager"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "EnemyAI",
-            "Attributes": [
-                {
-                    "Name": "speed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "direction",
-                    "Type": "int",
-                    "DefaultValue": "1"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Move",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "ChangeDirection",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["GameManager"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "Platform",
-            "Attributes": [
-                {
-                    "Name": "isMoving",
-                    "Type": "bool",
-                    "DefaultValue": "false"
-                },
-                {
-                    "Name": "moveSpeed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "MovePlatform",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": "null",
-            "ParentClass": "null"
-        },
-        {
-            "Name": "GameManager",
-            "Attributes": [
-                {
-                    "Name": "score",
-                    "Type": "int",
-                    "DefaultValue": "0"
-                },
-                {
-                    "Name": "lives",
-                    "Type": "int",
-                    "DefaultValue": "3"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "AddScore",
+                    "Name": "OnCollisionEnter",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "points",
-                            "Type": "int",
-                            "DefaultValue": "0"
+                            "Name": "collision",
+                            "Type": "Collision",
+                            "DefaultValue": "null"
                         }
                     ]
-                },
-                {
-                    "Name": "LoseLife",
-                    "ReturnType": "void",
-                    "Parameters": []
                 }
             ],
             "ComposedClasses": "null",
@@ -141,13 +93,16 @@ To create a platformer game system, I have designed a UML diagram with classes a
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
+                    "properties": {
+                        "position": ["0", "1", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1.0",
-                        "drag": "0.0",
+                        "mass": "1",
+                        "drag": "0",
                         "angularDrag": "0.05",
                         "useGravity": "true",
                         "isKinematic": "false"
@@ -156,7 +111,7 @@ To create a platformer game system, I have designed a UML diagram with classes a
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "size": "1.0, 2.0, 1.0"
+                        "size": ["1", "1", "1"]
                     }
                 },
                 {
@@ -186,13 +141,16 @@ To create a platformer game system, I have designed a UML diagram with classes a
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
+                    "properties": {
+                        "position": ["5", "1", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1.0",
-                        "drag": "0.0",
+                        "mass": "1",
+                        "drag": "0",
                         "angularDrag": "0.05",
                         "useGravity": "true",
                         "isKinematic": "false"
@@ -201,13 +159,13 @@ To create a platformer game system, I have designed a UML diagram with classes a
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "size": "1.0, 1.0, 1.0"
+                        "size": ["1", "1", "1"]
                     }
                 },
                 {
                     "type": "Script",
                     "properties": {
-                        "Name": "EnemyAI"
+                        "Name": "EnemyPatrol"
                     }
                 },
                 {
@@ -225,53 +183,53 @@ To create a platformer game system, I have designed a UML diagram with classes a
             ]
         },
         {
-            "name": "Platform",
-            "tag": "Platform",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {}
-                },
-                {
-                    "type": "BoxCollider",
-                    "properties": {
-                        "size": "3.0, 0.5, 1.0"
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "Platform"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "GameManager",
+            "name": "CheckpointA",
             "tag": "Untagged",
             "layer": "Default",
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
+                    "properties": {
+                        "position": ["3", "0", "0"],
+                        "localScale": ["0.5", "0.5", "0.5"]
+                    }
                 },
                 {
-                    "type": "Script",
+                    "type": "MeshFilter",
                     "properties": {
-                        "Name": "GameManager"
+                        "mesh": "Sphere"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Sprites-Default"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "CheckpointB",
+            "tag": "Untagged",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["7", "0", "0"],
+                        "localScale": ["0.5", "0.5", "0.5"]
+                    }
+                },
+                {
+                    "type": "MeshFilter",
+                    "properties": {
+                        "mesh": "Sphere"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Sprites-Default"
                     }
                 }
             ]

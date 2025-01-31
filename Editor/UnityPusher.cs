@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using System.Globalization;
 using System.Security.Permissions;
 using UnityEngine.UI;
+using System.Numerics;
 
 
 
@@ -154,8 +155,9 @@ public class GameObjectCreator : GenerativeProcess{
                     if (componentType != typeof(Transform)){
                         component = go.AddComponent(componentType);
                     }else{
-                        continue;
+                        component = go.transform;
                     }
+                    
 
                     if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
                     {
@@ -204,6 +206,15 @@ public class GameObjectCreator : GenerativeProcess{
                     }else if (kvp.Key == "material"){
                         // Ici la kvp.Value ne change rien car on applique un material par default
                         SetMeshRendererFromString((MeshRenderer)component);
+                    }else if (propertyType == typeof(UnityEngine.Vector3)){
+                        
+                        List<object> vector3ListJson = (List<object>) kvp.Value;
+                        List<float> vector3List = new List<float>();
+                        foreach(object number in vector3ListJson){
+                            vector3List.Add(Convert.ToSingle(number, CultureInfo.InvariantCulture));
+                        }
+                        UnityEngine.Vector3 vector3 = new UnityEngine.Vector3(vector3List[0], vector3List[1], vector3List[2]);
+                        propertyInfo.SetValue(component, vector3);
                     }
                     else
                     {
@@ -216,7 +227,7 @@ public class GameObjectCreator : GenerativeProcess{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
             }catch (Exception ex){
-                Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+                    Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
             }
             
         }
@@ -228,6 +239,7 @@ public class GameObjectCreator : GenerativeProcess{
         {
             GameObject temp = GameObject.CreatePrimitive(primitiveType);
             meshFilter.mesh = temp.GetComponent<MeshFilter>().sharedMesh;
+            GameObject.DestroyImmediate(temp);
         }
         else
         {
