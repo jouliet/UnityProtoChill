@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UMLClassDiag;
@@ -21,6 +22,17 @@ public class ObjectResearch
     }
 
     public static List<BaseObject> AllBaseObjects = new List<BaseObject>();
+
+    public static BaseObject FindBaseObjectByName(string name){
+        foreach (var baseObject in AllBaseObjects) {
+        if (baseObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+            return baseObject;
+        }
+    
+    }
+    return null;
+
+    }
     public static BaseObject BaseObjectResearch(BaseObject root, string className)
     {
         string baseObjectName = "";

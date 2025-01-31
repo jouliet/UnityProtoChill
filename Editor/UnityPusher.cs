@@ -17,7 +17,7 @@ using System.Security.Permissions;
 namespace UnityPusher
 {
 
-public class GameObjectCreator : GenerativeProcess{
+public class GameObjectCreator : GenerativeProcess {
     public static string prefabPath = "Assets/Prefabs";
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
@@ -129,7 +129,12 @@ public class GameObjectCreator : GenerativeProcess{
 
         foreach (object _component in components)
         {
-            if (_component is Dictionary<string, object> componentDict)
+            AddComponentToGO(_component, go);
+        }
+    }
+
+    public static void AddComponentToGO(object _component, GameObject go){
+        if (_component is Dictionary<string, object> componentDict)
             {
                 string type = componentDict.ContainsKey("type") ? componentDict["type"].ToString() : string.Empty;
 
@@ -152,10 +157,10 @@ public class GameObjectCreator : GenerativeProcess{
                     // Ajoute le component au gameObject si ce n'est pas un transform (parce qu'il est deja dessus par défault).
                     if (componentType != typeof(Transform)){
                         component = go.AddComponent(componentType);
-                    }else{
-                        continue;
                     }
-
+                    else {
+                        return;
+                    }
                     if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
                     {
                         if (type != "Script")
@@ -171,9 +176,7 @@ public class GameObjectCreator : GenerativeProcess{
                     Debug.LogWarning($"Composant non reconnu : {type}");
                 }
             }
-        }
     }
-
 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)

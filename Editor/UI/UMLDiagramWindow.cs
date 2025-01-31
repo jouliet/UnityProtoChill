@@ -6,6 +6,7 @@ using System.IO;
 using static JsonParser;
 using static UIManager;
 using static SaverLoader;
+using static ObjectResearch;
 
 namespace UMLClassDiag
 {
@@ -464,6 +465,8 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
+            CleanUp();
+
             //LoadUML();
             var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
             if (jsonFile != null)
@@ -472,9 +475,20 @@ namespace UMLClassDiag
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+                List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+                foreach(BaseObject bo in baseObjects){
+                    bo.refreshStateToMatchUnityProjet();
+                }
+                
+                // foreach (BaseGameObject bgo in baseGameObjects){
+                //     bgo.GeneratePrefab();
+                // }
                 GenerativeProcess.SetJsonScripts(jsonString);
                 ReloadDiagram(baseObjects);
             }
+            else {
+                Debug.Log("Could not find save file");
+        }
         }
         
         /// 

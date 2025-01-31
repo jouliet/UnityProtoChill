@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking; // For HTTP requests in Unity
+using UnityEngine.Networking;
+using static PromptEngineeringUtilities;
 
 namespace ChatGPTWrapper
 {
@@ -27,7 +28,7 @@ namespace ChatGPTWrapper
         private string _lastChatGPTMsg;
 
         // private string _chatbotName = "ChatGPT";
-        private string _initialPrompt = "You are a game developer specialized in Unity. You will be asked to write jsons which you will put in json markers (```json ... ```). Always make a summary of your answers and put it in 'user' markers (```user ... ```). Only ever include at most 1 json and 1 user summary per answer. If you are tasked to write a script, put it in ```csharp ... ``` markers. ";
+        private string _initialPrompt;
 
         public CustomChatGPTConversation(bool useProxy, string proxyUri, string apiKey, CustomChatGPTConversation.Model model, string initialPrompt, float temperature)
         {
@@ -36,7 +37,8 @@ namespace ChatGPTWrapper
             _proxyUri = proxyUri;
             _apiKey = apiKey;
             _model = model;
-            _initialPrompt = initialPrompt;
+            //voili voilou
+            _initialPrompt = staticOverridenInitialPrompt;
 
             _reqHeaders = new List<(string, string)>
             {
