@@ -84,10 +84,22 @@ public class BaseObject
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
     private void GenerateScriptbis()
     {
+        string ComposedClassesString = "Here are the attribut and methods of the composed class you may use to interact with others objects : \n";
+        if (ComposedClasses.Count>0){
+            foreach(BaseObject composedClass in this.ComposedClasses){
+                ComposedClassesString += composedClass.ToString();
+                ComposedClassesString += "\n";
+            }
+        }else{
+            ComposedClassesString = "";
+        }
+        
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
         string input = 
-        "You are in Unity, write this c# class :" + this.Name + "as described in this json : " + this.ToString() + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
-Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
+        "You are in Unity, write this c# class : " + this.Name + "as described here : \n" + this.ToString() + "\n" 
+        + ComposedClassesString 
+        + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
+        Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
         if (GPTGenerator.Instance == null){
             Debug.Log("No instance of gptGenerator");
             return;

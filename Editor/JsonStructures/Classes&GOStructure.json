@@ -84,7 +84,7 @@
             {
                 "type": "MeshRenderer",
                 "properties": {
-                    "material": "Sprites-Default"
+                    "material": "Black (or Green, Yellow and Red)"
                 }
             }
         ]

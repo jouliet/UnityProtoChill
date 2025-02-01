@@ -195,8 +195,8 @@ public class GameObjectCreatorTest{
             return;
         }
         string jsonString = jsonFile.text;
-        Debug.Log("here is the json file:");
-        Debug.Log(jsonString);
+        // Debug.Log("here is the json file:");
+        // Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
 
         GameObjectCreator.JsonToDictionary(jsonString);
