@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
     <ui:VisualElement name="root" style="flex-grow: 1">
-        <ui:VisualElement name="canvas" style="border-color: white; border-width:3px;">
+        <ui:VisualElement name="canvas">
             <!-- UML Diagram is dynamically addes here -->
         </ui:VisualElement>
 
@@ -8,9 +8,14 @@
             <ui:Button name="refresh-button" class="refresh-button" style="position: absolute; top: 5px; left: 5px; pointer-events: all;">
                 <ui:Image name="refresh-icon" class="refresh-icon" />
             </ui:Button>
+
             <ui:VisualElement style="position: absolute; top: 7px; right: 5px; pointer-events: all;">
                 <ui:Button name="zoom-in-button" class="zoom-button" text="+"/>
                 <ui:Button name="zoom-out-button" class="zoom-button" style="margin-top: 3px;" text="-"/>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="loading-container" style="position: absolute; top: 150; left: 260;">
+
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

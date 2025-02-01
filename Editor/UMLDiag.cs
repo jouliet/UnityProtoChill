@@ -57,6 +57,7 @@ public class UMLDiag : GenerativeProcess
 
     public void OnSubmit(string input)
     {
+        umlDiagramWindow.OnLoadingUML(true);
         Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
         GenerateClassesandGOs(input);
     }
@@ -96,6 +97,7 @@ public class UMLDiag : GenerativeProcess
         {
             jsonScripts = response;
             SaveUML(jsonScripts);
+            umlDiagramWindow.OnLoadingUML(false);
             Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse

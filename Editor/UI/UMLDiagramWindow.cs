@@ -28,6 +28,12 @@ namespace UMLClassDiag
         private bool isDragging;
         private VisualElement canvas;
 
+        private VisualElement loadingContainer;
+        private Image loadingImage;
+        private List<Texture2D> loadingImages = new List<Texture2D>();
+        private bool isLoading = false;
+        private int loadingImageIndex = 0;
+
         private VisualElement selectedNode;
         private BaseObject selectedObject;
 
@@ -77,6 +83,8 @@ namespace UMLClassDiag
 
             var overlayContainer = root.Q<VisualElement>("overlay-container");
             overlayContainer.pickingMode = PickingMode.Ignore;
+            loadingContainer = root.Q<VisualElement>("loading-container");
+            LoadImages();
 
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
@@ -599,6 +607,73 @@ namespace UMLClassDiag
             Debug.Log($"GenerateObject called for {obj.Name}");
 
             obj.GenerateScript();
+        }
+
+        public void OnLoadingUML(bool state)
+        {
+            canvas.Clear();
+
+            if (loadingImage == null)
+            {
+                Debug.LogError("loadingImage is null. Ensure LoadImages() is called.");
+                return;
+            }
+
+            if (state)
+            {
+                var loadingText = new Label("GENERATING UML...");
+                loadingText.style.top = 0f;
+                loadingText.style.left = 0f;
+                loadingText.style.fontSize = 20f;
+
+                loadingContainer.Add(loadingText);
+                loadingContainer.Add(loadingImage);
+
+                isLoading = true;
+                UpdateLoadingAnimation(0.5f);
+            }
+            else
+            {
+                isLoading = false;
+                loadingContainer.Clear();
+            }
+        }
+
+        private void UpdateLoadingAnimation(float waitTime)
+        {
+            if (!isLoading)
+            {
+                return;
+            }
+
+            if (loadingImages.Count > 0)
+            {
+                loadingImage.image = loadingImages[loadingImageIndex];
+                loadingImageIndex = (loadingImageIndex + 1) % 6;
+            }
+
+            loadingContainer.schedule.Execute(() => UpdateLoadingAnimation(waitTime)).StartingIn((long)(waitTime * 1000));
+        }
+
+        private void LoadImages()
+        {
+            for (int i = 1; i <= 6; i++)
+            {
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>($"Packages/com.jin.protochill/Editor/UI/resources/loading-{i}.png");
+                if (texture != null)
+                {
+                    loadingImages.Add(texture);
+                }
+                else
+                {
+                    Debug.LogError($"Failed to load image: loading-{i}.png");
+                }
+            }
+
+            loadingImage = new Image();
+            loadingImage.style.width = 100;
+            loadingImage.style.height = 100;
+            loadingImage.image = loadingImages[0];
         }
     }
 
