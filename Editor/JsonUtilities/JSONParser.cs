@@ -7,8 +7,7 @@ using UMLClassDiag;
 
 public static class JsonParser
 {
-    public static List<BaseObject> baseObjects = new List<BaseObject>();
-
+    
     public static object Parse(string json)
     {
         if (string.IsNullOrEmpty(json)){

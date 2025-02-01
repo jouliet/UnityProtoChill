@@ -1,27 +1,56 @@
 ```user
-To create a platformer game system, I have designed a UML diagram with classes and their relationships, as well as a list of GameObjects with their respective components. The UML includes essential scripts for player movement, enemy behavior, platform interaction, and game management. The GameObjects include a player, platforms, enemies, and a game manager, each with appropriate components like Rigidbody, BoxCollider, and custom scripts. The structure ensures coherence between the UML and GameObjects.
+I created a JSON structure for a platformer game. The UML section includes classes for the player, enemy, and platform, with attributes and methods relevant to their functionality. The GameObjects section defines the player, enemy, and platform GameObjects, including their components and properties. The structure ensures coherence between the UML and GameObjects.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "PlayerController",
+            "Name": "Enemy",
             "Attributes": [
                 {
-                    "Name": "speed",
+                    "Name": "PatrolPointA",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
+                },
+                {
+                    "Name": "PatrolPointB",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
+                },
+                {
+                    "Name": "Speed",
+                    "Type": "float",
+                    "DefaultValue": "2.0"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "Patrol",
+                    "ReturnType": "void",
+                    "Parameters": []
+                }
+            ],
+            "ComposedClasses": "null",
+            "ParentClass": "null"
+        },
+        {
+            "Name": "Player",
+            "Attributes": [
+                {
+                    "Name": "Health",
+                    "Type": "int",
+                    "DefaultValue": "100"
+                },
+                {
+                    "Name": "Speed",
                     "Type": "float",
                     "DefaultValue": "5.0"
                 },
                 {
-                    "Name": "jumpForce",
+                    "Name": "JumpForce",
                     "Type": "float",
                     "DefaultValue": "10.0"
-                },
-                {
-                    "Name": "isGrounded",
-                    "Type": "bool",
-                    "DefaultValue": "false"
                 }
             ],
             "Methods": [
@@ -36,60 +65,7 @@ To create a platformer game system, I have designed a UML diagram with classes a
                     "Parameters": []
                 },
                 {
-                    "Name": "CheckGround",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["GameManager"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "EnemyAI",
-            "Attributes": [
-                {
-                    "Name": "speed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "isMovingRight",
-                    "Type": "bool",
-                    "DefaultValue": "true"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Move",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "FlipDirection",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": ["GameManager"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "Platform",
-            "Attributes": [
-                {
-                    "Name": "isMoving",
-                    "Type": "bool",
-                    "DefaultValue": "false"
-                },
-                {
-                    "Name": "moveSpeed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "MovePlatform",
+                    "Name": "Attack",
                     "ReturnType": "void",
                     "Parameters": []
                 }
@@ -98,37 +74,20 @@ To create a platformer game system, I have designed a UML diagram with classes a
             "ParentClass": "null"
         },
         {
-            "Name": "GameManager",
+            "Name": "Platform",
             "Attributes": [
                 {
-                    "Name": "score",
-                    "Type": "int",
-                    "DefaultValue": "0"
+                    "Name": "Position",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
                 },
                 {
-                    "Name": "lives",
-                    "Type": "int",
-                    "DefaultValue": "3"
+                    "Name": "Size",
+                    "Type": "Vector3",
+                    "DefaultValue": "null"
                 }
             ],
-            "Methods": [
-                {
-                    "Name": "AddScore",
-                    "ReturnType": "void",
-                    "Parameters": [
-                        {
-                            "Name": "points",
-                            "Type": "int",
-                            "DefaultValue": "0"
-                        }
-                    ]
-                },
-                {
-                    "Name": "LoseLife",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
+            "Methods": [],
             "ComposedClasses": "null",
             "ParentClass": "null"
         }
@@ -141,26 +100,27 @@ To create a platformer game system, I have designed a UML diagram with classes a
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
+                    "properties": {
+                        "position": "0,0,0",
+                        "rotation": "0,0,0",
+                        "scale": "1,1,1"
+                    }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1.0",
-                        "drag": "0.0",
+                        "mass": "1",
+                        "drag": "0",
+                        "angularDrag": "0.05",
                         "useGravity": "true"
                     }
                 },
                 {
-                    "type": "BoxCollider",
+                    "type": "Player",
                     "properties": {
-                        "isTrigger": "false"
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "PlayerController"
+                        "Health": "100",
+                        "Speed": "5.0",
+                        "JumpForce": "10.0"
                     }
                 }
             ]
@@ -172,62 +132,49 @@ To create a platformer game system, I have designed a UML diagram with classes a
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
+                    "properties": {
+                        "position": "5,0,0",
+                        "rotation": "0,0,0",
+                        "scale": "1,1,1"
+                    }
                 },
                 {
                     "type": "Rigidbody",
                     "properties": {
-                        "mass": "1.0",
-                        "drag": "0.0",
+                        "mass": "1",
+                        "drag": "0",
+                        "angularDrag": "0.05",
                         "useGravity": "true"
                     }
                 },
                 {
-                    "type": "BoxCollider",
+                    "type": "Enemy",
                     "properties": {
-                        "isTrigger": "false"
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "EnemyAI"
+                        "PatrolPointA": "3,0,0",
+                        "PatrolPointB": "7,0,0",
+                        "Speed": "2.0"
                     }
                 }
             ]
         },
         {
             "name": "Platform",
-            "tag": "Platform",
+            "tag": "Untagged",
             "layer": "Default",
             "components": [
                 {
                     "type": "Transform",
-                    "properties": {}
-                },
-                {
-                    "type": "BoxCollider",
                     "properties": {
-                        "isTrigger": "false"
+                        "position": "0,-1,0",
+                        "rotation": "0,0,0",
+                        "scale": "5,1,1"
                     }
                 },
                 {
-                    "type": "Script",
+                    "type": "Platform",
                     "properties": {
-                        "Name": "Platform"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "GameManager",
-            "tag": "GameController",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "GameManager"
+                        "Position": "0,-1,0",
+                        "Size": "5,1,1"
                     }
                 }
             ]

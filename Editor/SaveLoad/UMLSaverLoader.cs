@@ -47,6 +47,7 @@ public static class SaverLoader
             GenerativeProcess.SetJsonScripts(jsonString);
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
             List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+            List<BaseGameObject> gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
             Debug.Log("UML Loaded");
 
             //Reload UI (cas relous...) géré par uml diag

@@ -35,7 +35,10 @@ public class BaseGameObject
 
 
         foreach(BaseObject comp in Components){
-
+            Debug.Log(comp.Name + " est un baseObject qui s'ajoute au baseGameObject : " + this.Name);
+            if (comp.hasBeenGenerated){
+                Debug.Log("script a bien été généré");
+            }
             if (comp.Name != "Transform"){
                 comp.DirectAddScriptToGameObject(go);
             }
@@ -84,13 +87,18 @@ public class Method
 public class BaseObject
 {
     // On constitue la liste localement
-    public BaseObject(){
+    public BaseObject(string Name){
+        this.Name = Name;
         ObjectResearch.Add(this);
 
         Type scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
 
         if (scriptType != null) {
             hasBeenGenerated = true;
+            Debug.Log("Ce script a bien été trouvé et hasBeenGenerated est correct : " + scriptType.FullName);
+        }
+        else {
+            Debug.LogWarning("Le script " +this.Name + " n'a pas été généré");
         }
     }
 
@@ -131,7 +139,7 @@ public class BaseObject
     public List<string> GameObjectAttachedTo { get; set; } = new List<string>();
     public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
 
-    bool hasBeenGenerated = false;
+    public bool hasBeenGenerated = false;
 
 
 
@@ -309,10 +317,7 @@ public class JsonMapper{
         if (className != "null")
         {
             Debug.LogWarning("The object class " + className  + " doesn't exist. Generating it now and updating incomplete json...");
-            BaseObject bo = new BaseObject
-            {
-                Name = className
-            };
+            BaseObject bo = new BaseObject (className);
             //bo.ToJson();
             return bo;
         }
@@ -428,9 +433,9 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
 
     public static BaseObject MapToBaseObject(Dictionary<string, object> classDict, Dictionary<string,object> jsonDict)
     {
-        var baseObject = new BaseObject
+        string Name = classDict.ContainsKey("Name") ? classDict["Name"].ToString() : string.Empty;
+        var baseObject = new BaseObject(Name)
         {
-            Name = classDict.ContainsKey("Name") ? classDict["Name"].ToString() : string.Empty,
             Attributes = MapAttributes(classDict),
             Methods = MapMethods(classDict),
             // Les classes composées seront ajoutées après. Si on le fait tout de suite, 
