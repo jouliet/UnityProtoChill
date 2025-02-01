@@ -19,7 +19,7 @@ using System.Numerics;
 namespace UnityPusher
 {
 
-public class GameObjectCreator : GenerativeProcess{
+public class GameObjectCreator : GenerativeProcess {
     public static string prefabPath = "Assets/Prefabs";
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
@@ -131,7 +131,12 @@ public class GameObjectCreator : GenerativeProcess{
 
         foreach (object _component in components)
         {
-            if (_component is Dictionary<string, object> componentDict)
+            AddComponentToGO(_component, go);
+        }
+    }
+
+    public static void AddComponentToGO(object _component, GameObject go){
+        if (_component is Dictionary<string, object> componentDict)
             {
                 string type = componentDict.ContainsKey("type") ? componentDict["type"].ToString() : string.Empty;
 
@@ -174,9 +179,7 @@ public class GameObjectCreator : GenerativeProcess{
                     Debug.LogWarning($"Composant non reconnu : {type}");
                 }
             }
-        }
     }
-
 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)
@@ -191,7 +194,7 @@ public class GameObjectCreator : GenerativeProcess{
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
                     // Ecrit les properties dans le component
-                    //Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
+                    Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
         
                     object value = kvp.Value;
                     Type propertyType = propertyInfo.PropertyType;

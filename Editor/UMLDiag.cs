@@ -7,10 +7,12 @@ using UnityPusher;
 using ChatClass;
 using System.IO;
 using ChatGPTWrapper;
+using static PromptEngineeringUtilities;
+using static ObjectResearch;
 public class UMLDiag : GenerativeProcess
 {
     private static UMLDiag _instance;
-    private static string classesAndGOJsonStructurePath = "Packages/com.jin.protochill/Editor/JsonStructures/Classes&GOStructure.json";
+    
     public static UMLDiag Instance 
     {
         get
@@ -25,6 +27,7 @@ public class UMLDiag : GenerativeProcess
 
     private UMLDiagramWindow umlDiagramWindow;
 
+    public BaseObject selectedObject;
     private UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
     {
         umlDiagramWindow = umlDiagramWindowInstance;
@@ -57,8 +60,14 @@ public class UMLDiag : GenerativeProcess
 
     public void OnSubmit(string input)
     {
-        Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
-        GenerateClassesandGOs(input);
+        if (selectedObject == null){
+            Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
+            GenerateClassesandGOs(input);
+        }
+        else {
+            Debug.Log("Submit received in UMLDiag, Updating specific Object "+selectedObject.Name+ ". Generating UML..." + input);
+            GenerateSingleClass(input,selectedObject);
+        }
     }
 
     public void OnGenerateScript(BaseObject root){
@@ -66,37 +75,41 @@ public class UMLDiag : GenerativeProcess
         GenerateScript(root);
     }
 
-    private string classesAndGOJsonStructure = 
-    "You are a Json Writer. You will follow this exact format with every value in between quotes : \n" +
-    File.ReadAllText(classesAndGOJsonStructurePath);
-    private string separationRequest = "The UML part is on the 'Classes' node and the 'GameObjects' part is on the GameObjects node.";
-    private string classesRequest = "For the Classes part: \n" +
-    "Composed Classes are the classes used by the classe in question. \n" +
-    "Classes with the most composed classes should be at the top of the list.";
-    private string goRequests = 
-    "For the GameObject part : \n" +
-    "Float values format exemple : 10.5 \n" +
-    "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
-    "Don't hesitate to add boxCollider or rigidbody components if necessary. Also don't hesisate to scale the gameobject with the Transform localScale.\n" +
-    "You must add MeshFilter (with MeshRenderer) component on almost all game objects who are not UI or Managers.\n" +
-    "Ground must be black. You choose for the other game objects.";
 
-    private static string inputToCreatePrefabs = 
-    "Remember that the script names must be coherent with the UML scripts. \n";
+    private void GenerateSingleClass(string input, BaseObject bo){
+        input = UpdateSingleClassPrompt(bo, input);
 
-    private void GenerateClassesandGOs(string input)
-    {
-        input = input + classesAndGOJsonStructure + separationRequest + classesRequest +  goRequests + inputToCreatePrefabs;
-        //BaseObject root;
-        List<BaseObject> baseObjects = new List<BaseObject>();
-        if (GPTGenerator.Instance == null){
-            Debug.Log("No instance of gptGenerator");
-            return;
-        }
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonScripts = response;
-            SaveUML(jsonScripts);
+            Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
+
+            //Le cast est nécessaire pour parse
+            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
+
+            if (umlDiagramWindow == null)
+            {
+                Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+                return;
+            }
+            umlDiagramWindow.ReloadDiagram(AllBaseObjects); 
+        });
+    }
+    private void GenerateClassesandGOs(string input)
+    {
+        input = UMLAndGOPrompt(input);
+        //BaseObject root;
+        List<BaseObject> baseObjects = new List<BaseObject>();
+        List<BaseGameObject> gameObjects = new List<BaseGameObject>();
+        ObjectResearch.CleanUp();
+        if (GPTGenerator.Instance == null){
+            Debug.Log("No instance of gptGenerator");
+            return;
+        } 
+        GPTGenerator.Instance.GenerateFromText(input, (response) =>
+        {
+            jsonScripts = response;  
+
             Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
@@ -105,20 +118,23 @@ public class UMLDiag : GenerativeProcess
             //Mapping vers structure objet maison
             //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+            gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+            
             if (umlDiagramWindow == null)
             {
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
-            umlDiagramWindow.ReloadDiagram(baseObjects); 
+            umlDiagramWindow.ReloadDiagram(baseObjects);
+            Debug.Log("finished generating !");
+            SaveDataToCurrentUML();
+            // if (GameObjectCreator.GameObjectNameList != null){
+            //     GameObjectCreator.GameObjectNameList.Clear();
+            // }
 
-            if (GameObjectCreator.GameObjectNameList != null){
-                GameObjectCreator.GameObjectNameList.Clear();
-            }
-
-            GameObjectCreator.JsonToDictionary(jsonScripts);
-            GameObjectCreator.StockEveryGOsInList();
-            GameObjectCreator.CreateAllGameObjects();
+            // GameObjectCreator.JsonToDictionary(jsonScripts);
+            // GameObjectCreator.StockEveryGOsInList();
+            // GameObjectCreator.CreateAllGameObjects();
         });
     }
 
@@ -136,5 +152,31 @@ public class UMLDiag : GenerativeProcess
           return;
         }
       umlDiagramWindow.ReloadDiagram(baseObjects);
+    }
+
+    public static void SaveDataToCurrentUML(){
+        
+        string updatedJson = "{ \"Classes\": [";
+
+        // Ajouter les classes
+        foreach (BaseObject bo in AllBaseObjects){
+            // Ici, on suppose que bo.ToJson() renvoie une chaîne représentant un objet de classe JSON
+            updatedJson += bo.ToJson() + ",";
+        }
+
+        // Ajouter les objets de jeu
+        updatedJson += "], \"GameObjects\": [";
+        foreach (BaseGameObject bgo in AllBaseGameObjects){
+            // Ici aussi, on suppose que bgo.ToJson() renvoie une chaîne représentant un objet de jeu en JSON
+            updatedJson += bgo.ToJson() + ",";
+        }
+
+        // Si des classes ou objets de jeu ont été ajoutés, on enlève la dernière virgule
+        if (AllBaseObjects.Count > 0) {
+            updatedJson = updatedJson.TrimEnd(',');
+        }
+        updatedJson += "]}";
+
+        SaveUML(updatedJson);
     }
 }

@@ -12,19 +12,98 @@ using Unity.VisualScripting.YamlDotNet.Core.Events;
 using static JsonParser;
 using UnityPusher;
 using Unity.VisualScripting;
+using static PromptEngineeringUtilities;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace UMLClassDiag
 {
+
+
+public class BaseGameObject
+{
+    public string Name;
+    public string Tag = "Untagged";
+    public string Layer = "Default";
+    public List<BaseObject> Components = new List<BaseObject>();
+
+    public BaseGameObject(){
+        ObjectResearch.AddBGO(this);
+        Debug.Log("bgo created");
+    }
+    public string ToJson()
+    {
+        var componentsJson = string.Join(", ", Components.Select(c => c.ToJsonGOSpecific()));
+        return $"{{\"name\": \"{Name}\", \"tag\": \"{Tag}\", \"layer\": \"{Layer}\", \"components\": [{componentsJson}]}}";
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is BaseGameObject other)
+        {
+            return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
+    }
+    public override int GetHashCode()
+    {
+        return Name?.GetHashCode() ?? 0;
+    }
+    public void GeneratePrefab(){
+        if (this.Name == null){
+            Debug.Log("Problème");
+        }
+        GameObject go = new GameObject(this.Name)
+        {
+            tag = this.Tag,
+            layer = LayerMask.NameToLayer(this.Layer)
+        }; 
+
+
+        foreach(BaseObject comp in Components){
+
+            if (comp.Name != "Transform"){
+                comp.DirectAddScriptToGameObject(go);
+            }
+        }
+        
+
+        if (!Directory.Exists( GameObjectCreator.prefabPath))
+        {
+            Directory.CreateDirectory( GameObjectCreator.prefabPath);
+            Debug.Log("Dossier créé : " +  GameObjectCreator.prefabPath);
+        }
+        // Sauvegarder le GameObject en tant que prefab
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(go, GameObjectCreator.prefabPath + "/" + this.Name + ".prefab");
+        if (prefab ==null){
+            Debug.Log("problème");
+        }
+        else {
+            Debug.Log(prefab.name);
+        }
+        GameObject.DestroyImmediate(go);
+    }
+
+
+}
+
+
+
 public class Attribute
 {
     public string Name { get; set; } 
     public string Type { get; set; } 
-    public string DefaultValue { get; set; } 
 
     public override string ToString()
     {
-        return $"Attribute Name: {Name}, Type: {Type}, Default Value: {DefaultValue ?? "None"}";
+        return $"Attribute Name: {Name}, Type: {Type}";
     }
+
+    public string ToJson()
+        {
+            return $"{{\"Name\": \"{Name}\", \"Type\": \"{Type}\"}}";
+        }
 }
 
 public class Method
@@ -38,19 +117,65 @@ public class Method
         string parametersStr = Parameters.Count > 0 ? string.Join(", ", Parameters) : "None";
         return $"Method Name: {Name}, Return Type: {ReturnType ?? "None"}, Parameters: [{parametersStr}]";
     }
+
+public string ToJson()
+    {
+        var parametersJson = string.Join(", ", Parameters.Select(p => p.ToJson()));
+        return $"{{\"Name\": \"{Name}\", \"ReturnType\": \"{ReturnType}\", \"Parameters\": [{parametersJson}]}}";
+    }
 }
+ 
 
 public class BaseObject
 {
     // On constitue la liste localement
-    public BaseObject(){
+    public BaseObject(string Name){
+        this.Name = Name;
         ObjectResearch.Add(this);
+
+        scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+
+        if (scriptType != null) {
+            hasBeenGenerated = true;
+        }
+        else {
+            scriptType = Type.GetType($"UnityEngine.{Name}, UnityEngine");
+            if (scriptType != null){
+                isSpecificUnityComponent = true;
+                hasBeenGenerated = true;
+                Debug.Log("Component : "+ Name + " is now recognized");
+            }
+        }
+    }
+
+
+    public void refreshStateToMatchUnityProjet(){
+        Type scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+
+        if (scriptType != null) {
+            hasBeenGenerated = true;
+        }
+    }
+
+    public string ToJson()
+    {
+        var attributesJson = string.Join(", ", Attributes.Select(a => a.ToJson()));
+        var methodsJson = string.Join(", ", Methods.Select(m => m.ToJson()));
+        var composedClassesJson = string.Join(", ", ComposedClasses.Select(c => $"\"{c.Name}\""));
+        
+        return $"{{\"Name\": \"{Name}\", \"Attributes\": [{attributesJson}], \"Methods\": [{methodsJson}], \"ComposedClasses\": [{composedClassesJson}], \"ParentClass\": \"{ParentClass}\"}}";
+    }
+
+    public string ToJsonGOSpecific()
+    {
+        var propertiesJson = string.Join(", ", Properties.Select(kv => $"\"{kv.Key}\": \"{kv.Value}\""));
+        return $"{{\"type\": \"{Name}\", \"properties\": {{ {propertiesJson} }} }}";
     }
 
     ~BaseObject(){
         AllBaseObjects.Remove(this);
     }
- 
+    
     public override bool Equals(object obj)
     {
         if (obj is BaseObject other)
@@ -72,6 +197,50 @@ public class BaseObject
     public List<BaseObject> ComposedClasses { get; set; } = new List<BaseObject>();
     public BaseObject ParentClass { get; set; }
     public List<string> GameObjectAttachedTo { get; set; } = new List<string>();
+    public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
+
+    public bool hasBeenGenerated = false;
+    public bool isSpecificUnityComponent;
+
+    public Type scriptType;
+    public void InitWithProperties(Dictionary<string, object> propertiesDict)
+    {
+           
+        foreach (var property in propertiesDict)
+        {
+            if (this.Properties.ContainsKey(property.Key))
+            {
+                this.Properties[property.Key] = property.Value; 
+            }
+            else
+            {
+                this.Properties.Add(property.Key, property.Value);
+            }
+        }
+   
+    if (!this.isSpecificUnityComponent)  // Si ce n'est pas un composant Unity, mettre à jour les attributs aussi
+    {
+
+        foreach (var property in propertiesDict)
+        {
+            var attribute = this.Attributes.FirstOrDefault(a => a.Name == property.Key);
+            if (attribute != null)
+            {
+
+                
+            }
+            else
+            {
+                this.Attributes.Add(new Attribute
+                {
+                    Name = property.Key,
+                    Type = property.Value.GetType().Name
+                });
+            }
+        }
+    }
+}
+
 
     // Appelé par UMLDiag ligne 110
     public void GenerateScript(){
@@ -95,11 +264,8 @@ public class BaseObject
         }
         
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
-        string input = 
-        "You are in Unity, write this c# class : " + this.Name + "as described here : \n" + this.ToString() + "\n" 
-        + ComposedClassesString 
-        + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
-        Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
+        string input = ScriptGenerationPrompt(this.Name, this.ToString());
+        
         if (GPTGenerator.Instance == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -130,42 +296,81 @@ public class BaseObject
         // Important que ce soit à la fin comme ça !!!! (pour des raisons obscures peut être multithread unity bizarre)
          #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
+        this.hasBeenGenerated = true;
         //LoadUML();
         #endif
     }
 
+    public void DirectAddScriptToGameObject(GameObject newPrefab){
+        
+        if (scriptType == null)
+            {
+                scriptType = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .SelectMany(assembly => assembly.GetTypes())
+                    .FirstOrDefault(t => t.Name == Name);
+                Debug.LogWarning("Not finding component : "+ Name);
+            }
+        else{
 
-    public static void AddScriptToGameObject(string prefabPath, string scriptName)
+            
+            if (this.hasBeenGenerated){
+                
+
+                Component newComponent = newPrefab.AddComponent(scriptType);
+
+                // Appliquer les propriétés avec la fonction existante
+                if (this.isSpecificUnityComponent){
+                    GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
+                }
+                else{
+                    GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
+                }
+            }
+        }
+    }
+
+    public void AddScriptToGameObject(string prefabPath)
     {
         // Charger le prefab
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
         if (prefab == null)
         {
             //Debug.LogError("Prefab introuvable : " + prefabPath);
+
             return;
         }
 
         // Obtenir le type du script
-        Type scriptType = Type.GetType($"{scriptName}, Assembly-CSharp");
+        Type scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
         if (scriptType == null)
         {
-            //Debug.LogError("Script introuvable : " + scriptName);
+            //Debug.LogError("Script introuvable : " + this.Name);
             return;
         }
 
         // Instancier temporairement le prefab pour modifier ses composants
-        GameObject tempInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-        if (tempInstance.GetComponent(scriptType) == null) // Éviter les doublons
+        //GameObject tempInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+        if (prefab.GetComponent(scriptType) == null) // Éviter les doublons
         {
-            tempInstance.AddComponent(scriptType);
+            prefab.AddComponent(scriptType);
         }
 
-
         // Appliquer les modifications au prefab
-        PrefabUtility.SaveAsPrefabAsset(tempInstance, prefabPath);
-        GameObject.DestroyImmediate(tempInstance); // Nettoyage
+        PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+        //Debug.Log(tempInstance == null);
 
-        Debug.Log($"Script {scriptName} ajouté au prefab {prefabPath}.");
+        // if (tempInstance != null){
+        //     //Debug.Log("attempting to destroy go : " + tempInstance.name);
+        //     //GameObject.DestroyImmediate(tempInstance); // Nettoyage
+            
+        //     Debug.Log($"Script {this.Name} ajouté au prefab {prefabPath}.");
+        // }
+        // else {
+        //     Debug.LogWarning("une Instance de prefab traine peut être dans la scène");
+        //     EditorApplication.QueuePlayerLoopUpdate();
+        //     SceneView.RepaintAll();
+        // }
     }
     
     private string ExtractCSharpCode(string input)
@@ -210,16 +415,21 @@ public class BaseObject
         }
         return result;
     }
+
+
 }
 
 public class JsonMapper{
+
     // List of Dictionary object of classes
     public static List<object> Classes;
 
     // List of baseobjects classes
-    public static List<BaseObject> BaseObjects;
+
+
+
     public static BaseObject TrackBaseObjectByName(string className){
-        foreach (BaseObject bo in BaseObjects){
+        foreach (BaseObject bo in AllBaseObjects){
             if (bo.Name == className){
                 return bo;
             }
@@ -233,14 +443,88 @@ public class JsonMapper{
         }
         if (className != "null")
         {
-            Debug.LogError("La classe " + className  + " n'existe pas.");
+            Debug.LogWarning("The object class " + className  + " doesn't exist. Generating it now and updating incomplete json...");
+            BaseObject bo = new BaseObject (className);
+            //bo.ToJson();
+            return bo;
         }
         
         return null;
     }
 
+public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, object> jsonDict)
+    {
+        Debug.Log("Map ALL WAS CALLED");
+        List<BaseGameObject> mappedGameObjects = new List<BaseGameObject>();
+        
+        if (jsonDict.ContainsKey("GameObjects") && jsonDict["GameObjects"] is List<object> gameObjects)
+        {
+            
+            foreach (object obj in gameObjects)
+            {
+                if (obj is Dictionary<string, object> gameObjectDict)
+                {
+                    
+                    BaseGameObject baseGameObject = new BaseGameObject
+                    {
+                        Name = gameObjectDict.ContainsKey("name") ? gameObjectDict["name"].ToString() : "Unknown",
+                        Tag = gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged",
+                        Layer = gameObjectDict.ContainsKey("layer") ? gameObjectDict["layer"].ToString() : "Default",
+                        Components = new List<BaseObject>()
+                    };
+                    
+                    if (gameObjectDict.ContainsKey("components") && gameObjectDict["components"] is List<object> componentList)
+                    {
+                        foreach (object component in componentList)
+                        {
+                            if (component is Dictionary<string, object> componentDict)
+                            {
+                                if (componentDict.ContainsKey("type") && componentDict["type"] is string type)
+                                {
+                                    BaseObject baseObject = ObjectResearch.FindBaseObjectByName(type);
+                                    
+                                    if (baseObject != null){
+
+                                        if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
+                                        {
+                                            baseObject.InitWithProperties(propertiesDict);
+                                        }
+                                        
+                                        baseGameObject.Components.Add(baseObject);
+                                    }
+                                    else {
+                                        //Cas nul (pas de baseobject connu, donc un composant spécifique unity, c'est ici qu'on va générer le baseObject du coup):
+                                        if (type != "Transform"){
+                                            Debug.Log("Mapping Unity Component  : " +type );
+                                            BaseObject bo = new BaseObject(type);
+                                            if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
+                                            {
+                                                bo.Properties = propertiesDict;
+                                                bo.hasBeenGenerated = true;
+                                                bo.isSpecificUnityComponent = true;
+                                            }
+
+                                            baseGameObject.Components.Add(bo);
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+
+                    mappedGameObjects.Add(baseGameObject);
+                    baseGameObject.GeneratePrefab();
+                }
+            }
+        }
+        return mappedGameObjects;
+    }
+
+
     public static List<BaseObject> MapAllBaseObjects(Dictionary<string, object> jsonDict){
-        BaseObjects = new List<BaseObject>();
+        List<BaseObject> BaseObjects = new List<BaseObject>();
         
         BaseObject bo;
         if (jsonDict == null){
@@ -261,7 +545,7 @@ public class JsonMapper{
                     foreach (string goName in bo.GameObjectAttachedTo)
                     {
                         // Debug.Log("Le script " + bo.Name + "s'ajoute au gameobject " + goName);
-                        BaseObject.AddScriptToGameObject(GameObjectCreator.prefabPath + "/" + goName + ".prefab", bo.Name);
+                        //bo.AddScriptToGameObject(GameObjectCreator.prefabPath + "/" + goName + ".prefab");
                     }
                 }
             }
@@ -290,9 +574,9 @@ public class JsonMapper{
 
     public static BaseObject MapToBaseObject(Dictionary<string, object> classDict, Dictionary<string,object> jsonDict)
     {
-        var baseObject = new BaseObject
+        string Name = classDict.ContainsKey("Name") ? classDict["Name"].ToString() : string.Empty;
+        var baseObject = new BaseObject(Name)
         {
-            Name = classDict.ContainsKey("Name") ? classDict["Name"].ToString() : string.Empty,
             Attributes = MapAttributes(classDict),
             Methods = MapMethods(classDict),
             // Les classes composées seront ajoutées après. Si on le fait tout de suite, 
@@ -300,7 +584,7 @@ public class JsonMapper{
         };
         baseObject.GameObjectAttachedTo = MapGameObjectAttachedTo(jsonDict, baseObject.Name);
 
-        BaseObjects.Add(baseObject);
+        AllBaseObjects.Add(baseObject);
     
         return baseObject;
     }
@@ -325,6 +609,9 @@ public class JsonMapper{
                                             string goname = gameObjectDict["name"].ToString();
                                             //Debug.Log("Le gameobject " + goname + " est ajouté au baseobject " + boname);
                                             list.Add(goname);
+                                            
+
+                                            
                                         }
                                         
                                     }
@@ -352,7 +639,6 @@ public class JsonMapper{
                     {
                         Name = attributeDict.ContainsKey("Name") ? attributeDict["Name"].ToString() : string.Empty,
                         Type = attributeDict.ContainsKey("Type") ? attributeDict["Type"].ToString() : string.Empty,
-                        DefaultValue = attributeDict.ContainsKey("DefaultValue") ? attributeDict["DefaultValue"]?.ToString() : null
                     };
 
                     attributesList.Add(attribute);
