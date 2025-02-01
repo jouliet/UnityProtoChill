@@ -1,0 +1,7 @@
+{
+"Dialogue":[{
+"message":"un tower defense simple mais efficace avec des goblins qui vont vite et des mamooth qui vnt lentement","typeMessage":"user"},{
+"message":"The JSON defines a simple tower defense game with three classes: TowerDefense, Goblin, and Mammoth. The TowerDefense class has attributes for damage and range, while Goblins move quickly and Mammoths move slowly. Three game objects are created: a Tower, a Goblin, and a Mammoth, each with appropriate components and properties.","typeMessage":"llm"},{
+"message":"Goblin and Mammoth should be the same script Ennemy but with different properties ","typeMessage":"user"},{
+"message":"The UML has been modified to combine Goblin and Mammoth into a single class called Enemy with different properties. The components of the GameObjects have also been updated accordingly.","typeMessage":"llm"}]
+}

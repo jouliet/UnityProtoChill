@@ -13,8 +13,13 @@ public static class PromptEngineeringUtilities
 
     public static string UMLAndGOPrompt(string inputUser) 
     {
+
+
+     
         string output;
-        string currentUml = File.ReadAllText(UMLFilePath);
+        string currentUml = "nada";
+        try {currentUml = File.ReadAllText(UMLFilePath); }
+        catch{Debug.Log("No UML Yet, Generating for the first time");}
         string classesAndGOJsonStructure;
         string separationRequest = "The UML part is on the 'Classes' node and the 'GameObjects' part is on the GameObjects node.";
         string classesRequest = "For the Classes part: \n" +
@@ -22,12 +27,14 @@ public static class PromptEngineeringUtilities
         "Classes with the most composed classes should be at the top of the list.";
         string goRequests = 
         "For the GameObject part : \n" +
-        "Float values format exemple : 10.5 \n" + "The type of a component should be the name of the class when it's a script\n";
-
+        "Float values format exemple : 10.5 \n" +
+        "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
+        "Don't hesitate to add boxCollider or rigidbody components if necessary. Also don't hesisate to scale the gameobject with the Transform localScale.\n" +
+        "You must add MeshFilter (with MeshRenderer) component on almost all game objects who are not UI or Managers.";
         string inputToCreatePrefabs = 
         "Remember that the script names must be coherent with the UML scripts. \n";
 
-        if (currentUml == null){ // Cas de première génération
+        if (currentUml == "nada"){ // Cas de première génération
             classesAndGOJsonStructure = 
             "You are a Json Writer. You will follow this exact format with every value in between quotes : \n" +
             File.ReadAllText(classesAndGOJsonStructurePath);

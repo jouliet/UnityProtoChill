@@ -125,7 +125,7 @@ public string ToJson()
         return $"{{\"Name\": \"{Name}\", \"ReturnType\": \"{ReturnType}\", \"Parameters\": [{parametersJson}]}}";
     }
 }
-
+ 
 
 public class BaseObject
 {
@@ -134,7 +134,7 @@ public class BaseObject
         this.Name = Name;
         ObjectResearch.Add(this);
 
-        Type scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+        scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
 
         if (scriptType != null) {
             hasBeenGenerated = true;
@@ -143,6 +143,8 @@ public class BaseObject
             scriptType = Type.GetType($"UnityEngine.{Name}, UnityEngine");
             if (scriptType != null){
                 isSpecificUnityComponent = true;
+                hasBeenGenerated = true;
+                Debug.Log("Component : "+ Name + " is now recognized");
             }
         }
     }
@@ -201,6 +203,7 @@ public class BaseObject
     public bool hasBeenGenerated = false;
     public bool isSpecificUnityComponent;
 
+    public Type scriptType;
     public void InitWithProperties(Dictionary<string, object> propertiesDict)
 {
     // Vérification si c'est un composant spécifique Unity ou un script personnalisé
@@ -297,23 +300,18 @@ public class BaseObject
     }
 
     public void DirectAddScriptToGameObject(GameObject newPrefab){
-        Type scriptType;
-        if (this.isSpecificUnityComponent){
-            scriptType = Type.GetType($"UnityEngine.{this.Name}, UnityEngine");
-        }
-        else {
-            scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
-            
-        }
-
+        
         if (scriptType == null)
             {
                 scriptType = AppDomain.CurrentDomain
                     .GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
                     .FirstOrDefault(t => t.Name == Name);
+                Debug.LogWarning("Not finding component : "+ Name);
             }
         else{
+
+            
             if (this.hasBeenGenerated){
                 
                 newPrefab.AddComponent(scriptType);

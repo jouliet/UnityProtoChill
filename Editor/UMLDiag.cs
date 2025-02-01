@@ -82,7 +82,6 @@ public class UMLDiag : GenerativeProcess
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonScripts = response;
-            SaveUML(jsonScripts);
             Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
             //Le cast est nécessaire pour parse
@@ -120,6 +119,7 @@ public class UMLDiag : GenerativeProcess
             //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
             gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+            SaveDataToCurrentUML();
             if (umlDiagramWindow == null)
             {
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
