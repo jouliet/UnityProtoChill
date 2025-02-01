@@ -84,7 +84,7 @@ public class ObjectResearch
         }
         else
         {
-            Debug.Log($"objet {obj.Name} doublon grrr");
+            // Debug.Log($"objet {obj.Name} doublon grrr");
         }
     }
 
@@ -97,7 +97,7 @@ public class ObjectResearch
         }
         else
         {
-            Debug.Log($"objet {bgo} doublon grrr");
+            // Debug.Log($"objet {bgo} doublon grrr");
         }
     }
 }

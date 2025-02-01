@@ -140,7 +140,7 @@ public class BaseObject
             if (scriptType != null){
                 isSpecificUnityComponent = true;
                 hasBeenGenerated = true;
-                Debug.Log("Component : "+ Name + " is now recognized");
+                // Debug.Log("Component : "+ Name + " is now recognized");
             }
         }
     }
