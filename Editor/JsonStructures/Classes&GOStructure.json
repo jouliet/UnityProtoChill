@@ -62,11 +62,30 @@
         "layer": "string (layer du GameObject ou 'Default')",
         "components": [
             {
-            "type": "string (nom du composant, ex: Transform, Rigidbody, Script)",
-            "properties": {
-                "property1": "value1 (clé-valeurs spécifiques au composant)",
-                "property2": "value2"
-            }
+                "type": "string (nom du composant, ex: Transform, Rigidbody, Script)",
+                "properties": {
+                    "property1": "value1 (clé-valeurs spécifiques au composant)",
+                    "property2": "value2"
+                }
+            },
+            {
+                "type": "Transform",
+                "properties": {
+                    "position": ["0","0","0"],
+                    "localScale": ["1","1","1"]
+                }
+            },
+            {
+                "type": "MeshFilter",
+                "properties": {
+                    "mesh": "Cube (or Capsule, Cylinder, Plane, Sphere)"
+                }
+            },
+            {
+                "type": "MeshRenderer",
+                "properties": {
+                    "material": "Sprites-Default"
+                }
             }
         ]
         }

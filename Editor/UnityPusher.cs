@@ -11,6 +11,8 @@ using static SaverLoader;
 using Unity.VisualScripting;
 using System.Globalization;
 using System.Security.Permissions;
+using UnityEngine.UI;
+using System.Numerics;
 
 
 
@@ -157,10 +159,11 @@ public class GameObjectCreator : GenerativeProcess {
                     // Ajoute le component au gameObject si ce n'est pas un transform (parce qu'il est deja dessus par défault).
                     if (componentType != typeof(Transform)){
                         component = go.AddComponent(componentType);
+                    }else{
+                        component = go.transform;
                     }
-                    else {
-                        return;
-                    }
+                    
+
                     if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
                     {
                         if (type != "Script")
@@ -200,22 +203,64 @@ public class GameObjectCreator : GenerativeProcess {
                     if (propertyType == typeof(float) || propertyType == typeof(Single))
                     {
                         value = Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                        propertyInfo.SetValue(component, value);
+                    }else if (kvp.Key == "mesh"){
+                        SetMeshFilterFromString((string)kvp.Value, (MeshFilter)component);
+                    }else if (kvp.Key == "material"){
+                        // Ici la kvp.Value ne change rien car on applique un material par default
+                        SetMeshRendererFromString((MeshRenderer)component);
+                    }else if (propertyType == typeof(UnityEngine.Vector3)){
+                        
+                        List<object> vector3ListJson = (List<object>) kvp.Value;
+                        List<float> vector3List = new List<float>();
+                        foreach(object number in vector3ListJson){
+                            vector3List.Add(Convert.ToSingle(number, CultureInfo.InvariantCulture));
+                        }
+                        UnityEngine.Vector3 vector3 = new UnityEngine.Vector3(vector3List[0], vector3List[1], vector3List[2]);
+                        propertyInfo.SetValue(component, vector3);
                     }
                     else
                     {
                         value = Convert.ChangeType(value, propertyType);
+                        propertyInfo.SetValue(component, value);
                     }
-                    propertyInfo.SetValue(component, value);
+                    
                     //Debug.LogException(ex);
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
             }catch (Exception ex){
-                Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+                    Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
             }
             
         }
     }
+
+    public static void SetMeshFilterFromString(string primitiveTypeName, MeshFilter meshFilter)
+    {
+        if (Enum.TryParse(primitiveTypeName, out PrimitiveType primitiveType))
+        {
+            GameObject temp = GameObject.CreatePrimitive(primitiveType);
+            meshFilter.mesh = temp.GetComponent<MeshFilter>().sharedMesh;
+            GameObject.DestroyImmediate(temp);
+        }
+        else
+        {
+            Debug.LogError($"PrimitiveType '{primitiveTypeName}' invalide.");
+        }
+    }
+
+
+    public static void SetMeshRendererFromString(MeshRenderer meshRenderer)
+    {
+      
+        //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
+        Material DefaultMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+
+        DefaultMaterial.SetInt("_Smoothness", 0);
+        meshRenderer.material = DefaultMaterial;
+    }
+
 
     public static void AddFieldsToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)

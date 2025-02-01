@@ -20,8 +20,9 @@ namespace UMLClassDiag
         private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
+        private Dictionary<BaseObject, List<VisualElement>> connectionElements = new Dictionary<BaseObject, List<VisualElement>>();
 
-        private float width = 300f;
+        private float width = 300f; // width of nodes
         private float offset = 50f;
 
         private Vector2 dragStart;
@@ -88,7 +89,10 @@ namespace UMLClassDiag
             //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
 
-            DrawNetwork();
+            canvas.schedule.Execute(() =>
+            {
+                DrawNetwork();
+            }).ExecuteLater(100);
 
 
             // Zoom buttons set up
@@ -122,7 +126,12 @@ namespace UMLClassDiag
                     currentX += width + offset; // Avancer horizontalement pour le prochain nœud
                 }
             }
-            DrawConnections();
+
+            canvas.schedule.Execute(() =>
+            {
+                DrawConnections();
+                AdjustCanvasSize();
+            });
         }
 
         public void DrawNode(BaseObject obj, float x, float y)
@@ -153,11 +162,11 @@ namespace UMLClassDiag
                 methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
 
-            var generateButton = new Button(() => GenerateObject(obj)) { text = "Generate" };
+            var generateButton = new Button(() => OnGenerateObject(obj)) { text = "Generate" };
             umlNode.Add(generateButton);
             var collapseButton = umlNode.Q<Button>("collapse-button");
             var collapseContent = umlNode.Q<VisualElement>("uml-diagram-contents");
-            collapseButton.clicked +=  () => OnCollapseNode(collapseContent, collapseButton);
+            collapseButton.clicked +=  () => OnCollapseNode(obj, nodeContainer, collapseContent, collapseButton);
 
             nodeContainer.Add(umlNode);
 
@@ -202,13 +211,6 @@ namespace UMLClassDiag
                     childX += width + offset; // Avancer horizontalement pour chaque enfant
                 }
             }
-
-
-             // Planifier les connexions après le rendu
-            nodeContainer.schedule.Execute(() =>
-            {
-                DrawConnections();
-            });
         }
 
         public void DrawConnections()
@@ -228,12 +230,56 @@ namespace UMLClassDiag
                     {
                         List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
                         List<Vector2> childAnchors = FindAnchorPoints(childNode);
-                        List<Vector2> lineCoordinates = FindBestConnexion(parentAnchors, childAnchors);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
 
-                        DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        if (!connectionElements.ContainsKey(parentObject))
+                        {
+                            connectionElements[parentObject] = new List<VisualElement>();
+                        }
+                        connectionElements[parentObject].Add(line);
                     }
                 }
             }
+        }
+
+        private void ClearConnection(BaseObject parentObject)
+        {
+            if (connectionElements.TryGetValue(parentObject, out var connections))
+            {
+                foreach (var connection in connections)
+                {
+                    connection.RemoveFromHierarchy();
+                }
+                connectionElements[parentObject].Clear();
+            }
+        }
+
+        private VisualElement DrawLine(float endpointX, float endpointY, float originX, float originY)
+        {
+            float dx = endpointX - originX;
+            float dy = endpointY - originY;
+            float length = Mathf.Sqrt(dx * dx + dy * dy);
+            float angle = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
+
+            var line = new VisualElement();
+            line.AddToClassList("uml-line");
+            line.style.left = originX;
+            line.style.top = originY;
+            line.style.width = length;
+            line.style.rotate = new StyleRotate(new Rotate(angle));
+
+            var arrow = new VisualElement();
+            arrow.AddToClassList("uml-arrow");
+            arrow.style.left = endpointX - 10f;
+            arrow.style.top = endpointY - 10f;
+            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
+
+            canvas.Add(line);
+            canvas.Add(arrow);
+
+            return line;
         }
 
         private List<Vector2> FindAnchorPoints(VisualElement node)
@@ -241,18 +287,18 @@ namespace UMLClassDiag
             List<Vector2> anchorPoints = new List<Vector2>();
 
             // top anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width / 2, node.resolvedStyle.top));
             // left anchor point
             anchorPoints.Add(new Vector2(node.resolvedStyle.left, node.resolvedStyle.top + node.resolvedStyle.height / 2));
             // right anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width, node.resolvedStyle.top + node.resolvedStyle.height / 2));
             // bottom anchor point
-            anchorPoints.Add(new Vector2(node.resolvedStyle.left + node.resolvedStyle.width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
+            anchorPoints.Add(new Vector2(node.resolvedStyle.left + width / 2, node.resolvedStyle.top + node.resolvedStyle.height));
 
             return anchorPoints;
         }
 
-        private List<Vector2> FindBestConnexion(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
+        private List<Vector2> FindBestConnection(List<Vector2> anchorsParent, List<Vector2> anchorsChild)
         {
             List<Vector2> anchors = new List<Vector2> { Vector2.zero, Vector2.zero };
 
@@ -285,51 +331,40 @@ namespace UMLClassDiag
             return anchors;
         }
 
-        private void GenerateObject(BaseObject obj)
+        private Rect CalculateBoundingBox()
         {
-            Debug.Log($"GenerateObject called for {obj.Name}");
+            float minX = float.MaxValue;
+            float minY = float.MaxValue;
+            float maxX = float.MinValue;
+            float maxY = float.MinValue;
 
-            obj.GenerateScript();
-        }
-
-        private float CalculateTotalWidth(BaseObject node)
-        {
-            if (node.ComposedClasses.Count == 0)
+            foreach (var kvp in nodeElements)
             {
-                return width;
+                var node = kvp.Value;
+
+                float nodeLeft = node.resolvedStyle.left;
+                float nodeTop = node.resolvedStyle.top;
+                float nodeHeight = node.resolvedStyle.height;
+
+                minX = Mathf.Min(minX, nodeLeft);
+                minY = Mathf.Min(minY, nodeTop);
+                maxX = Mathf.Max(maxX, nodeLeft + width);
+                maxY = Mathf.Max(maxY, nodeTop + nodeHeight);
             }
 
-            float totalWidth = 0;
-            foreach (var baseObject in node.ComposedClasses)
-            {
-                totalWidth += CalculateTotalWidth(baseObject) + offset;
-            }
-
-            return totalWidth - offset;
+            float padding = 100f;
+            return new Rect(minX - padding, minY - padding, maxX - minX + 2 * padding, maxY - minY + 2 * padding);
         }
 
-        private void DrawLine(float endpointX, float endpointY, float originX, float originY)
+        private void AdjustCanvasSize()
         {
-            float dx = endpointX - originX;
-            float dy = endpointY - originY;
-            float length = Mathf.Sqrt(dx * dx + dy * dy);
-            float angle = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
+            Rect boundingBox = CalculateBoundingBox();
 
-            var line = new VisualElement();
-            line.AddToClassList("uml-line");
-            line.style.left = originX;
-            line.style.top = originY;
-            line.style.width = length;
-            line.style.rotate = new StyleRotate(new Rotate(angle));
+            canvas.style.width = boundingBox.width;
+            canvas.style.height = boundingBox.height;
 
-            var arrow = new VisualElement();
-            arrow.AddToClassList("uml-arrow");
-            arrow.style.left = endpointX - 10f;
-            arrow.style.top = endpointY - 10f;
-            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
-
-            canvas.Add(line);
-            canvas.Add(arrow);
+            canvas.style.left = -boundingBox.x;
+            canvas.style.top = -boundingBox.y;
         }
 
         private void Refresh()
@@ -517,7 +552,7 @@ namespace UMLClassDiag
         /// ANIMATIONS
         /// 
         ///
-        private void OnCollapseNode(VisualElement collapseContainer, Button collapseButton)
+        private void OnCollapseNode(BaseObject obj, VisualElement objContainer, VisualElement collapseContainer, Button collapseButton)
         {
             if (collapseContainer.style.display == DisplayStyle.Flex)
             {
@@ -533,6 +568,32 @@ namespace UMLClassDiag
                 collapseButton.RemoveFromClassList("collapse-button__up");
                 collapseButton.AddToClassList("collapse-button__down");
             }
+
+            ClearConnection(obj);
+            objContainer.schedule.Execute(() =>
+            {
+                foreach (var child in obj.ComposedClasses)
+                {
+                    if (nodeElements.TryGetValue(child, out var childNode))
+                    {
+                        List<Vector2> parentAnchors = FindAnchorPoints(objContainer);
+                        List<Vector2> childAnchors = FindAnchorPoints(childNode);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
+
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        connectionElements[obj].Add(line);
+                    }
+                }
+                canvas.MarkDirtyRepaint();
+            });
+        }
+
+        private void OnGenerateObject(BaseObject obj)
+        {
+            Debug.Log($"GenerateObject called for {obj.Name}");
+
+            obj.GenerateScript();
         }
     }
 }

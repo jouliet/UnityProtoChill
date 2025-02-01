@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using static JsonParser;
 using ChatGPTWrapper;
 using UnityPusher;
+using ChatClass;
 
 public class DataStructureTests
 {
@@ -183,10 +184,11 @@ public class UMLViewTest
         //UMLDiagramWindow.ShowDiagram(baseObjects);
     }
 }
+
 public class GameObjectCreatorTest{
     [Test]
     public void gameObjectCreation(){
-        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Tests/gameObjects_model1.json");
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/GeneratedContent/currentUML.json");
         if (jsonFile == null)
         {
             Debug.LogError("Failed to load JSON.");
@@ -197,6 +199,9 @@ public class GameObjectCreatorTest{
         Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
 
+        GameObjectCreator.JsonToDictionary(jsonString);
+        GameObjectCreator.StockEveryGOsInList();
+        GameObjectCreator.CreateAllGameObjects();
         GameObjectCreator.CreateEveryGameObjects(parsedObject);
     }
 }
@@ -219,6 +224,17 @@ public class NewUMLJsonStructTest{
         foreach(BaseObject bo in bos){
             Debug.Log(bo);
         }
+    }
+}
+
+public class ChatWindowTest{
+    [Test]
+    public void MessagesToJsonTest(){
+
+    }
+
+    public void JsonToMessagesTest(){
+
     }
 }
 
