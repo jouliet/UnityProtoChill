@@ -394,6 +394,7 @@ namespace UMLClassDiag
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
                         selectedNode = null;
                         selectedObject = null;
+                        DeselectObject();
                     }
                 }
                 isDragging = false;
@@ -498,8 +499,13 @@ namespace UMLClassDiag
         private void OnSelectNode(BaseObject baseObject)
         {
             selectedObject = baseObject;
+            UMLDiag.Instance.selectedObject = selectedObject;
             string msg = $"Node {baseObject.Name} selected in UML Diagram.";
             uiManager.SendMessageToChatWindow(msg);
+        }
+
+        private void DeselectObject(){
+            UMLDiag.Instance.selectedObject = null;
         }
 
         public BaseObject GetSelectedBaseObjectFromUML()

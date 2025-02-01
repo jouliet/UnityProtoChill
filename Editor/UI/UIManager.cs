@@ -18,6 +18,8 @@ public class UIManager : EditorWindow
     private UMLDiagramWindow umlDiagramWindow;
     private Button settingsButton;
 
+    private Button saveButton;
+
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public event System.Action<string> OnMessageToChat;
 
@@ -81,7 +83,8 @@ public class UIManager : EditorWindow
         settingsContainer.style.alignItems = Align.Center;
 
         InitializeGPTButton();
-        
+        InitializeSaveUMLDataButton();
+
         rootContainer.Add(settingsContainer);
 
         // Set up main content
@@ -143,11 +146,21 @@ public class UIManager : EditorWindow
         settingsButton.clicked += OnSettingsButtonClick;
         settingsContainer.Add(settingsButton);
     }
+
+    private void InitializeSaveUMLDataButton(){
+        saveButton = new Button() { text = "Save" };
+        saveButton.clicked += OnSaveButtonClick;
+        settingsContainer.Add(saveButton);
+    }
     private void OnSettingsButtonClick()
     {
         //Debug.Log("Custom OnClick Event: Settings button clicked!");
 
         SettingsWindow.ShowWindow();
+    }
+
+    private void OnSaveButtonClick(){
+        UMLDiag.SaveDataToCurrentUML();
     }
 
     public void SendMessageToChatWindow(string message)

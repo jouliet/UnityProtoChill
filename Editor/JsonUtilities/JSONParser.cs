@@ -239,6 +239,9 @@ public static string GetScript(string response){
     return response;
 }
 
+public static string Serialize(object jsonobject){
+    return "yes";
+}
 
 }
 

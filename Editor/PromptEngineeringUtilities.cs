@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using static SaverLoader;
+using UMLClassDiag;
 public static class PromptEngineeringUtilities
 {
 
@@ -12,9 +13,9 @@ public static class PromptEngineeringUtilities
 
     public static string UMLAndGOPrompt(string inputUser) 
     {
-        string classesAndGOJsonStructure = 
-        "You are a Json Writer. You will follow this exact format with every value in between quotes : \n" +
-        File.ReadAllText(classesAndGOJsonStructurePath);
+        string output;
+        string currentUml = File.ReadAllText(UMLFilePath);
+        string classesAndGOJsonStructure;
         string separationRequest = "The UML part is on the 'Classes' node and the 'GameObjects' part is on the GameObjects node.";
         string classesRequest = "For the Classes part: \n" +
         "Composed Classes are the classes used by the classe in question. \n" +
@@ -25,9 +26,22 @@ public static class PromptEngineeringUtilities
 
         string inputToCreatePrefabs = 
         "Remember that the script names must be coherent with the UML scripts. \n";
+
+        if (currentUml == null){ // Cas de première génération
+            classesAndGOJsonStructure = 
+            "You are a Json Writer. You will follow this exact format with every value in between quotes : \n" +
+            File.ReadAllText(classesAndGOJsonStructurePath);
+            output = classesAndGOJsonStructure+separationRequest+classesRequest+goRequests+inputToCreatePrefabs + inputUser;
+            
+        }
+        else { //Cas d'update
+            classesAndGOJsonStructure = currentUml;
+            output = currentUml + "Modify the UML following these instructions : " + inputUser + " . Modifying Components values means modifying the components inside the GameObjects. The Classes should be modified and updated only if demanded or if a new Class is asked to be created. ";
+        }
         
         
-        return (classesAndGOJsonStructure+separationRequest+classesRequest+goRequests+inputToCreatePrefabs + inputUser);
+        
+        return (output);
     }
 
     //Prompt spécifique pour générer un script
@@ -35,5 +49,9 @@ public static class PromptEngineeringUtilities
     {
         return "You are in Unity, write this c# class :" + name + "as described in this json : " + jsonOfSelfAndNeighbors + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
         Never assume a method, class or function exists unless specified in the uml. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. ";
+    }
+
+    public static string UpdateSingleClassPrompt(BaseObject bo, string inputuser){
+        return inputuser;
     }
 }
