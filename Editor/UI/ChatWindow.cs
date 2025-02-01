@@ -168,6 +168,12 @@ namespace ChatClass
                 Debug.LogError("Il y a une erreur dans le reload du chat. \n Exception: \n" + ex );
             }
         }
+
+        public void DeleteMessages(){
+            if (File.Exists(DialoguePath)){
+                File.Delete(DialoguePath);
+            }
+        }
     }
 
     public class DialogueMessage{
