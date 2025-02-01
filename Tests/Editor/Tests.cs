@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using static JsonParser;
 using ChatGPTWrapper;
 using UnityPusher;
+using ChatClass;
 
 public class DataStructureTests
 {
@@ -223,6 +224,17 @@ public class NewUMLJsonStructTest{
         foreach(BaseObject bo in bos){
             Debug.Log(bo);
         }
+    }
+}
+
+public class ChatWindowTest{
+    [Test]
+    public void MessagesToJsonTest(){
+
+    }
+
+    public void JsonToMessagesTest(){
+
     }
 }
 

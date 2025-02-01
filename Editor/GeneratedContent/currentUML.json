@@ -1,123 +1,201 @@
 ```user
-I have created a UML structure for the platformer game system, including the necessary classes and their relationships. Additionally, I have designed a GameObject list with appropriate components, such as Transform, MeshFilter, MeshRenderer, BoxCollider, and Rigidbody, to represent the player, enemy, checkpoints, and other elements in the game. The scripts and GameObjects are coherent and follow the requested format.
+I have created a UML structure under the "Classes" node and a GameObject list under the "GameObjects" node. The UML includes classes with attributes, methods, composed classes, and parent classes. The GameObject list includes GameObjects with components such as Transform, MeshFilter, MeshRenderer, and relevant scripts. I ensured that the script names in the GameObjects are coherent with the UML structure and added appropriate components like BoxCollider and Rigidbody where necessary. Float values are formatted correctly, and scaling is applied to GameObjects where needed.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "EnemyPatrol",
+            "Name": "TestManager",
             "Attributes": [
                 {
-                    "Name": "checkpointA",
-                    "Type": "Vector3",
+                    "Name": "testName",
+                    "Type": "string",
                     "DefaultValue": "null"
                 },
                 {
-                    "Name": "checkpointB",
-                    "Type": "Vector3",
-                    "DefaultValue": "null"
-                },
-                {
-                    "Name": "speed",
+                    "Name": "testDuration",
                     "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "isAlive",
-                    "Type": "bool",
-                    "DefaultValue": "true"
+                    "DefaultValue": "0.0"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "Patrol",
+                    "Name": "StartTest",
                     "ReturnType": "void",
                     "Parameters": []
                 },
                 {
-                    "Name": "Die",
+                    "Name": "EndTest",
                     "ReturnType": "void",
                     "Parameters": []
                 }
             ],
-            "ComposedClasses": ["PlayerController"],
+            "ComposedClasses": ["QuestionManager", "ScoreManager"],
             "ParentClass": "null"
         },
         {
-            "Name": "PlayerController",
+            "Name": "QuestionManager",
             "Attributes": [
                 {
-                    "Name": "jumpForce",
-                    "Type": "float",
-                    "DefaultValue": "5.0"
+                    "Name": "currentQuestion",
+                    "Type": "string",
+                    "DefaultValue": "null"
                 },
                 {
-                    "Name": "isGrounded",
-                    "Type": "bool",
-                    "DefaultValue": "true"
+                    "Name": "questionList",
+                    "Type": "List<string>",
+                    "DefaultValue": "null"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "Move",
+                    "Name": "LoadNextQuestion",
                     "ReturnType": "void",
                     "Parameters": []
                 },
                 {
-                    "Name": "Jump",
+                    "Name": "ShuffleQuestions",
                     "ReturnType": "void",
                     "Parameters": []
+                }
+            ],
+            "ComposedClasses": ["null"],
+            "ParentClass": "null"
+        },
+        {
+            "Name": "ScoreManager",
+            "Attributes": [
+                {
+                    "Name": "currentScore",
+                    "Type": "int",
+                    "DefaultValue": "0"
                 },
                 {
-                    "Name": "OnCollisionEnter",
+                    "Name": "highScore",
+                    "Type": "int",
+                    "DefaultValue": "0"
+                }
+            ],
+            "Methods": [
+                {
+                    "Name": "AddScore",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "collision",
-                            "Type": "Collision",
-                            "DefaultValue": "null"
+                            "Name": "points",
+                            "Type": "int",
+                            "DefaultValue": "0"
                         }
                     ]
+                },
+                {
+                    "Name": "ResetScore",
+                    "ReturnType": "void",
+                    "Parameters": []
                 }
             ],
-            "ComposedClasses": "null",
+            "ComposedClasses": ["null"],
             "ParentClass": "null"
         }
     ],
     "GameObjects": [
         {
-            "name": "Player",
-            "tag": "Player",
+            "name": "TestManagerObject",
+            "tag": "Manager",
             "layer": "Default",
+            "components": [
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "TestManager"
+                    }
+                },
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["0", "0", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "QuestionManagerObject",
+            "tag": "Manager",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "QuestionManager"
+                    }
+                },
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["1", "0", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ScoreManagerObject",
+            "tag": "Manager",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "ScoreManager"
+                    }
+                },
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["2", "0", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "QuestionDisplay",
+            "tag": "UI",
+            "layer": "UI",
             "components": [
                 {
                     "type": "Transform",
                     "properties": {
-                        "position": ["0", "1", "0"],
+                        "position": ["0", "5", "0"],
                         "localScale": ["1", "1", "1"]
                     }
                 },
                 {
-                    "type": "Rigidbody",
+                    "type": "MeshFilter",
                     "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "angularDrag": "0.05",
-                        "useGravity": "true",
-                        "isKinematic": "false"
+                        "mesh": "Plane"
                     }
                 },
                 {
-                    "type": "BoxCollider",
+                    "type": "MeshRenderer",
                     "properties": {
-                        "size": ["1", "1", "1"]
+                        "material": "Sprites-Default"
                     }
-                },
+                }
+            ]
+        },
+        {
+            "name": "AnswerButton",
+            "tag": "UI",
+            "layer": "UI",
+            "components": [
                 {
-                    "type": "Script",
+                    "type": "Transform",
                     "properties": {
-                        "Name": "PlayerController"
+                        "position": ["0", "-2", "0"],
+                        "localScale": ["1", "0.5", "1"]
                     }
                 },
                 {
@@ -131,105 +209,11 @@ I have created a UML structure for the platformer game system, including the nec
                     "properties": {
                         "material": "Sprites-Default"
                     }
-                }
-            ]
-        },
-        {
-            "name": "Enemy",
-            "tag": "Enemy",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {
-                        "position": ["5", "1", "0"],
-                        "localScale": ["1", "1", "1"]
-                    }
-                },
-                {
-                    "type": "Rigidbody",
-                    "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "angularDrag": "0.05",
-                        "useGravity": "true",
-                        "isKinematic": "false"
-                    }
                 },
                 {
                     "type": "BoxCollider",
                     "properties": {
-                        "size": ["1", "1", "1"]
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "EnemyPatrol"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "CheckpointA",
-            "tag": "Untagged",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {
-                        "position": ["3", "0", "0"],
-                        "localScale": ["0.5", "0.5", "0.5"]
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Sphere"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "CheckpointB",
-            "tag": "Untagged",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {
-                        "position": ["7", "0", "0"],
-                        "localScale": ["0.5", "0.5", "0.5"]
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Sphere"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Sprites-Default"
+                        "isTrigger": "true"
                     }
                 }
             ]
