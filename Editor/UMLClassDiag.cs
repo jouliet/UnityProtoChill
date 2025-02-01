@@ -26,7 +26,6 @@ public class BaseGameObject
     public List<BaseObject> Components = new List<BaseObject>();
 
     public void GeneratePrefab(){
-        Debug.Log("Generating prefab : " + this.Name);
         GameObject go = new GameObject(this.Name)
         {
             tag = this.Tag,
@@ -35,10 +34,7 @@ public class BaseGameObject
 
 
         foreach(BaseObject comp in Components){
-            Debug.Log(comp.Name + " est un baseObject qui s'ajoute au baseGameObject : " + this.Name);
-            if (comp.hasBeenGenerated){
-                Debug.Log("script a bien été généré");
-            }
+
             if (comp.Name != "Transform"){
                 comp.DirectAddScriptToGameObject(go);
             }
@@ -95,10 +91,12 @@ public class BaseObject
 
         if (scriptType != null) {
             hasBeenGenerated = true;
-            Debug.Log("Ce script a bien été trouvé et hasBeenGenerated est correct : " + scriptType.FullName);
         }
         else {
-            Debug.LogWarning("Le script " +this.Name + " n'a pas été généré");
+            scriptType = Type.GetType($"UnityEngine.{Name}, UnityEngine");
+            if (scriptType != null){
+                isSpecificUnityComponent = true;
+            }
         }
     }
 
@@ -140,7 +138,7 @@ public class BaseObject
     public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
 
     public bool hasBeenGenerated = false;
-
+    public bool isSpecificUnityComponent;
 
 
     // Appelé par UMLDiag ligne 110
@@ -193,9 +191,23 @@ public class BaseObject
     }
 
     public void DirectAddScriptToGameObject(GameObject newPrefab){
+        Type scriptType;
+        if (this.isSpecificUnityComponent){
+            scriptType = Type.GetType($"UnityEngine.{this.Name}, UnityEngine");
+        }
+        else {
+            scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+            if (scriptType == null)
+            {
+                scriptType = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .SelectMany(assembly => assembly.GetTypes())
+                    .FirstOrDefault(t => t.Name == Name);
+            }
+        }
 
         if (this.hasBeenGenerated){
-            Type scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+            
             if (newPrefab.GetComponent(scriptType) == null) // Éviter les doublons
             {
                 newPrefab.AddComponent(scriptType);
@@ -364,9 +376,19 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                                     baseGameObject.GeneratePrefab();
                                     }
                                     else {
-                                        //Cas nul (pas de baseobject connu, donc):
+                                        //Cas nul (pas de baseobject connu, donc un composant spécifique unity, c'est ici qu'on va générer le baseObject du coup):
                                         if (type != "Transform"){
-                                            Debug.LogError("Component  : " +type +" non reconnu, avez vous avez oublié de le générer ? Vérifiez la liste des components Unity reconnus");
+                                            Debug.Log("Mapping Unity Component  : " +type );
+                                            BaseObject bo = new BaseObject(type);
+                                            if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
+                                            {
+                                                bo.Properties = propertiesDict;
+                                                bo.hasBeenGenerated = true;
+                                                bo.isSpecificUnityComponent = true;
+                                            }
+
+                                            baseGameObject.Components.Add(bo);
+
                                         }
                                     }
                                 }
@@ -374,7 +396,9 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                         }
                     }
                     
+
                     mappedGameObjects.Add(baseGameObject);
+                    baseGameObject.GeneratePrefab();
                 }
             }
         }
@@ -404,7 +428,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                     foreach (string goName in bo.GameObjectAttachedTo)
                     {
                         // Debug.Log("Le script " + bo.Name + "s'ajoute au gameobject " + goName);
-                        bo.AddScriptToGameObject(GameObjectCreator.prefabPath + "/" + goName + ".prefab");
+                        //bo.AddScriptToGameObject(GameObjectCreator.prefabPath + "/" + goName + ".prefab");
                     }
                 }
             }
