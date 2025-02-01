@@ -21,15 +21,14 @@ public static class PromptEngineeringUtilities
         try {currentUml = File.ReadAllText(UMLFilePath); }
         catch{Debug.Log("No UML Yet, Generating for the first time");}
         string classesAndGOJsonStructure;
-        string separationRequest = "The UML part is on the 'Classes' node and the 'GameObjects' part is on the GameObjects node.";
+        string separationRequest = "The UML in the 'Classes' node describe the scripts and the 'GameObjects' node describes the prefabs and it's components, which are scripts defined in Classes or Unity specific components. Their properties are also described, you may modify values inside the properties ";
         string classesRequest = "For the Classes part: \n" +
-        "Composed Classes are the classes used by the classe in question. \n" +
+        "Composed Classes are the classes used by the class\n" +
         "Classes with the most composed classes should be at the top of the list.";
         string goRequests = 
         "For the GameObject part : \n" +
         "Float values format exemple : 10.5 \n" +
-        "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
-        "Don't hesitate to add boxCollider or rigidbody components if necessary. Also don't hesisate to scale the gameobject with the Transform localScale.\n" +
+        "Don't hesitate to add boxCollider, rigidbody or any Unity specific component. Also don't hesisate to use the properties : scale the gameobject with the Transform localScale, or edit the values of a Script component.\n" +
         "You must add MeshFilter (with MeshRenderer) component on almost all game objects who are not UI or Managers.";
         string inputToCreatePrefabs = 
         "Remember that the script names must be coherent with the UML scripts. \n";
@@ -43,7 +42,7 @@ public static class PromptEngineeringUtilities
         }
         else { //Cas d'update
             classesAndGOJsonStructure = currentUml;
-            output = currentUml + "Modify the UML following these instructions : " + inputUser + " . Modifying Components values means modifying the components inside the GameObjects. The Classes should be modified and updated only if demanded or if a new Class is asked to be created. ";
+            output = currentUml + "Modify this Json File to achieve this goal : " + inputUser + ". Before answering with the json, answer this question : Do i need to modify the Classes or their properties in the GameObjects Node ?";
         }
         
         

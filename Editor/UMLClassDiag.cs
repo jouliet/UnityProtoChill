@@ -94,16 +94,15 @@ public class Attribute
 {
     public string Name { get; set; } 
     public string Type { get; set; } 
-    public string DefaultValue { get; set; } 
 
     public override string ToString()
     {
-        return $"Attribute Name: {Name}, Type: {Type}, Default Value: {DefaultValue ?? "None"}";
+        return $"Attribute Name: {Name}, Type: {Type}";
     }
 
     public string ToJson()
         {
-            return $"{{\"Name\": \"{Name}\", \"Type\": \"{Type}\", \"DefaultValue\": \"{DefaultValue}\"}}";
+            return $"{{\"Name\": \"{Name}\", \"Type\": \"{Type}\"}}";
         }
 }
 
@@ -205,43 +204,36 @@ public class BaseObject
 
     public Type scriptType;
     public void InitWithProperties(Dictionary<string, object> propertiesDict)
-{
-    // Vérification si c'est un composant spécifique Unity ou un script personnalisé
-    if (this.isSpecificUnityComponent)
     {
-        // Met à jour les propriétés directement dans le dictionnaire Properties pour un composant Unity spécifique
+           
         foreach (var property in propertiesDict)
         {
             if (this.Properties.ContainsKey(property.Key))
             {
-                this.Properties[property.Key] = property.Value; // Mettre à jour la valeur de la propriété
+                this.Properties[property.Key] = property.Value; 
             }
             else
             {
-                this.Properties.Add(property.Key, property.Value); // Ajouter une nouvelle propriété si elle n'existe pas
+                this.Properties.Add(property.Key, property.Value);
             }
         }
-    }
-    else
+   
+    if (!this.isSpecificUnityComponent)  // Si ce n'est pas un composant Unity, mettre à jour les attributs aussi
     {
-        // Si ce n'est pas un composant Unity, mettre à jour les attributs de la classe (dans Attributes)
+
         foreach (var property in propertiesDict)
         {
-            // Chercher si l'attribut existe dans la liste d'attributs
             var attribute = this.Attributes.FirstOrDefault(a => a.Name == property.Key);
             if (attribute != null)
             {
-                // Si l'attribut existe, on met à jour sa valeur
-                attribute.DefaultValue = property.Value.ToString();
+
+                
             }
             else
             {
-                // Si l'attribut n'existe pas, on peut soit l'ajouter, soit ignorer selon le comportement désiré
-                // Si vous voulez l'ajouter :
                 this.Attributes.Add(new Attribute
                 {
                     Name = property.Key,
-                    DefaultValue = property.Value.ToString(),
                     Type = property.Value.GetType().Name
                 });
             }
@@ -314,8 +306,16 @@ public class BaseObject
             
             if (this.hasBeenGenerated){
                 
-                newPrefab.AddComponent(scriptType);
-                
+
+                Component newComponent = newPrefab.AddComponent(scriptType);
+
+                // Appliquer les propriétés avec la fonction existante
+                if (this.isSpecificUnityComponent){
+                    GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
+                }
+                else{
+                    GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
+                }
             }
         }
     }
@@ -415,11 +415,11 @@ public class JsonMapper{
     public static List<object> Classes;
 
     // List of baseobjects classes
-    public static List<BaseObject> BaseObjects;
+
 
 
     public static BaseObject TrackBaseObjectByName(string className){
-        foreach (BaseObject bo in BaseObjects){
+        foreach (BaseObject bo in AllBaseObjects){
             if (bo.Name == className){
                 return bo;
             }
@@ -475,12 +475,12 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                                     
                                     if (baseObject != null){
 
-                                    if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
-                                    {
-                                        baseObject.InitWithProperties(propertiesDict);
-                                    }
-                                    
-                                    baseGameObject.Components.Add(baseObject);
+                                        if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
+                                        {
+                                            baseObject.InitWithProperties(propertiesDict);
+                                        }
+                                        
+                                        baseGameObject.Components.Add(baseObject);
                                     }
                                     else {
                                         //Cas nul (pas de baseobject connu, donc un composant spécifique unity, c'est ici qu'on va générer le baseObject du coup):
@@ -514,7 +514,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
 
 
     public static List<BaseObject> MapAllBaseObjects(Dictionary<string, object> jsonDict){
-        BaseObjects = new List<BaseObject>();
+        List<BaseObject> BaseObjects = new List<BaseObject>();
         
         BaseObject bo;
         if (jsonDict == null){
@@ -574,7 +574,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
         };
         baseObject.GameObjectAttachedTo = MapGameObjectAttachedTo(jsonDict, baseObject.Name);
 
-        BaseObjects.Add(baseObject);
+        AllBaseObjects.Add(baseObject);
     
         return baseObject;
     }
@@ -629,7 +629,6 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                     {
                         Name = attributeDict.ContainsKey("Name") ? attributeDict["Name"].ToString() : string.Empty,
                         Type = attributeDict.ContainsKey("Type") ? attributeDict["Type"].ToString() : string.Empty,
-                        DefaultValue = attributeDict.ContainsKey("DefaultValue") ? attributeDict["DefaultValue"]?.ToString() : null
                     };
 
                     attributesList.Add(attribute);

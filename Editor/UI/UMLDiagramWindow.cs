@@ -17,7 +17,6 @@ namespace UMLClassDiag
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
 
-        private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
         private Dictionary<BaseObject, List<VisualElement>> connectionElements = new Dictionary<BaseObject, List<VisualElement>>();
@@ -36,7 +35,7 @@ namespace UMLClassDiag
 
         public static void ShowDiagram(List<BaseObject> baseObjects){
             var window = GetWindow<UMLDiagramWindow>("UML Diagram");
-            window.baseObjects = baseObjects;
+            //window.baseObjects = baseObjects;
             window.Repaint();
             window.Refresh();
         }
@@ -50,6 +49,7 @@ namespace UMLClassDiag
 
         public void ReloadDiagram(List<BaseObject> baseObjects)
         {
+            Debug.Log("reloading");
             canvas.Clear();
             if (baseObjects == null)
             {
@@ -57,7 +57,7 @@ namespace UMLClassDiag
             }
             else
             {
-                this.baseObjects = baseObjects;
+                //this.baseObjects = baseObjects;
                 nodeElements.Clear();
                 DrawNetwork();
             }
@@ -114,11 +114,12 @@ namespace UMLClassDiag
         //
         private void DrawNetwork()
         {
+            Debug.Log("Reloading!!");
             float currentX = 50f; // Position initiale pour les nœuds
             float currentY = 50f;
             drawnNodes.Clear();
 
-            foreach (var baseObject in baseObjects)
+            foreach (var baseObject in AllBaseObjects)
             {
                 if (!drawnNodes.Contains(baseObject))
                 {
@@ -369,7 +370,7 @@ namespace UMLClassDiag
 
         private void Refresh()
         {
-            if (baseObjects != null)
+            if (AllBaseObjects.Count > 0)
             {
                 DrawNetwork();
             }
@@ -497,7 +498,7 @@ namespace UMLClassDiag
         }
 
         /// 
-        /// CLICK EVENTS
+        /// CLICK EVENTS 
         /// 
         private void OnRefreshtButtonClick()
         {
@@ -512,7 +513,7 @@ namespace UMLClassDiag
                 ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
-                foreach(BaseObject bo in baseObjects){
+                foreach(BaseObject bo in AllBaseObjects){
                     bo.refreshStateToMatchUnityProjet();
                 }
                 
@@ -520,7 +521,7 @@ namespace UMLClassDiag
                 //     bgo.GeneratePrefab();
                 // }
                 GenerativeProcess.SetJsonScripts(jsonString);
-                ReloadDiagram(baseObjects);
+                ReloadDiagram(AllBaseObjects);
             }
             else {
                 Debug.Log("Could not find save file");

@@ -101,7 +101,7 @@ public class UMLDiag : GenerativeProcess
         //BaseObject root;
         List<BaseObject> baseObjects = new List<BaseObject>();
         List<BaseGameObject> gameObjects = new List<BaseGameObject>();
-
+        ObjectResearch.CleanUp();
         if (GPTGenerator.Instance == null){
             Debug.Log("No instance of gptGenerator");
             return;
@@ -119,14 +119,15 @@ public class UMLDiag : GenerativeProcess
             //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
             baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
             gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
-            SaveDataToCurrentUML();
+            
             if (umlDiagramWindow == null)
             {
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
-            umlDiagramWindow.ReloadDiagram(baseObjects); 
-
+            umlDiagramWindow.ReloadDiagram(baseObjects);
+            Debug.Log("finished generating !");
+            SaveDataToCurrentUML();
             // if (GameObjectCreator.GameObjectNameList != null){
             //     GameObjectCreator.GameObjectNameList.Clear();
             // }

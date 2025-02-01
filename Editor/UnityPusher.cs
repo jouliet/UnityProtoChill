@@ -194,7 +194,7 @@ public class GameObjectCreator : GenerativeProcess {
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
                     // Ecrit les properties dans le component
-                    //Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
+                    Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
         
                     object value = kvp.Value;
                     Type propertyType = propertyInfo.PropertyType;

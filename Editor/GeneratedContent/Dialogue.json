@@ -1,7 +1,12 @@
 {
 "Dialogue":[{
-"message":"un tower defense simple mais efficace avec des goblins qui vont vite et des mamooth qui vnt lentement","typeMessage":"user"},{
-"message":"The JSON defines a simple tower defense game with three classes: TowerDefense, Goblin, and Mammoth. The TowerDefense class has attributes for damage and range, while Goblins move quickly and Mammoths move slowly. Three game objects are created: a Tower, a Goblin, and a Mammoth, each with appropriate components and properties.","typeMessage":"llm"},{
-"message":"Goblin and Mammoth should be the same script Ennemy but with different properties ","typeMessage":"user"},{
-"message":"The UML has been modified to combine Goblin and Mammoth into a single class called Enemy with different properties. The components of the GameObjects have also been updated accordingly.","typeMessage":"llm"}]
+"message":"design a simple first person shooter with Ennemies running at you, the player, that you have to eliminate with your machine gun","typeMessage":"user"},{
+"message":"Created a JSON structure for a simple first-person shooter game, including classes for player control, gun handling, and enemy AI. Defined game objects for the player and enemy, with appropriate components and properties.","typeMessage":"llm"},{
+"message":"Created a C# class for GunController with attributes for fire rate and damage, and a method to handle firing the gun. The Start method initializes the attributes.","typeMessage":"llm"},{
+"message":"Wrote a C# class for the EnemyAI as specified, including attributes for health and speed, and methods for chasing the player and taking damage. The class uses Unity's Start and Update methods for initialization and continuous behavior.","typeMessage":"llm"},{
+"message":"Created a C# class for the PlayerController, implementing attributes for health and ammo, and methods for movement and shooting. The class uses Unity's Start and Update methods for initialization and frame updates, respectively.","typeMessage":"llm"},{
+"message":"The player prefab needs his GunController component.
+
+Also add a new ennemy that goes twice as fast","typeMessage":"user"},{
+"message":"To achieve the goal of adding a GunController component to the Player prefab and creating a new enemy that moves twice as fast, I only need to modify the GameObjects node. The Classes remain unchanged. Here is the updated JSON.","typeMessage":"llm"}]
 }

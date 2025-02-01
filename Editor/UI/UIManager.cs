@@ -47,7 +47,7 @@ public class UIManager : EditorWindow
     private void OnGUI()
     {   
         if (ObjectResearch.AllBaseObjects.Count == 0){
-            LoadUML();
+            //LoadUML();
         }
         if (GPTGenerator.Instance._chatGPTConversation == null){
             GPTSettingsManager.LoadGPTSettings(() => {});
