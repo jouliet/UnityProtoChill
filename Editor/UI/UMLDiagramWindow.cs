@@ -7,6 +7,7 @@ using static JsonParser;
 using static UIManager;
 using static SaverLoader;
 using static ObjectResearch;
+using System;
 
 namespace UMLClassDiag
 {
@@ -39,17 +40,21 @@ namespace UMLClassDiag
             window.Repaint();
             window.Refresh();
         }
-
+ 
         private void OnGUI()
         {   
             if (ObjectResearch.AllBaseObjects.Count == 0){
-                LoadUML();
+                //LoadUML();
             }
+            else{
+
+                Refresh();
+            }
+
         }
 
         public void ReloadDiagram(List<BaseObject> baseObjects)
         {
-            Debug.Log("reloading");
             canvas.Clear();
             if (baseObjects == null)
             {
@@ -114,7 +119,6 @@ namespace UMLClassDiag
         //
         private void DrawNetwork()
         {
-            Debug.Log("Reloading!!");
             float currentX = 50f; // Position initiale pour les nœuds
             float currentY = 50f;
             drawnNodes.Clear();
@@ -503,12 +507,10 @@ namespace UMLClassDiag
         private void OnRefreshtButtonClick()
         {
             CleanUp();
-
             //LoadUML();
-            var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
-            if (jsonFile != null)
-            {
-                string jsonString = jsonFile.text;
+            try {
+                var jsonFile = File.ReadAllText(UMLFilePath);
+                string jsonString = jsonFile;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
@@ -516,17 +518,20 @@ namespace UMLClassDiag
                 foreach(BaseObject bo in AllBaseObjects){
                     bo.refreshStateToMatchUnityProjet();
                 }
-                
-                // foreach (BaseGameObject bgo in baseGameObjects){
-                //     bgo.GeneratePrefab();
-                // }
+
                 GenerativeProcess.SetJsonScripts(jsonString);
                 ReloadDiagram(AllBaseObjects);
+
+
             }
-            else {
-                Debug.Log("Could not find save file");
+            catch (Exception ex) {
+                Debug.LogWarning(ex);
+            }
+
+
+
         }
-        }
+
         
         /// 
         /// BASE OBJECT SELECTION

@@ -24,9 +24,9 @@ namespace ChatClass
         private string userInput = "";
         private Button submitButton;
 
-        private ScrollView chatContainer;
+        private ScrollView chatContainer; 
         private static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
-        private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
+        //private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
 
 

@@ -42,7 +42,7 @@ public static class PromptEngineeringUtilities
         }
         else { //Cas d'update
             classesAndGOJsonStructure = currentUml;
-            output = currentUml + "Modify this Json File to achieve this goal : " + inputUser + ". Before answering with the json, answer this question : Do i need to modify the Classes or their properties in the GameObjects Node ?";
+            output = currentUml + "Modify this Json File to achieve this goal : " + inputUser + ". Before answering with the json, answer this question : Do you need to modify the Classes or their properties in the GameObjects Node ? You may comment your operations on the Json to reaffirm this goal";
         }
         
         

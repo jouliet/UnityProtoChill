@@ -18,7 +18,7 @@ public class UIManager : EditorWindow
     private UMLDiagramWindow umlDiagramWindow;
     private Button settingsButton;
 
-    private Button saveButton;
+    private Button resetButton;
 
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public event System.Action<string> OnMessageToChat;
@@ -83,7 +83,7 @@ public class UIManager : EditorWindow
         settingsContainer.style.alignItems = Align.Center;
 
         InitializeGPTButton();
-        InitializeSaveUMLDataButton();
+        InitializeResetUMLDataButton();
 
         rootContainer.Add(settingsContainer);
 
@@ -147,10 +147,10 @@ public class UIManager : EditorWindow
         settingsContainer.Add(settingsButton);
     }
 
-    private void InitializeSaveUMLDataButton(){
-        saveButton = new Button() { text = "Save" };
-        saveButton.clicked += OnSaveButtonClick;
-        settingsContainer.Add(saveButton);
+    private void InitializeResetUMLDataButton(){
+        resetButton = new Button() { text = "Reset" };
+        resetButton.clicked += OnResetButtonClick;
+        settingsContainer.Add(resetButton);
     }
     private void OnSettingsButtonClick()
     {
@@ -159,8 +159,8 @@ public class UIManager : EditorWindow
         SettingsWindow.ShowWindow();
     }
 
-    private void OnSaveButtonClick(){
-        UMLDiag.SaveDataToCurrentUML();
+    private void OnResetButtonClick(){
+        RemoveJsonFiles();
     }
 
     public void SendMessageToChatWindow(string message)

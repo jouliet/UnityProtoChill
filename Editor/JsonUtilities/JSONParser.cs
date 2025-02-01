@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UMLClassDiag;
-using System;
+
 using System.Text.RegularExpressions;
 
 public static class JsonParser

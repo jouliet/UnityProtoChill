@@ -30,7 +30,6 @@ public class BaseGameObject
 
     public BaseGameObject(){
         ObjectResearch.AddBGO(this);
-        Debug.Log("bgo created");
     }
     public string ToJson()
     {
@@ -79,9 +78,7 @@ public class BaseGameObject
         if (prefab ==null){
             Debug.Log("problème");
         }
-        else {
-            Debug.Log(prefab.name);
-        }
+
         GameObject.DestroyImmediate(go);
     }
 
@@ -454,7 +451,6 @@ public class JsonMapper{
 
 public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, object> jsonDict)
     {
-        Debug.Log("Map ALL WAS CALLED");
         List<BaseGameObject> mappedGameObjects = new List<BaseGameObject>();
         
         if (jsonDict.ContainsKey("GameObjects") && jsonDict["GameObjects"] is List<object> gameObjects)
