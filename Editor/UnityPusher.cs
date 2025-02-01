@@ -204,8 +204,8 @@ public class GameObjectCreator : GenerativeProcess{
                     }else if (kvp.Key == "mesh"){
                         SetMeshFilterFromString((string)kvp.Value, (MeshFilter)component);
                     }else if (kvp.Key == "material"){
-                        // Ici la kvp.Value ne change rien car on applique un material par default
-                        SetMeshRendererFromString((MeshRenderer)component);
+                        // Ici la kvp.Value change la couleur en fait.
+                        SetMeshRendererFromString((MeshRenderer)component, kvp.Value.ToString());
                     }else if (propertyType == typeof(UnityEngine.Vector3)){
                         
                         List<object> vector3ListJson = (List<object>) kvp.Value;
@@ -248,14 +248,24 @@ public class GameObjectCreator : GenerativeProcess{
     }
 
 
-    public static void SetMeshRendererFromString(MeshRenderer meshRenderer)
+    public static void SetMeshRendererFromString(MeshRenderer meshRenderer, string color)
     {
       
         //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
-        Material DefaultMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+        //Material DefaultMaterial = Resources.Load<Material>("Packages/com.jin.protochill/Editor/Material/Black.mat"); 
+        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Black.mat");
 
         DefaultMaterial.SetInt("_Smoothness", 0);
+        if (color == "Yellow"){
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Yellow.mat");
+        }else if (color == "Red"){
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Red.mat");
+        }else if (color == "Green"){
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Green.mat");
+        }
+        
         meshRenderer.material = DefaultMaterial;
+       
     }
 
 

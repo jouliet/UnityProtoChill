@@ -79,7 +79,8 @@ public class UMLDiag : GenerativeProcess
     "Float values format exemple : 10.5 \n" +
     "For type = Script, there is always a properties Name who must be an existing script name" + "\n" +
     "Don't hesitate to add boxCollider or rigidbody components if necessary. Also don't hesisate to scale the gameobject with the Transform localScale.\n" +
-    "You must add MeshFilter (with MeshRenderer) component on almost all game objects who are not UI or Managers.";
+    "You must add MeshFilter (with MeshRenderer) component on almost all game objects who are not UI or Managers.\n" +
+    "Ground must be black. You choose for the other game objects.";
 
     private static string inputToCreatePrefabs = 
     "Remember that the script names must be coherent with the UML scripts. \n";

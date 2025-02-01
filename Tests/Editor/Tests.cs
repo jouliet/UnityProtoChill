@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using static JsonParser;
 using ChatGPTWrapper;
 using UnityPusher;
+using ChatClass;
 
 public class DataStructureTests
 {
@@ -194,8 +195,8 @@ public class GameObjectCreatorTest{
             return;
         }
         string jsonString = jsonFile.text;
-        Debug.Log("here is the json file:");
-        Debug.Log(jsonString);
+        // Debug.Log("here is the json file:");
+        // Debug.Log(jsonString);
         Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
 
         GameObjectCreator.JsonToDictionary(jsonString);
@@ -223,6 +224,17 @@ public class NewUMLJsonStructTest{
         foreach(BaseObject bo in bos){
             Debug.Log(bo);
         }
+    }
+}
+
+public class ChatWindowTest{
+    [Test]
+    public void MessagesToJsonTest(){
+
+    }
+
+    public void JsonToMessagesTest(){
+
     }
 }
 

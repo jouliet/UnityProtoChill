@@ -36,7 +36,6 @@ public static class SaverLoader
     {
         try
         {
-            
             if (!File.Exists(UMLFilePath))
             {
                 //Debug.Log("fichier n'existe po");
@@ -57,7 +56,6 @@ public static class SaverLoader
             else {
                 Debug.Log("TRES SUS NE PAS IGNORER CE DEBUG");
             }
-
         }
         catch (Exception ex)
         {
