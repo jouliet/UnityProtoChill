@@ -39,6 +39,7 @@ namespace ChatClass
 
             chatCanvas = chatVisualTree.CloneTree();
             chatCanvas.style.flexGrow = 1;
+            chatCanvas.style.width = new Length(100, LengthUnit.Percent);
             chatCanvas.styleSheets.Add(chatStyleSheet);
 
             inputField = chatCanvas.Q<TextField>("chat-input-field");

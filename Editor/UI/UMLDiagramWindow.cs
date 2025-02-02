@@ -95,8 +95,7 @@ namespace UMLClassDiag
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
             canvas.styleSheets.Add(umlStyleSheet);
-            canvas.style.flexGrow = 0;
-            canvas.style.flexShrink = 0;
+            canvas.style.flexGrow = 1;
 
             canvas.schedule.Execute(() =>
             {
