@@ -24,6 +24,7 @@ public class GameObjectCreator : GenerativeProcess {
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
 
+    
     public static void CreateAllGameObjects(){
         foreach(string goName in GameObjectNameList){
             CreateGameObjectWithName(goName);
@@ -256,18 +257,19 @@ public class GameObjectCreator : GenerativeProcess {
       
         //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
         //Material DefaultMaterial = Resources.Load<Material>("Packages/com.jin.protochill/Editor/Material/Black.mat"); 
-        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Black.mat");
+        // Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Black.mat");
 
-        DefaultMaterial.SetInt("_Smoothness", 0);
-        if (color == "Yellow"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Yellow.mat");
-        }else if (color == "Red"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Red.mat");
-        }else if (color == "Green"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Green.mat");
-        }
+        // DefaultMaterial.SetInt("_Smoothness", 0);
+        // if (color == "Yellow"){
+        //     DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Yellow.mat");
+        // }else if (color == "Red"){
+        //     DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Red.mat");
+        // }else if (color == "Green"){
+        //     DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Green.mat");
+        // }
         
-        meshRenderer.material = DefaultMaterial;
+        meshRenderer.material = new Material(Shader.Find("Specular"));
+
        
     }
 

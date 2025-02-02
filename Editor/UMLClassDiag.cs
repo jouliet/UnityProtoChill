@@ -50,7 +50,9 @@ public class BaseGameObject
         if (this.Name == null){
             Debug.Log("Problème");
         }
+        UsefulFunctions.EnsureTagExists(this.Tag);
         GameObject go = new GameObject(this.Name)
+
         {
             tag = this.Tag,
             layer = LayerMask.NameToLayer(this.Layer)
