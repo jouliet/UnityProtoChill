@@ -79,6 +79,6 @@ public static class SaverLoader
             Debug.Log("Failed to delete json files: " + ex);
         }     
         AssetDatabase.Refresh();
-  
+        UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation(); // Force la recompilation des scripts
     }
 }
