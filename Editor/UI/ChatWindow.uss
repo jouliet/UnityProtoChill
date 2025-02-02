@@ -10,8 +10,8 @@
 
 /* Style for the chat messages container (ScrollView) */
 .chat-messages-container {
-    height: 60%;
-    background-color: #95928f;
+    height: 63%;
+    background-color: #686868;
     padding: 5px;
     overflow: scroll;
     flex-direction: column;
@@ -42,19 +42,18 @@
     border-color: transparent;
 }
 
+/* Style for the chat protochill bubbles */
 .chat-protochill-bubble {
-    background-color: #f5b5b5;
+    background-color: #adced4;
     border-radius: 8px;
     margin: 10px 50px 10px 5px;
 }
 
 /* Style for the input field container */
 .chat-input-container {
-    height: 40%;
+    height: 37%;
     background-color: white;
     padding: 10px;
-    border-top-width: 3px;
-    border-top-color: black; 
     flex-direction: row;
 }
 
@@ -100,4 +99,13 @@
     color: black;
     height: 100%;
     width: 20%;
+}
+
+.delete-button{
+    position: absolute;
+    margin: 1px;
+    bottom: 2px;
+    right: 3px;
+    height: 15px;
+    width: 10px;
 }

@@ -71,12 +71,18 @@ namespace ChatClass
         private void AddUserMessage(string message){
             VisualElement bubble = new VisualElement();
             bubble.AddToClassList("chat-user-bubble");
+
             TextField content = new TextField();
             content.AddToClassList("chat-text");
             content.multiline = true;
             content.value = message;
             content.isReadOnly = true;
             bubble.Add(content);
+
+            Button deleteButton = new Button();
+            deleteButton.clicked += () => DeleteMessage(message, bubble);
+            deleteButton.AddToClassList("delete-button");
+            bubble.Add(deleteButton);
 
             chatContainer.Add(bubble);
             chatContainer.ScrollTo(bubble);
@@ -88,6 +94,7 @@ namespace ChatClass
         {
             VisualElement bubble = new VisualElement();
             bubble.AddToClassList("chat-protochill-bubble");
+
             TextField content = new TextField();
             content.AddToClassList("chat-text");
             content.multiline = true;
@@ -95,10 +102,16 @@ namespace ChatClass
             content.isReadOnly = true;
             bubble.Add(content);
 
+            Button deleteButton = new Button();
+            deleteButton.clicked += () => DeleteMessage(message, bubble);
+            deleteButton.AddToClassList("delete-button");
+            bubble.Add(deleteButton);
+
             chatContainer.Add(bubble);
             chatContainer.ScrollTo(bubble);
 
             dialogueMemory.Add(new DialogueMessage { Message = message, TypeMessage = "user" });
+            ConvertToJSON(dialogueMemory);
         }
         
         public void AddChatResponse(string responseText)
@@ -108,16 +121,19 @@ namespace ChatClass
 
 
             VisualElement bubble = new VisualElement();
-            bubble.AddToClassList("chat-response-bubble");
+            bubble.AddToClassList("chat-protochill-bubble");
             TextField content = new TextField();
-            content.AddToClassList("chat-response-text");
+            content.AddToClassList("chat-text");
 
             content.multiline = true;
             content.value = responseText;
             content.isReadOnly = true;
-            content.style.flexGrow = 1;
-            content.style.whiteSpace = WhiteSpace.Normal;
             bubble.Add(content);
+
+            Button deleteButton = new Button();
+            deleteButton.clicked += () => DeleteMessage(responseText, bubble);
+            deleteButton.AddToClassList("delete-button");
+            bubble.Add(deleteButton);
 
             chatContainer.Add(bubble);
             chatContainer.ScrollTo(bubble);
@@ -169,7 +185,21 @@ namespace ChatClass
             }
         }
 
-        public void DeleteMessages(){
+        private void DeleteMessage(string msg, VisualElement bubble)
+        {
+            bubble.RemoveFromHierarchy();
+
+            var messageToRemove = dialogueMemory.Find(m => m.Message == msg);
+            if (messageToRemove != null)
+            {
+                dialogueMemory.Remove(messageToRemove);
+            }
+
+            ConvertToJSON(dialogueMemory);
+        }
+
+        public void DeleteMessages()
+        {
             if (File.Exists(DialoguePath)){
                 File.Delete(DialoguePath);
             }
