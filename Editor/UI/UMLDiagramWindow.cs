@@ -634,6 +634,8 @@ namespace UMLClassDiag
             }
             else
             {
+                loadingImageIndex = 0;
+                loadingImage.image = loadingImages[loadingImageIndex];
                 isLoading = false;
                 loadingContainer.Clear();
             }

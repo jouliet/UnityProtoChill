@@ -1,235 +1,125 @@
 ```user
-This is a simple platformer game where the player must navigate through a level, avoiding or defeating enemies by jumping on them. The game includes a player character, enemy patrols, and a ground platform. The player can jump and move left or right, while enemies patrol a specific area. The game can evolve by adding new enemy types, power-ups, collectibles, and more complex levels with obstacles like moving platforms or traps. Additionally, features like a scoring system, health system, or multiplayer mode could be added to enhance gameplay.
+This game is a simple 3D game where the player interacts with enemies and the environment. The goal is to add an enemy to the game. The enemy will have basic attributes like health and damage, and it will be able to move and attack. The game can evolve by adding more complex enemy behaviors, different enemy types, and interactions with the player, such as combat mechanics or AI-driven movement. The environment can also be expanded with obstacles, power-ups, and other interactive elements.
 ```
 
 ```json
 {
     "Classes": [
         {
-            "Name": "PlayerController",
+            "Name": "Enemy",
             "Attributes": [
+                {
+                    "Name": "health",
+                    "Type": "float",
+                    "DefaultValue": "100.0"
+                },
+                {
+                    "Name": "damage",
+                    "Type": "float",
+                    "DefaultValue": "10.0"
+                },
                 {
                     "Name": "speed",
                     "Type": "float",
                     "DefaultValue": "5.0"
                 },
                 {
-                    "Name": "jumpForce",
-                    "Type": "float",
-                    "DefaultValue": "10.0"
-                },
-                {
-                    "Name": "isGrounded",
+                    "Name": "isAlive",
                     "Type": "bool",
-                    "DefaultValue": "false"
+                    "DefaultValue": "true"
                 }
             ],
             "Methods": [
                 {
                     "Name": "Move",
                     "ReturnType": "void",
-                    "Parameters": []
+                    "Parameters": [
+                        {
+                            "Name": "direction",
+                            "Type": "Vector3",
+                            "DefaultValue": "null"
+                        }
+                    ]
                 },
                 {
-                    "Name": "Jump",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "OnCollisionEnter",
+                    "Name": "Attack",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "collision",
-                            "Type": "Collision",
+                            "Name": "target",
+                            "Type": "GameObject",
                             "DefaultValue": "null"
+                        }
+                    ]
+                },
+                {
+                    "Name": "TakeDamage",
+                    "ReturnType": "void",
+                    "Parameters": [
+                        {
+                            "Name": "amount",
+                            "Type": "float",
+                            "DefaultValue": "0.0"
                         }
                     ]
                 }
             ],
-            "ComposedClasses": ["EnemyController"],
-            "ParentClass": "null"
-        },
-        {
-            "Name": "EnemyController",
-            "Attributes": [
-                {
-                    "Name": "patrolSpeed",
-                    "Type": "float",
-                    "DefaultValue": "2.0"
-                },
-                {
-                    "Name": "patrolRange",
-                    "Type": "float",
-                    "DefaultValue": "4.0"
-                },
-                {
-                    "Name": "isAlive",
-                    "Type": "bool",
-                    "DefaultValue": "false"
-                }
-            ],
-            "Methods": [
-                {
-                    "Name": "Patrol",
-                    "ReturnType": "void",
-                    "Parameters": []
-                },
-                {
-                    "Name": "Die",
-                    "ReturnType": "void",
-                    "Parameters": []
-                }
-            ],
-            "ComposedClasses": "null",
+            "ComposedClasses": ["GameObject"],
             "ParentClass": "null"
         },
         {
             "Name": "GameManager",
             "Attributes": [
                 {
-                    "Name": "score",
-                    "Type": "int",
-                    "DefaultValue": "0"
+                    "Name": "enemies",
+                    "Type": "List<Enemy>",
+                    "DefaultValue": "null"
+                },
+                {
+                    "Name": "player",
+                    "Type": "GameObject",
+                    "DefaultValue": "null"
                 }
             ],
             "Methods": [
                 {
-                    "Name": "AddScore",
+                    "Name": "SpawnEnemy",
                     "ReturnType": "void",
                     "Parameters": [
                         {
-                            "Name": "points",
-                            "Type": "int",
-                            "DefaultValue": "0"
+                            "Name": "position",
+                            "Type": "Vector3",
+                            "DefaultValue": "null"
                         }
                     ]
                 },
                 {
-                    "Name": "RestartGame",
+                    "Name": "UpdateGame",
                     "ReturnType": "void",
                     "Parameters": []
                 }
             ],
-            "ComposedClasses": ["PlayerController", "EnemyController"],
+            "ComposedClasses": ["Enemy", "GameObject"],
             "ParentClass": "null"
         }
     ],
     "GameObjects": [
         {
-            "name": "Player",
-            "tag": "Player",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {
-                        "position": ["0", "1", "0"],
-                        "localScale": ["1", "1", "1"]
-                    }
-                },
-                {
-                    "type": "Rigidbody",
-                    "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "useGravity": "true"
-                    }
-                },
-                {
-                    "type": "BoxCollider",
-                    "properties": {
-                        "size": ["1", "2", "1"]
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "PlayerController"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Green"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Enemy",
-            "tag": "Enemy",
-            "layer": "Default",
-            "components": [
-                {
-                    "type": "Transform",
-                    "properties": {
-                        "position": ["5", "1", "0"],
-                        "localScale": ["1", "1", "1"]
-                    }
-                },
-                {
-                    "type": "Rigidbody",
-                    "properties": {
-                        "mass": "1",
-                        "drag": "0",
-                        "useGravity": "true"
-                    }
-                },
-                {
-                    "type": "BoxCollider",
-                    "properties": {
-                        "size": ["1", "2", "1"]
-                    }
-                },
-                {
-                    "type": "Script",
-                    "properties": {
-                        "Name": "EnemyController"
-                    }
-                },
-                {
-                    "type": "MeshFilter",
-                    "properties": {
-                        "mesh": "Cube"
-                    }
-                },
-                {
-                    "type": "MeshRenderer",
-                    "properties": {
-                        "material": "Red"
-                    }
-                }
-            ]
-        },
-        {
             "name": "Ground",
-            "tag": "Ground",
+            "tag": "Environment",
             "layer": "Default",
             "components": [
                 {
                     "type": "Transform",
                     "properties": {
                         "position": ["0", "0", "0"],
-                        "localScale": ["10", "1", "10"]
-                    }
-                },
-                {
-                    "type": "BoxCollider",
-                    "properties": {
-                        "size": ["10", "1", "10"]
+                        "localScale": ["50", "1", "50"]
                     }
                 },
                 {
                     "type": "MeshFilter",
                     "properties": {
-                        "mesh": "Cube"
+                        "mesh": "Plane"
                     }
                 },
                 {
@@ -241,10 +131,62 @@ This is a simple platformer game where the player must navigate through a level,
             ]
         },
         {
-            "name": "GameManager",
-            "tag": "Untagged",
+            "name": "Enemy1",
+            "tag": "Enemy",
             "layer": "Default",
             "components": [
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["5", "0", "5"],
+                        "localScale": ["1", "1", "1"]
+                    }
+                },
+                {
+                    "type": "MeshFilter",
+                    "properties": {
+                        "mesh": "Capsule"
+                    }
+                },
+                {
+                    "type": "MeshRenderer",
+                    "properties": {
+                        "material": "Red"
+                    }
+                },
+                {
+                    "type": "BoxCollider",
+                    "properties": {
+                        "isTrigger": "false"
+                    }
+                },
+                {
+                    "type": "Rigidbody",
+                    "properties": {
+                        "useGravity": "true",
+                        "isKinematic": "false"
+                    }
+                },
+                {
+                    "type": "Script",
+                    "properties": {
+                        "Name": "Enemy"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "GameManager",
+            "tag": "Manager",
+            "layer": "Default",
+            "components": [
+                {
+                    "type": "Transform",
+                    "properties": {
+                        "position": ["0", "0", "0"],
+                        "localScale": ["1", "1", "1"]
+                    }
+                },
                 {
                     "type": "Script",
                     "properties": {
