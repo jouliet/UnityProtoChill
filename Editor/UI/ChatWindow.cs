@@ -85,7 +85,7 @@ namespace ChatClass
             content.isReadOnly = true;
             bubble.Add(content);
 
-            Button deleteButton = new Button();
+            Button deleteButton = new Button() { text = "X" };
             deleteButton.clicked += () => DeleteMessage(message, bubble);
             deleteButton.AddToClassList("delete-button");
             bubble.Add(deleteButton);
@@ -125,7 +125,7 @@ namespace ChatClass
             content.isReadOnly = true;
             bubble.Add(content);
 
-            Button deleteButton = new Button();
+            Button deleteButton = new Button() { text = "X"};
             deleteButton.clicked += () => DeleteMessage(responseText, bubble);
             deleteButton.AddToClassList("delete-button");
             bubble.Add(deleteButton);

@@ -55,6 +55,15 @@
 	background-color: #adced4;
 }
 
+.options-button {
+    position: absolute;
+    left: 0px;
+    height: 80%;
+    width: 10%;
+	font-size: 16px;
+    -unity-font-style: bold;
+}
+
 /* Base Object styling */
 .uml-base-object {
     font-size: 16px;

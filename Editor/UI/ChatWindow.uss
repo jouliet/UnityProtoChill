@@ -120,6 +120,10 @@
     height: 15px;
     width: 10px;
     background-color: transparent;
+    font-size: 10px;
+    color: #ec5252;
+    border-width: 1px;
+    border-color: #ec5252;
 }
 
 .delete-button:hover{
