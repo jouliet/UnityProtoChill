@@ -84,8 +84,9 @@ public class UIManager : EditorWindow
         settingsContainer.style.alignItems = Align.Center;
 
         InitializeGPTButton();
-        InitializeResetUMLDataButton();
         InitializeLDCreatorButton();
+        InitializeResetUMLDataButton();
+        
 
         rootContainer.Add(settingsContainer);
 
@@ -159,7 +160,7 @@ public class UIManager : EditorWindow
     }
 
     private void InitializeLDCreatorButton(){
-        LDCreatorButton = new Button() { text = "Push LevelDesign" };
+        LDCreatorButton = new Button() { text = "LevelDesign" };
         LDCreatorButton.clicked += OnLDCreatorButtonClick;
         settingsContainer.Add(LDCreatorButton);
     }
@@ -177,10 +178,7 @@ public class UIManager : EditorWindow
 
     private void OnLDCreatorButtonClick()
     {
-        // var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/LevelDesignStructure.json");
-        // Dictionary<string, object> LDDict = (Dictionary<string, object>)JsonParser.Parse(jsonFile.text);
-        // LevelDesignCreator.PushGOsOnScene(LDDict);
-        LevelDesignCreator.GenerateLevelDesign();
+        LevelDesignWindow.ShowWindow();
     }
 
     public void SendSelectionStateToChatWindow(bool isSelected, string message)

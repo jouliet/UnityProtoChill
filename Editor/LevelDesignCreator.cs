@@ -23,16 +23,14 @@ public class LevelDesignCreator : GenerativeProcess
     private static string formatPrompt = 
     "The json must follow this format: \n" +
     AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignStructureJsonPath).text + "\n";
-    private static string additionalPrompt = 
-    "Create multiple platformers with enemies on it. The player must have difficulties to arrive to an end. Jump must necessary to arrive at the end of the level. \n";
     private static string jsonLD;
-    public static void GenerateLevelDesign(){
+    public static void GenerateLevelDesign(string input){
         if (File.Exists(UMLFilePath)){
             jsonClassesAndGos = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath).text;
         }else{
             throw new Exception("Cannot push GameObjects without a the UMLandGOs json.");
         }
-        string input = directivePrompt + jsonClassesAndGos + formatPrompt + additionalPrompt;
+        input = directivePrompt + jsonClassesAndGos + formatPrompt + input;
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonLD = response;
