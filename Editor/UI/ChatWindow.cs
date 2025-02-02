@@ -28,7 +28,7 @@ namespace ChatClass
         private VisualElement stateContainer;
         private Label stateText;
 
-        private static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
+        public static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
         //private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
 
