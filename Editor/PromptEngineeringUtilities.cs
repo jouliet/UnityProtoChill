@@ -58,6 +58,6 @@ public static class PromptEngineeringUtilities
     }
 
     public static string UpdateSingleClassPrompt(BaseObject bo, string inputuser){
-        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n");
+        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n" + "Adding a new class means writing a similar structure for it in the Classes list, and being careful to use the same name in ComposedClasses");
     }
 }

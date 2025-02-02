@@ -527,7 +527,6 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
-            CleanUp();
             //LoadUML();
             try {
                 if (!File.Exists(UMLFilePath)){
@@ -537,7 +536,7 @@ namespace UMLClassDiag
                 
                 string jsonString = jsonFile;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-                ObjectResearch.CleanUp();
+                //ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
                 foreach(BaseObject bo in AllBaseObjects){
@@ -564,8 +563,13 @@ namespace UMLClassDiag
         ///
         private void OnSelectNode(bool isSelected, BaseObject baseObject)
         {
-            selectedObject = baseObject;
-            UMLDiag.Instance.selectedObject = selectedObject;
+            if (!isSelected){
+                DeselectObject();
+            }
+            else {
+                selectedObject = baseObject;
+                UMLDiag.Instance.selectedObject = selectedObject;
+            }
             string msg = $"Modifying : {baseObject.Name}";
             uiManager.SendSelectionStateToChatWindow(isSelected, msg);
         }
@@ -644,6 +648,7 @@ namespace UMLClassDiag
 
         public void OnLoadingUML(bool state)
         {
+            Debug.Log("loading ? : " + state);
             canvas.Clear();
 
             if (loadingImage == null)
