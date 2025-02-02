@@ -68,6 +68,7 @@ public class UMLDiag : GenerativeProcess
             Debug.Log("Submit received in UMLDiag, Updating specific Object "+selectedObject.Name+ ". Generating UML..." + input);
             GenerateSingleClass(input,selectedObject);
         }
+        umlDiagramWindow.OnLoadingUML(true);
     }
 
     public void OnGenerateScript(BaseObject root){
@@ -127,6 +128,7 @@ public class UMLDiag : GenerativeProcess
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
+            umlDiagramWindow.OnLoadingUML(false);
             umlDiagramWindow.ReloadDiagram(baseObjects);
             Debug.Log("finished generating !");
             SaveDataToCurrentUML();

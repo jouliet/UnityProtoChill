@@ -20,7 +20,7 @@ namespace UMLClassDiag
 
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
-        private Dictionary<BaseObject, List<VisualElement>> connectionElements = new Dictionary<BaseObject, List<VisualElement>>();
+        private List<Connection> connections = new List<Connection> ();
 
         private float width = 300f; // width of nodes
         private float offset = 50f;
@@ -28,8 +28,12 @@ namespace UMLClassDiag
         private Vector2 dragStart;
         private bool isDragging;
         private VisualElement canvas;
-        //private float canvasWidth = 1000f;
-        // private float canvasHeight = 1000f;
+
+        private VisualElement loadingContainer;
+        private Image loadingImage;
+        private List<Texture2D> loadingImages = new List<Texture2D>();
+        private bool isLoading = false;
+        private int loadingImageIndex = 0;
 
         private VisualElement selectedNode;
         private BaseObject selectedObject;
@@ -85,14 +89,13 @@ namespace UMLClassDiag
 
             var overlayContainer = root.Q<VisualElement>("overlay-container");
             overlayContainer.pickingMode = PickingMode.Ignore;
+            loadingContainer = root.Q<VisualElement>("loading-container");
+            LoadImages();
 
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
-            //canvas.style.left = - canvasWidth / 2 + width; // Center display
-            //canvas.style.top = 0f;
-            //canvas.style.width = canvasWidth; // TODO: add dynamic size off canvas
-            //canvas.style.height = canvasHeight;
             canvas.styleSheets.Add(umlStyleSheet);
+            canvas.style.flexGrow = 1;
 
             canvas.schedule.Execute(() =>
             {
@@ -136,9 +139,9 @@ namespace UMLClassDiag
 
             canvas.schedule.Execute(() =>
             {
-                DrawConnections();
                 AdjustCanvasSize();
-            });
+                DrawConnections();
+            }).ExecuteLater(100);
         }
 
         public void DrawNode(BaseObject obj, float x, float y)
@@ -184,18 +187,20 @@ namespace UMLClassDiag
                     if (selectedObject != null && selectedObject != obj)
                     {
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        OnSelectNode(false, obj);
                     }
                     if (nodeContainer.ClassListContains("uml-diagram__selected"))
                     {
                         nodeContainer.RemoveFromClassList("uml-diagram__selected");
                         selectedNode = null;
                         selectedObject = null;
+                        OnSelectNode(false, obj);
                     }
                     else
                     {
                         nodeContainer.AddToClassList("uml-diagram__selected");
                         selectedNode = nodeContainer;
-                        OnSelectNode(obj);
+                        OnSelectNode(true, obj);
                     }
                 }
                 evt.StopPropagation();
@@ -225,6 +230,7 @@ namespace UMLClassDiag
             if (nodeElements == null)
             {
                 Debug.LogWarning("La liste nodeElements est null donc impossible de dessiner les liens.");
+                return;
             }
             foreach (var kvp in nodeElements)
             {
@@ -240,27 +246,37 @@ namespace UMLClassDiag
                         List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
 
                         var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
-
-                        if (!connectionElements.ContainsKey(parentObject))
-                        {
-                            connectionElements[parentObject] = new List<VisualElement>();
-                        }
-                        connectionElements[parentObject].Add(line);
+                        connections.Add(new Connection(line, parentObject, child));
                     }
                 }
             }
         }
 
-        private void ClearConnection(BaseObject parentObject)
+        private List<BaseObject> ClearConnections(BaseObject obj)
         {
-            if (connectionElements.TryGetValue(parentObject, out var connections))
+            var connectionsToClear = new List<Connection>();
+            var parents = new List<BaseObject>();
+
+            foreach (var connection in connections)
             {
-                foreach (var connection in connections)
+                if (connection.Start == obj)
                 {
-                    connection.RemoveFromHierarchy();
+                    connection.Arrow.RemoveFromHierarchy();
+                    connectionsToClear.Add(connection);
                 }
-                connectionElements[parentObject].Clear();
+                if (connection.End == obj)
+                {
+                    connection.Arrow.RemoveFromHierarchy();
+                    connectionsToClear.Add(connection);
+                    parents.Add(connection.Start);
+                }
             }
+            foreach (var connection in connectionsToClear)
+            {
+                connections.Remove(connection);
+            }
+
+            return parents;
         }
 
         private VisualElement DrawLine(float endpointX, float endpointY, float originX, float originY)
@@ -277,16 +293,18 @@ namespace UMLClassDiag
             line.style.width = length;
             line.style.rotate = new StyleRotate(new Rotate(angle));
 
-            var arrow = new VisualElement();
-            arrow.AddToClassList("uml-arrow");
-            arrow.style.left = endpointX - 10f;
-            arrow.style.top = endpointY - 10f;
-            arrow.style.rotate = new StyleRotate(new Rotate(angle - 90));
+            var arrowPointer = new VisualElement();
+            arrowPointer.AddToClassList("uml-arrow");
+            arrowPointer.style.left = endpointX - 10f;
+            arrowPointer.style.top = endpointY - 10f;
+            arrowPointer.style.rotate = new StyleRotate(new Rotate(angle - 90));
 
-            canvas.Add(line);
+            var arrow = new VisualElement();
+            arrow.Add(line);
+            arrow.Add(arrowPointer);
             canvas.Add(arrow);
 
-            return line;
+            return arrow;
         }
 
         private List<Vector2> FindAnchorPoints(VisualElement node)
@@ -434,6 +452,7 @@ namespace UMLClassDiag
                     if (selectedNode != null)
                     {
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        OnSelectNode(false, selectedObject);
                         selectedNode = null;
                         selectedObject = null;
                         DeselectObject();
@@ -450,7 +469,7 @@ namespace UMLClassDiag
         //
         private float zoomScale = 1.0f;
         private const float zoomIncrement = 0.1f;
-        private const float minZoom = 0.5f;
+        private const float minZoom = 0.1f;
         private const float maxZoom = 2.0f;
 
         private void OnMouseWheel(WheelEvent evt)
@@ -539,12 +558,12 @@ namespace UMLClassDiag
         /// BASE OBJECT SELECTION
         /// 
         ///
-        private void OnSelectNode(BaseObject baseObject)
+        private void OnSelectNode(bool isSelected, BaseObject baseObject)
         {
             selectedObject = baseObject;
             UMLDiag.Instance.selectedObject = selectedObject;
-            string msg = $"Node {baseObject.Name} selected in UML Diagram.";
-            uiManager.SendMessageToChatWindow(msg);
+            string msg = $"Modifying : {baseObject.Name}";
+            uiManager.SendSelectionStateToChatWindow(isSelected, msg);
         }
 
         private void DeselectObject(){
@@ -577,7 +596,8 @@ namespace UMLClassDiag
                 collapseButton.AddToClassList("collapse-button__down");
             }
 
-            ClearConnection(obj);
+            var parents = ClearConnections(obj);
+
             objContainer.schedule.Execute(() =>
             {
                 foreach (var child in obj.ComposedClasses)
@@ -590,9 +610,23 @@ namespace UMLClassDiag
 
                         var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
 
-                        connectionElements[obj].Add(line);
+                        connections.Add( new Connection(line, obj, child) );
                     }
                 }
+                foreach (var parent in parents)
+                {
+                    if (nodeElements.TryGetValue(parent, out var parentNode))
+                    {
+                        List<Vector2> parentAnchors = FindAnchorPoints(parentNode);
+                        List<Vector2> childAnchors = FindAnchorPoints(objContainer);
+                        List<Vector2> lineCoordinates = FindBestConnection(parentAnchors, childAnchors);
+
+                        var line = DrawLine(lineCoordinates[1].x, lineCoordinates[1].y, lineCoordinates[0].x, lineCoordinates[0].y);
+
+                        connections.Add(new Connection(line, parent, obj) );
+                    }
+                }
+
                 canvas.MarkDirtyRepaint();
             });
         }
@@ -602,6 +636,89 @@ namespace UMLClassDiag
             Debug.Log($"GenerateObject called for {obj.Name}");
 
             obj.GenerateScript();
+        }
+
+        public void OnLoadingUML(bool state)
+        {
+            canvas.Clear();
+
+            if (loadingImage == null)
+            {
+                Debug.LogError("loadingImage is null. Ensure LoadImages() is called.");
+                return;
+            }
+
+            if (state)
+            {
+                var loadingText = new Label("GENERATING UML...");
+                loadingText.style.top = 0f;
+                loadingText.style.left = 0f;
+                loadingText.style.fontSize = 20f;
+
+                loadingContainer.Add(loadingText);
+                loadingContainer.Add(loadingImage);
+
+                isLoading = true;
+                UpdateLoadingAnimation(0.5f);
+            }
+            else
+            {
+                loadingImageIndex = 0;
+                loadingImage.image = loadingImages[loadingImageIndex];
+                isLoading = false;
+                loadingContainer.Clear();
+            }
+        }
+
+        private void UpdateLoadingAnimation(float waitTime)
+        {
+            if (!isLoading)
+            {
+                return;
+            }
+
+            if (loadingImages.Count > 0)
+            {
+                loadingImage.image = loadingImages[loadingImageIndex];
+                loadingImageIndex = (loadingImageIndex + 1) % 6;
+            }
+
+            loadingContainer.schedule.Execute(() => UpdateLoadingAnimation(waitTime)).StartingIn((long)(waitTime * 1000));
+        }
+
+        private void LoadImages()
+        {
+            for (int i = 1; i <= 6; i++)
+            {
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>($"Packages/com.jin.protochill/Editor/UI/resources/loading-{i}.png");
+                if (texture != null)
+                {
+                    loadingImages.Add(texture);
+                }
+                else
+                {
+                    Debug.LogError($"Failed to load image: loading-{i}.png");
+                }
+            }
+
+            loadingImage = new Image();
+            loadingImage.style.width = 100;
+            loadingImage.style.height = 100;
+            loadingImage.image = loadingImages[0];
+        }
+    }
+
+    public struct Connection
+    {
+        public VisualElement Arrow { get; }
+        public BaseObject Start { get; }
+        public BaseObject End { get; }
+
+        public Connection(VisualElement arrow, BaseObject start, BaseObject end)
+        {
+            Arrow = arrow;
+            Start = start;
+            End = end;
         }
     }
 }

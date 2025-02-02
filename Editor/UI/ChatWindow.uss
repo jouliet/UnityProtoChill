@@ -10,8 +10,8 @@
 
 /* Style for the chat messages container (ScrollView) */
 .chat-messages-container {
-    height: 60%;
-    background-color: #95928f;
+    height: 63%;
+    background-color: #686868;
     padding: 5px;
     overflow: scroll;
     flex-direction: column;
@@ -42,25 +42,25 @@
     border-color: transparent;
 }
 
+/* Style for the chat protochill bubbles */
 .chat-protochill-bubble {
-    background-color: #f5b5b5;
+    background-color: #adced4;
     border-radius: 8px;
     margin: 10px 50px 10px 5px;
 }
 
 /* Style for the input field container */
 .chat-input-container {
-    height: 40%;
+    height: 37%;
     background-color: white;
-    padding: 10px;
-    border-top-width: 3px;
-    border-top-color: black; 
-    flex-direction: row;
+    padding: 4px;
+    flex-direction: column;
 }
 
 /* Style for the input field */
 .chat-input-field {
-    width: 80%;
+    width: 100%;
+    height: 90%;
 }
 
 .chat-input-field > .unity-text-field__input {
@@ -87,17 +87,67 @@
     border-color: transparent;
 }
 
-.unity-base-text-field__input > .unity-scroller {
-    width: 7px;
-}
-
 .unity-base-text-field__input > .unity-scroller > .unity-slider {
     margin-right: 0;
 }
 
 /* Style for the submit button */
 .chat-submit-button {
-    color: black;
-    height: 100%;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    color: #40563f;
+    background-color: #88e181;
+    height: 10%;
     width: 20%;
+    border-color: #40563f;
+}
+
+.chat-submit-button:hover {
+    background-color: #39cf32;
+}
+
+.chat-submit-button:active {
+    background-color: #0efb03;
+}
+
+/* Style for the delete button */
+.delete-button{
+    position: absolute;
+    margin: 1px;
+    bottom: 2px;
+    right: 3px;
+    height: 15px;
+    width: 10px;
+    background-color: transparent;
+    font-size: 10px;
+    color: #ec5252;
+    border-width: 1px;
+    border-color: #ec5252;
+}
+
+.delete-button:hover{
+    background-color: #ff9494;
+}
+
+.delete-button:active{
+    background-color: #f50e0e;
+}
+
+.selection-state {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    background-color: #f8f591;
+    height: 8%;
+    width: 77%;
+    margin: 1px;
+    border-radius: 12px;
+}
+
+.selection-state-text {
+    font-size: 10px;
+    color: black;
+    left: 10px;
+    padding: 3px;
 }
