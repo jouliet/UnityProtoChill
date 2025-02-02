@@ -62,6 +62,8 @@
     width: 10%;
 	font-size: 16px;
     -unity-font-style: bold;
+    background-color: #adced4;
+    color: #2c5b64;
 }
 
 /* Base Object styling */
@@ -109,4 +111,68 @@
     border-width: 10px;
     position: absolute;
     transform-origin: center;
+}
+
+.popup-container {
+    background-color: #2d2d2d;
+    border-width: 1px;
+    border-color: #555;
+    width: 170px;
+    height: 60px;
+    position: absolute;
+    top: 37px;
+    left: 10px;
+    border-radius: 5px;
+}
+
+.popup-text {
+    position: absolute;
+    font-size: 11px;
+    color: white;
+    top: 17px;
+    left: 3px;
+    padding: 3px;
+}
+
+.generate-button{
+    position: absolute;
+    top: 35px;
+    left: 3px;
+    height: auto;
+    width: 158px;
+    background-color: #88e181;
+    font-size: 10px;
+    color: #40563f;
+    border-width: 1px;
+    border-color: #40563f;
+}
+
+.generate-button:hover {
+    background-color: #39cf32;
+}
+
+.generate-button:active {
+    background-color: #0efb03;
+}
+
+.close-button{
+    position: absolute;
+    margin: 1px;
+    top: 2px;
+    right: 3px;
+    height: 15px;
+    width: 15px;
+    background-color: transparent;
+    font-size: 10px;
+    color: #ec5252;
+    border-width: 1px;
+    border-color: #ec5252;
+}
+
+.close-button:hover{
+    background-color: #ff9494;
+}
+
+.close-button:active{
+    background-color: #f50e0e;
 }

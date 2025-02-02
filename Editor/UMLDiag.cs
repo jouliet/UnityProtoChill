@@ -85,18 +85,26 @@ public class UMLDiag : GenerativeProcess
             jsonScripts = response;
             Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
-            //Le cast est nécessaire pour parse
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
-            JsonMapper.MapAllBaseObjects(parsedObject);
-
-            if (umlDiagramWindow == null)
+            try
             {
-                Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
-                return;
+                //Le cast est nécessaire pour parse
+                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonScripts);
+                JsonMapper.MapAllBaseObjects(parsedObject);
+
+                if (umlDiagramWindow == null)
+                {
+                    Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+                    return;
+                }
+                SaveDataToCurrentUML();
+                umlDiagramWindow.OnLoadingUML(false);
+                umlDiagramWindow.ReloadDiagram(AllBaseObjects);
             }
-            SaveDataToCurrentUML();
-            umlDiagramWindow.OnLoadingUML(false);
-            umlDiagramWindow.ReloadDiagram(AllBaseObjects); 
+            catch (Exception e) 
+            {
+                Debug.LogError($"Wrong JSON format: {ex.Message}");
+                umlDiagramWindow.OnLoadingUML(false);
+            }
         });
     }
     private void GenerateClassesandGOs(string input)
@@ -116,30 +124,38 @@ public class UMLDiag : GenerativeProcess
 
             Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
 
-            //Le cast est nécessaire pour parse
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
-
-            //Mapping vers structure objet maison
-            //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
-            baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
-            gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
-            
-            if (umlDiagramWindow == null)
+            try
             {
-                Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
-                return;
-            }
-            umlDiagramWindow.OnLoadingUML(false);
-            umlDiagramWindow.ReloadDiagram(baseObjects);
-            Debug.Log("finished generating !");
-            SaveDataToCurrentUML();
-            // if (GameObjectCreator.GameObjectNameList != null){
-            //     GameObjectCreator.GameObjectNameList.Clear();
-            // }
+                //Le cast est nécessaire pour parse
+                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonScripts);
 
-            // GameObjectCreator.JsonToDictionary(jsonScripts);
-            // GameObjectCreator.StockEveryGOsInList();
-            // GameObjectCreator.CreateAllGameObjects();
+                //Mapping vers structure objet maison
+                //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+                baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+                gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+
+                if (umlDiagramWindow == null)
+                {
+                    Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+                    return;
+                }
+                umlDiagramWindow.OnLoadingUML(false);
+                umlDiagramWindow.ReloadDiagram(baseObjects);
+                Debug.Log("finished generating !");
+                SaveDataToCurrentUML();
+                // if (GameObjectCreator.GameObjectNameList != null){
+                //     GameObjectCreator.GameObjectNameList.Clear();
+                // }
+
+                // GameObjectCreator.JsonToDictionary(jsonScripts);
+                // GameObjectCreator.StockEveryGOsInList();
+                // GameObjectCreator.CreateAllGameObjects();
+            }
+            catch (Exception e) 
+            {
+                Debug.LogError($"Wrong JSON format: {ex.Message}");
+                umlDiagramWindow.OnLoadingUML(false);
+            }
         });
     }
 

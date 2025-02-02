@@ -171,16 +171,25 @@ namespace UMLClassDiag
             {
                 methodsContainer.Add(new Label($"{method.Name}(): {method.ReturnType}"));
             }
-
-            var generateButton = new Button(() => OnGenerateObject(obj)) { text = "Generate" };
-            umlNode.Add(generateButton);
+            
             var collapseButton = umlNode.Q<Button>("collapse-button");
             var collapseContent = umlNode.Q<VisualElement>("uml-diagram-contents");
             collapseButton.clicked +=  () => OnCollapseNode(obj, nodeContainer, collapseContent, collapseButton);
 
+            var optionsButton = umlNode.Q<Button>("options-button");
+            optionsButton.style.backgroundColor = obj.hasBeenGenerated ? new Color(0.53f, 0.88f, 0.5f) : new Color(0.67f, 0.8f, 0.83f);
+            optionsButton.clicked += () => {
+                var existingPopup = nodeContainer.Q<VisualElement>("popup-container");
+                if (existingPopup != null)
+                {
+                    nodeContainer.Remove(existingPopup);
+                }
+                OpenOptionsPopUp(obj, nodeContainer);
+                optionsButton.style.backgroundColor = obj.hasBeenGenerated ? new Color(0.53f, 0.88f, 0.5f) : new Color(0.67f, 0.8f, 0.83f);
+            };
+
             nodeContainer.Add(umlNode);
 
-            // Add selection functionnality to node
             nodeContainer.RegisterCallback<MouseUpEvent>(evt =>
             {
                 if (!isDragging) {
@@ -553,7 +562,39 @@ namespace UMLClassDiag
 
         }
 
-        
+        private void OpenOptionsPopUp(BaseObject obj, VisualElement node)
+        {
+            var popupContainer = new VisualElement();
+            popupContainer.AddToClassList("popup-container");
+
+            var label = new Label("Status :");
+            label.AddToClassList("popup-text");
+            popupContainer.Add(label);
+
+            var isGeneratedText = new Label("NOT GENERATED");
+            isGeneratedText.AddToClassList("popup-text");
+            isGeneratedText.style.left = 50;
+            if (obj.hasBeenGenerated)
+            {
+                isGeneratedText.text = "GENERATED";
+            }
+            popupContainer.Add(isGeneratedText);
+
+            var generateButton = new Button(() =>
+                {
+                    node.Remove(popupContainer);
+                    OnGenerateObject(obj);
+                }) { text = "Generate" };
+            generateButton.AddToClassList("generate-button");
+            popupContainer.Add(generateButton);
+
+            var closeButton = new Button(() => node.Remove(popupContainer)) { text = "X" };
+            closeButton.AddToClassList("close-button");
+            popupContainer.Add(closeButton);
+
+            node.Add(popupContainer);
+        }
+
         /// 
         /// BASE OBJECT SELECTION
         /// 
