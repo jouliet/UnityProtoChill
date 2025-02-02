@@ -25,7 +25,6 @@ public class LevelDesignCreator : GenerativeProcess
     AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignStructureJsonPath).text + "\n";
     private static string additionalPrompt = 
     "Create multiple platformers with enemies on it. The player must have difficulties to arrive to an end. Jump must necessary to arrive at the end of the level. \n";
-
     private static string jsonLD;
     public static void GenerateLevelDesign(){
         if (File.Exists(UMLFilePath)){
@@ -57,7 +56,7 @@ public class LevelDesignCreator : GenerativeProcess
             foreach (Dictionary<string, object> GODict in LD_GO_List)
             {
                 string prefabName = GODict["prefab_name"].ToString();
-                string prefabPath = "Assets/Prefabs/" + prefabName + ".prefab";
+                string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                 if (prefab == null){
                     throw new Exception("Prefab non trouvée: " + prefabPath);
