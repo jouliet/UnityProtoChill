@@ -1,0 +1,42 @@
+{
+    "levelName": "Level_1",
+    "gameObjects": [
+      {
+        "name": "GameObject_1",
+        "prefab_name": "GameObject",
+        "transform": {
+          "position": ["0", "1", "0"],
+          "rotation": ["0", "0", "0"],
+          "scale": ["1", "1", "1"]
+        }
+      },
+      {
+        "name": "GameObject_2",
+        "prefab_name": "GameObject",
+        "transform": {
+          "position": ["5", "0", "10"],
+          "rotation": ["0", "180", "0"],
+          "scale": ["1", "1", "1"]
+        }
+      },
+      {
+        "name": "GameObject_3",
+        "prefab_name": "GameObject",
+        "transform": {
+          "position": ["-3", "0", "7"],
+          "rotation": ["0", "90", "0"],
+          "scale": ["2", "2", "2"]
+        }
+      },
+      {
+        "name": "GameObject_4",
+        "prefab_name": "GameObject",
+        "transform": {
+          "position": ["10", "0", "5"],
+          "rotation": ["0", "0", "0"],
+          "scale": ["1", "1", "1"]
+        }
+      }
+    ]
+  }
+  

@@ -9,6 +9,7 @@ using static JsonParser;
 using ChatGPTWrapper;
 using UnityPusher;
 using ChatClass;
+using Codice.Client.BaseCommands.Download;
 
 public class DataStructureTests
 {
@@ -227,14 +228,12 @@ public class NewUMLJsonStructTest{
     }
 }
 
-public class ChatWindowTest{
+public class LevelDesignTests{
     [Test]
-    public void MessagesToJsonTest(){
-
-    }
-
-    public void JsonToMessagesTest(){
-
+    public void PushThePrefabs(){
+        var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/LevelDesignStructure.json");
+        Dictionary<string, object> LDDict = (Dictionary<string, object>)Parse(jsonFile.text);
+        LevelDesignCreator.PushGOsOnScene(LDDict);
     }
 }
 

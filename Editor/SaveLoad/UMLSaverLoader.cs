@@ -11,7 +11,7 @@ using static ObjectResearch;
 using ChatClass;
 public static class SaverLoader
 {
-    private static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
+    public static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
     public static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
 
     public static void SaveUML(string input)
@@ -64,16 +64,17 @@ public static class SaverLoader
         {
             Debug.LogError("Error loading UML: " + ex.Message);
         }
-        
     }
 
     public static void RemoveJsonFiles(){
         try{
-            if (File.Exists(UMLFilePath))
+            // Récupère tous les fichiers du dossier
+            string[] assetPaths = Directory.GetFiles(generatedContentFolder, "*", SearchOption.AllDirectories);
+            
+            foreach (string assetPath in assetPaths)
             {
-                AssetDatabase.DeleteAsset(UMLFilePath);
-            }else if (File.Exists(ChatWindow.DialoguePath)){
-                AssetDatabase.DeleteAsset(ChatWindow.DialoguePath); 
+                // Supprime chaque asset dans le dossier
+                AssetDatabase.DeleteAsset(assetPath);
             }
         }catch(Exception ex){
             Debug.Log("Failed to delete json files: " + ex);
