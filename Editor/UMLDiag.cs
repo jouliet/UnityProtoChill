@@ -102,7 +102,7 @@ public class UMLDiag : GenerativeProcess
             }
             catch (Exception e) 
             {
-                Debug.LogError($"Wrong JSON format: {ex.Message}");
+                Debug.LogError($"Wrong JSON format: {e.Message}");
                 umlDiagramWindow.OnLoadingUML(false);
             }
         });
@@ -153,7 +153,7 @@ public class UMLDiag : GenerativeProcess
             }
             catch (Exception e) 
             {
-                Debug.LogError($"Wrong JSON format: {ex.Message}");
+                Debug.LogError($"Wrong JSON format: {e.Message}");
                 umlDiagramWindow.OnLoadingUML(false);
             }
         });
