@@ -122,7 +122,6 @@ namespace ChatGPTWrapper
                 return;
             }
 
-            text += ".  Use json and user markers : ```user ... ``` to explain simply what is your games and how can it evolve and ```json ... ``` for formatted content. Include only one of each, your answer should have 1 user summary and 1 json content only";
 
             _chatGPTConversation.SendToChatGPT(text, (response) =>
             {

@@ -286,14 +286,14 @@ public class BaseObject
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
     private void GenerateScriptbis()
     {
-        string ComposedClassesString = "Here are the attribut and methods of the composed class you may use to interact with others objects : \n";
+        string composedClassesString = ComposedClassesString();
         if (ComposedClasses.Count>0){
             foreach(BaseObject composedClass in this.ComposedClasses){
-                ComposedClassesString += composedClass.ToString();
-                ComposedClassesString += "\n";
+                composedClassesString += composedClass.ToString();
+                composedClassesString += "\n";
             }
-        }else{
-            ComposedClassesString = "";
+        }else {
+            composedClassesString = "";
         }
         
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
