@@ -7,6 +7,7 @@ using SettingsClass;
 using static SaverLoader;
 
 using ChatGPTWrapper;
+using System.Collections.Generic;
 public class UIManager : EditorWindow
 {
     private VisualElement mainContainer;
@@ -19,6 +20,8 @@ public class UIManager : EditorWindow
     private Button settingsButton;
 
     private Button resetButton;
+
+    private Button LDCreatorButton;
 
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
 
@@ -60,7 +63,6 @@ public class UIManager : EditorWindow
         Main.Instance.Init(umlDiagramWindow);
         //Initialise GPTGenerator pour qu'il puisse envoyer des réponses quel que soit la source de l'appel ... On fait le tri après
         GPTGenerator.Instance.uIManager =this;
-       
     }
 
     private void OnDisable()
@@ -83,6 +85,7 @@ public class UIManager : EditorWindow
 
         InitializeGPTButton();
         InitializeResetUMLDataButton();
+        InitializeLDCreatorButton();
 
         rootContainer.Add(settingsContainer);
 
@@ -154,6 +157,12 @@ public class UIManager : EditorWindow
         resetButton.clicked += OnResetButtonClick;
         settingsContainer.Add(resetButton);
     }
+
+    private void InitializeLDCreatorButton(){
+        LDCreatorButton = new Button() { text = "Push LevelDesign" };
+        LDCreatorButton.clicked += OnLDCreatorButtonClick;
+        settingsContainer.Add(LDCreatorButton);
+    }
     private void OnSettingsButtonClick()
     {
         //Debug.Log("Custom OnClick Event: Settings button clicked!");
@@ -161,8 +170,17 @@ public class UIManager : EditorWindow
         SettingsWindow.ShowWindow();
     }
 
-    private void OnResetButtonClick(){
+    private void OnResetButtonClick()
+    {
         RemoveJsonFiles();
+    }
+
+    private void OnLDCreatorButtonClick()
+    {
+        // var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>("Packages/com.jin.protochill/Editor/JsonStructures/LevelDesignStructure.json");
+        // Dictionary<string, object> LDDict = (Dictionary<string, object>)JsonParser.Parse(jsonFile.text);
+        // LevelDesignCreator.PushGOsOnScene(LDDict);
+        LevelDesignCreator.GenerateLevelDesign();
     }
 
     public void SendSelectionStateToChatWindow(bool isSelected, string message)

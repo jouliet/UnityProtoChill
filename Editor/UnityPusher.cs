@@ -20,7 +20,7 @@ namespace UnityPusher
 {
 
 public class GameObjectCreator : GenerativeProcess {
-    public static string prefabPath = "Assets/Prefabs";
+    public static string prefabPath = "Assets/Resources/prefabs/";
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
 
@@ -256,15 +256,15 @@ public class GameObjectCreator : GenerativeProcess {
       
         //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
         //Material DefaultMaterial = Resources.Load<Material>("Packages/com.jin.protochill/Editor/Material/Black.mat"); 
-        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Black.mat");
+        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Black.mat");
 
         DefaultMaterial.SetInt("_Smoothness", 0);
         if (color == "Yellow"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Yellow.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Yellow.mat");
         }else if (color == "Red"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Red.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Red.mat");
         }else if (color == "Green"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Green.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Green.mat");
         }
         
         meshRenderer.material = DefaultMaterial;
@@ -296,7 +296,9 @@ public class GameObjectCreator : GenerativeProcess {
                     {
                         value = Convert.ToSingle(value, CultureInfo.InvariantCulture);
                     }else if (fieldType == typeof(GameObject)){
-                        value = Resources.Load<GameObject>("Prefabs/" + kvp.Value);
+                        string fullPath = GameObjectCreator.prefabPath + kvp.Value + ".prefab"; 
+                        value = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+
                         if (value == null){
                             throw new Exception("Il n'existe pas de prefab " + kvp.Value + "." );
                         }
@@ -306,6 +308,11 @@ public class GameObjectCreator : GenerativeProcess {
                         value = Convert.ChangeType(value, fieldType);
                     }
                     fieldInfo.SetValue(component, value);
+                    if (component != null)
+                    {
+                        
+                        EditorUtility.SetDirty(component);
+                    }
                 }catch( Exception ex){
                     Debug.LogWarning("Exeption for field value : " + kvp.Value + " With asked type: " + fieldInfo.FieldType + "\nException : " +  ex);
                 } 

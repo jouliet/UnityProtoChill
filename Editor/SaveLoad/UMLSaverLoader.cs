@@ -8,9 +8,10 @@ using UnityEngine;
 using UnityEditor;
 using static UMLDiag;
 using static ObjectResearch;
+using ChatClass;
 public static class SaverLoader
 {
-    private static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
+    public static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
     public static string UMLFilePath = Path.Combine(generatedContentFolder, "currentUML.json");
 
     public static void SaveUML(string input)
@@ -63,17 +64,22 @@ public static class SaverLoader
         {
             Debug.LogError("Error loading UML: " + ex.Message);
         }
-        
     }
 
     public static void RemoveJsonFiles(){
         try{
-            if (File.Exists(UMLFilePath))
+            // Récupère tous les fichiers du dossier
+            string[] assetPaths = Directory.GetFiles(generatedContentFolder, "*", SearchOption.AllDirectories);
+            
+            foreach (string assetPath in assetPaths)
             {
-                File.Delete(UMLFilePath);
+                // Supprime chaque asset dans le dossier
+                AssetDatabase.DeleteAsset(assetPath);
             }
         }catch(Exception ex){
             Debug.Log("Failed to delete json files: " + ex);
-        }       
+        }     
+        AssetDatabase.Refresh();
+        UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation(); // Force la recompilation des scripts
     }
 }

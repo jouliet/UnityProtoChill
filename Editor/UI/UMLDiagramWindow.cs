@@ -95,7 +95,8 @@ namespace UMLClassDiag
             // Set up UML canvas
             canvas = root.Q<VisualElement>("canvas");
             canvas.styleSheets.Add(umlStyleSheet);
-            canvas.style.flexGrow = 1;
+            canvas.style.flexGrow = 0;
+            canvas.style.flexShrink = 0;
 
             canvas.schedule.Execute(() =>
             {
@@ -186,6 +187,7 @@ namespace UMLClassDiag
                 }
                 OpenOptionsPopUp(obj, nodeContainer);
                 optionsButton.style.backgroundColor = obj.hasBeenGenerated ? new Color(0.53f, 0.88f, 0.5f) : new Color(0.67f, 0.8f, 0.83f);
+                canvas.MarkDirtyRepaint();
             };
 
             nodeContainer.Add(umlNode);
@@ -387,7 +389,7 @@ namespace UMLClassDiag
             }
 
             float padding = 100f;
-            return new Rect(minX - padding, minY - padding, maxX - minX + 2 * padding, maxY - minY + 3 * padding);
+            return new Rect(minX - padding, minY - padding, maxX - minX + 2 * padding, maxY - minY + 2 * padding);
         }
 
         private void AdjustCanvasSize()
@@ -536,13 +538,16 @@ namespace UMLClassDiag
         /// 
         private void OnRefreshtButtonClick()
         {
-            CleanUp();
             //LoadUML();
             try {
+                if (!File.Exists(UMLFilePath)){
+                    return;
+                }
                 var jsonFile = File.ReadAllText(UMLFilePath);
+                
                 string jsonString = jsonFile;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
-                ObjectResearch.CleanUp();
+                //ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
                 foreach(BaseObject bo in AllBaseObjects){
@@ -601,8 +606,13 @@ namespace UMLClassDiag
         ///
         private void OnSelectNode(bool isSelected, BaseObject baseObject)
         {
-            selectedObject = baseObject;
-            UMLDiag.Instance.selectedObject = selectedObject;
+            if (!isSelected){
+                DeselectObject();
+            }
+            else {
+                selectedObject = baseObject;
+                UMLDiag.Instance.selectedObject = selectedObject;
+            }
             string msg = $"Modifying : {baseObject.Name}";
             uiManager.SendSelectionStateToChatWindow(isSelected, msg);
         }

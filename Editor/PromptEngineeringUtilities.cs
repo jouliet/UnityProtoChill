@@ -15,7 +15,7 @@ public static class PromptEngineeringUtilities
     {
 
 
-     
+        
         string output;
         string currentUml = "nada";
         try {currentUml = File.ReadAllText(UMLFilePath); }
@@ -24,7 +24,8 @@ public static class PromptEngineeringUtilities
         string separationRequest = "The UML in the 'Classes' node describe the scripts and the 'GameObjects' node describes the prefabs and it's components, which are scripts defined in Classes or Unity specific components. Their properties are also described, you may modify values inside the properties ";
         string classesRequest = "For the Classes part: \n" +
         "Composed Classes are the classes used by the class\n" +
-        "Classes with the most composed classes should be at the top of the list.";
+        "Classes with the most composed classes should be at the top of the list.\n" +
+        "Attributes may and should reference gameObjects in the GameObjects Node";
         string goRequests = 
         "For the GameObject part : \n" +
         "Float values format exemple : 10.5 \n" +
@@ -42,9 +43,8 @@ public static class PromptEngineeringUtilities
         }
         else { //Cas d'update
             classesAndGOJsonStructure = currentUml;
-            output = currentUml + "Modify this Json File to achieve this goal : " + inputUser + ". Before answering with the json, answer this question : Do you need to modify the Classes or their properties in the GameObjects Node ? You may comment your operations on the Json to reaffirm this goal";
+            output = currentUml + "Modify this Json File to achieve this goal : " + inputUser + ". Begin by answering this question : Do you need to modify the Classes or their properties in the GameObjects Node ? You may comment your operations on the Json to reaffirm this goal. Now on to Json Generation : ";
         }
-        
         
         
         return (output);
@@ -58,6 +58,8 @@ public static class PromptEngineeringUtilities
     }
 
     public static string UpdateSingleClassPrompt(BaseObject bo, string inputuser){
-        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n");
+        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n" + "Adding a new class means writing a similar structure for it in the Classes list, and being careful to use the same name in ComposedClasses");
     }
+
+    public static string ComposedClassesString(){ return "Here are the attribut and methods of the composed class you may use to interact with others objects : "; }
 }
