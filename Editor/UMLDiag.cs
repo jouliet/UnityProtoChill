@@ -71,11 +71,6 @@ public class UMLDiag : GenerativeProcess
         umlDiagramWindow.OnLoadingUML(true);
     }
 
-    public void OnGenerateScript(BaseObject root){
-        Debug.Log("generating script for" + root.ToString() + "...");
-        GenerateScript(root);
-    }
-
 
     private void GenerateSingleClass(string input, BaseObject bo){
         input = UpdateSingleClassPrompt(bo, input);
@@ -94,8 +89,10 @@ public class UMLDiag : GenerativeProcess
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
+            
+            umlDiagramWindow.OnLoadingUML(false);
+            umlDiagramWindow.ReloadDiagram(AllBaseObjects);
             SaveDataToCurrentUML();
-            umlDiagramWindow.ReloadDiagram(AllBaseObjects); 
         });
     }
     private void GenerateClassesandGOs(string input)

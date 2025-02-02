@@ -85,7 +85,7 @@ public class ObjectResearch
         }
         else
         {
-            //Nothing
+            AllBaseObjects[existingObjectIndex] = obj;
         }
     }
 
