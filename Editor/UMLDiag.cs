@@ -60,6 +60,7 @@ public class UMLDiag : GenerativeProcess
 
     public void OnSubmit(string input)
     {
+        umlDiagramWindow.OnLoadingUML(true);
         if (selectedObject == null){
             Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
             GenerateClassesandGOs(input);
@@ -68,7 +69,7 @@ public class UMLDiag : GenerativeProcess
             Debug.Log("Submit received in UMLDiag, Updating specific Object "+selectedObject.Name+ ". Generating UML..." + input);
             GenerateSingleClass(input,selectedObject);
         }
-        umlDiagramWindow.OnLoadingUML(true);
+        
     }
 
 

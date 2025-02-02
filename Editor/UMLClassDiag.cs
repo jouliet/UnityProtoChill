@@ -65,7 +65,6 @@ public class BaseGameObject
 
         foreach(BaseObject comp in Components){
             comp.DirectAddScriptToGameObject(go);
-            
         }
         
 
@@ -287,14 +286,14 @@ public class BaseObject
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
     private void GenerateScriptbis()
     {
-        string ComposedClassesString = "Here are the attribut and methods of the composed class you may use to interact with others objects : \n";
+        string composedClassesString = ComposedClassesString();
         if (ComposedClasses.Count>0){
             foreach(BaseObject composedClass in this.ComposedClasses){
-                ComposedClassesString += composedClass.ToString();
-                ComposedClassesString += "\n";
+                composedClassesString += composedClass.ToString();
+                composedClassesString += "\n";
             }
-        }else{
-            ComposedClassesString = "";
+        }else {
+            composedClassesString = "";
         }
         
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
@@ -343,7 +342,7 @@ public class BaseObject
                     .GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
                     .FirstOrDefault(t => t.Name == Name);
-                Debug.LogWarning("Not finding component : "+ Name);
+                Debug.LogWarning("Not finding component : "+ Name + " . Did you forget to generate it ? Interact with the graph !");
             }
         else{
             Component newComponent;
@@ -528,7 +527,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                                         //Cas nul (pas de baseobject connu, donc un composant spécifique unity, c'est ici qu'on va générer le baseObject du coup):
                                         if (type != "Transform"){
                                             Debug.Log("Mapping Unity Component  : " +type );
-                                            BaseObject bo = new BaseObject(type);
+                                            BaseObject bo = new BaseObject(type, true);
                                             if (componentDict.ContainsKey("properties") && componentDict["properties"] is Dictionary<string, object> propertiesDict)
                                             {
                                                 bo.Properties = propertiesDict;
@@ -615,8 +614,6 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
             // ca fait une boucle infini.
         };
         baseObject.GameObjectAttachedTo = MapGameObjectAttachedTo(jsonDict, baseObject.Name);
-
-        AllBaseObjects.Add(baseObject);
     
         return baseObject;
     }
