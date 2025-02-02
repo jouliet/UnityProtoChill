@@ -86,12 +86,14 @@ public class UMLDiag : GenerativeProcess
 
             //Le cast est nécessaire pour parse
             Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonScripts);
+            JsonMapper.MapAllBaseObjects(parsedObject);
 
             if (umlDiagramWindow == null)
             {
                 Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
                 return;
             }
+            SaveDataToCurrentUML();
             umlDiagramWindow.ReloadDiagram(AllBaseObjects); 
         });
     }
@@ -154,29 +156,45 @@ public class UMLDiag : GenerativeProcess
       umlDiagramWindow.ReloadDiagram(baseObjects);
     }
 
-    public static void SaveDataToCurrentUML(){
-        
-        string updatedJson = "{ \"Classes\": [";
+    public static void SaveDataToCurrentUML()
+    {
+        string updatedJson = "{\n\t\"Classes\": [\n";
 
         // Ajouter les classes
-        foreach (BaseObject bo in AllBaseObjects){
+        for (int i = 0; i < AllBaseObjects.Count; i++)
+        {
             // Ici, on suppose que bo.ToJson() renvoie une chaîne représentant un objet de classe JSON
-            updatedJson += bo.ToJson() + ",";
+            updatedJson += "\t\t" + AllBaseObjects[i].ToJson();
+
+            // Add a comma after each object except the last one
+            if (i < AllBaseObjects.Count - 1)
+            {
+                updatedJson += ",";
+            }
+
+            updatedJson += "\n";
         }
+
+        updatedJson += "\t],\n\t\"GameObjects\": [\n";
 
         // Ajouter les objets de jeu
-        updatedJson += "], \"GameObjects\": [";
-        foreach (BaseGameObject bgo in AllBaseGameObjects){
+        for (int i = 0; i < AllBaseGameObjects.Count; i++)
+        {
             // Ici aussi, on suppose que bgo.ToJson() renvoie une chaîne représentant un objet de jeu en JSON
-            updatedJson += bgo.ToJson() + ",";
+            updatedJson += "\t\t" + AllBaseGameObjects[i].ToJson();
+
+            // Add a comma after each object except the last one
+            if (i < AllBaseGameObjects.Count - 1)
+            {
+                updatedJson += ",";
+            }
+
+            updatedJson += "\n";
         }
 
-        // Si des classes ou objets de jeu ont été ajoutés, on enlève la dernière virgule
-        if (AllBaseObjects.Count > 0) {
-            updatedJson = updatedJson.TrimEnd(',');
-        }
-        updatedJson += "]}";
+        updatedJson += "\t]\n}";
 
+        // Save the formatted JSON
         SaveUML(updatedJson);
     }
 }

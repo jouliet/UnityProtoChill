@@ -58,6 +58,6 @@ public static class PromptEngineeringUtilities
     }
 
     public static string UpdateSingleClassPrompt(BaseObject bo, string inputuser){
-        return inputuser;
+        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n");
     }
 }

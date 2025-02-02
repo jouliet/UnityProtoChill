@@ -125,10 +125,12 @@ namespace UMLClassDiag
 
             foreach (var baseObject in AllBaseObjects)
             {
-                if (!drawnNodes.Contains(baseObject))
-                {
-                    DrawNode(baseObject, currentX, currentY);
-                    currentX += width + offset; // Avancer horizontalement pour le prochain nœud
+                if (!baseObject.isSpecificUnityComponent){
+                    if (!drawnNodes.Contains(baseObject))
+                    {
+                        DrawNode(baseObject, currentX, currentY);
+                        currentX += width + offset; // Avancer horizontalement pour le prochain nœud
+                    }
                 }
             }
 

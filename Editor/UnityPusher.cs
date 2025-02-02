@@ -185,8 +185,8 @@ public class GameObjectCreator : GenerativeProcess {
         foreach (var kvp in jsonDict)
         {
             var propertyInfo = componentType.GetProperty(kvp.Key);
-            // try 
-            // {
+             try 
+             {
                 if (propertyInfo == null){
                     throw new Exception("Cette property n'est pas reconnu: " + kvp.Key + " : " + kvp.Value);
                 }
@@ -219,7 +219,7 @@ public class GameObjectCreator : GenerativeProcess {
                         UnityEngine.Vector3 vector3 = new UnityEngine.Vector3(vector3List[0], vector3List[1], vector3List[2]);
                         propertyInfo.SetValue(component, vector3);
                     }
-                    else
+                    else 
                     {
                         value = Convert.ChangeType(value, propertyType);
                         propertyInfo.SetValue(component, value);
@@ -229,9 +229,9 @@ public class GameObjectCreator : GenerativeProcess {
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
-            // }catch (Exception ex){
-            //         Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
-            // }
+             }catch (Exception ex){
+                     Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+            }
             
         }
     }
@@ -251,7 +251,7 @@ public class GameObjectCreator : GenerativeProcess {
     }
 
 
-    public static void SetMeshRendererFromString(MeshRenderer meshRenderer, string color)
+    public static void SetMeshRendererFromString(MeshRenderer meshRenderer, string color) 
     {
       
         //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");

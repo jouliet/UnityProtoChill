@@ -23,15 +23,21 @@ public class BaseGameObject
     public string Name;
     public string Tag = "Untagged";
     public string Layer = "Default";
-    public List<BaseObject> Components = new List<BaseObject>();
+    public List<BaseObject> Components = new List<BaseObject>(); 
 
     public BaseGameObject(){
         ObjectResearch.AddBGO(this);
     }
     public string ToJson()
     {
-        var componentsJson = string.Join(", ", Components.Select(c => c.ToJsonGOSpecific()));
-        return $"{{\"name\": \"{Name}\", \"tag\": \"{Tag}\", \"layer\": \"{Layer}\", \"components\": [{componentsJson}]}}";
+        var componentsJson = string.Join(",\n\t\t", Components.Select(c => c.ToJsonGOSpecific()));
+
+        return $"{{\n" +
+            $"\t\"name\": \"{Name}\",\n" +
+            $"\t\"tag\": \"{Tag}\",\n" +
+            $"\t\"layer\": \"{Layer}\",\n" +
+            $"\t\"components\": [\n\t\t{componentsJson}\n\t]\n" +
+            $"}}";
     }
 
     public override bool Equals(object obj)
@@ -58,10 +64,8 @@ public class BaseGameObject
 
 
         foreach(BaseObject comp in Components){
-
-            if (comp.Name != "Transform"){
-                comp.DirectAddScriptToGameObject(go);
-            }
+            comp.DirectAddScriptToGameObject(go);
+            
         }
         
 
@@ -95,9 +99,12 @@ public class Attribute
     }
 
     public string ToJson()
-        {
-            return $"{{\"Name\": \"{Name}\", \"Type\": \"{Type}\"}}";
-        }
+    {
+        return $"{{\n" +
+            $"\t\"Name\": \"{Name}\",\n" +
+            $"\t\"Type\": \"{Type}\"\n" +
+            $"}}";
+    }
 }
 
 public class Method
@@ -112,10 +119,15 @@ public class Method
         return $"Method Name: {Name}, Return Type: {ReturnType ?? "None"}, Parameters: [{parametersStr}]";
     }
 
-public string ToJson()
+    public string ToJson()
     {
-        var parametersJson = string.Join(", ", Parameters.Select(p => p.ToJson()));
-        return $"{{\"Name\": \"{Name}\", \"ReturnType\": \"{ReturnType}\", \"Parameters\": [{parametersJson}]}}";
+        var parametersJson = string.Join(",\n\t\t", Parameters.Select(p => p.ToJson()));
+
+        return $"{{\n" +
+            $"\t\"Name\": \"{Name}\",\n" +
+            $"\t\"ReturnType\": \"{ReturnType}\",\n" +
+            $"\t\"Parameters\": [\n\t\t{parametersJson}\n\t]\n" +
+            $"}}";
     }
 }
  
@@ -123,10 +135,12 @@ public string ToJson()
 public class BaseObject
 {
     // On constitue la liste localement
-    public BaseObject(string Name){
+    public BaseObject(string Name, bool isReal = false){
         this.Name = Name;
-        ObjectResearch.Add(this);
-
+        this.isReal = isReal;
+        if (!isReal){
+            ObjectResearch.Add(this);
+        }
         scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
 
         if (scriptType != null) {
@@ -153,21 +167,43 @@ public class BaseObject
 
     public string ToJson()
     {
-        var attributesJson = string.Join(", ", Attributes.Select(a => a.ToJson()));
-        var methodsJson = string.Join(", ", Methods.Select(m => m.ToJson()));
-        var composedClassesJson = string.Join(", ", ComposedClasses.Select(c => $"\"{c.Name}\""));
-        
-        return $"{{\"Name\": \"{Name}\", \"Attributes\": [{attributesJson}], \"Methods\": [{methodsJson}], \"ComposedClasses\": [{composedClassesJson}], \"ParentClass\": \"{ParentClass}\"}}";
+        if (this.isReal){
+            Debug.Log("très sus");
+        }
+        var attributesJson = Attributes.Any() 
+        ? string.Join(",\n\t\t", Attributes.Select(a => a.ToJson())) 
+        : string.Empty;
+
+        var methodsJson = Methods.Any() 
+            ? string.Join(",\n\t\t", Methods.Select(m => m.ToJson())) 
+            : string.Empty;
+
+        var composedClassesJson = ComposedClasses.Any() 
+            ? string.Join(",\n\t\t", ComposedClasses.Select(c => $"\"{c.Name}\"")) 
+            : string.Empty;
+ 
+        return $"{{\n" +
+            $"\t\"Name\": \"{Name}\",\n" +
+            $"\t\"Attributes\": [{attributesJson}],\n" +
+            $"\t\"Methods\": [{methodsJson}],\n" +
+            $"\t\"ComposedClasses\": [{composedClassesJson}],\n" +
+            $"\t\"ParentClass\": \"{ParentClass}\"\n" +
+            $"}}";
+
     }
 
     public string ToJsonGOSpecific()
     {
-        var propertiesJson = string.Join(", ", Properties.Select(kv => 
+        var propertiesJson = string.Join(",\n\t\t", Properties.Select(kv => 
             kv.Value is System.Collections.IEnumerable && kv.Value is not string
-                ? $"\"{kv.Key}\": [{string.Join(", ", ((IEnumerable<object>)kv.Value).Select(v => $"\"{v}\""))}]"
+                ? $"\"{kv.Key}\": [\n\t\t\t{string.Join(",\n\t\t\t", ((IEnumerable<object>)kv.Value).Select(v => $"\"{v}\""))}\n\t\t]"
                 : $"\"{kv.Key}\": \"{kv.Value}\""
         ));
-        return $"{{\"type\": \"{Name}\", \"properties\": {{ {propertiesJson} }} }}";
+
+        return $"{{\n" +
+            $"\t\"type\": \"{Name}\",\n" +
+            $"\t\"properties\": {{\n\t\t{propertiesJson}\n\t}}\n" +
+            $"}}";
     }
 
     ~BaseObject(){
@@ -196,7 +232,7 @@ public class BaseObject
     public BaseObject ParentClass { get; set; }
     public List<string> GameObjectAttachedTo { get; set; } = new List<string>();
     public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
-
+    private bool isReal;
     public bool hasBeenGenerated = false;
     public bool isSpecificUnityComponent;
 
@@ -310,22 +346,21 @@ public class BaseObject
                 Debug.LogWarning("Not finding component : "+ Name);
             }
         else{
+            Component newComponent;
+            if (scriptType != typeof(Transform)){
+                    newComponent = newPrefab.AddComponent(scriptType);
+                }else{
+                    newComponent = newPrefab.transform;
 
-            
-            if (this.hasBeenGenerated){
+                }
                 
-
-                Component newComponent = newPrefab.AddComponent(scriptType);
-
-                // Appliquer les propriétés avec la fonction existante
-                if (this.isSpecificUnityComponent){
-                    GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
-                }
-                else{
-                    GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
-                }
+            if (this.isSpecificUnityComponent){
+                GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
             }
-        }
+            else{
+                GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
+            }
+        } 
     }
 
     public void AddScriptToGameObject(string prefabPath)
@@ -461,7 +496,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
             {
                 if (obj is Dictionary<string, object> gameObjectDict)
                 {
-                    
+                    UsefulFunctions.EnsureTagExists(gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged");
                     BaseGameObject baseGameObject = new BaseGameObject
                     {
                         Name = gameObjectDict.ContainsKey("name") ? gameObjectDict["name"].ToString() : "Unknown",
@@ -478,7 +513,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                             {
                                 if (componentDict.ContainsKey("type") && componentDict["type"] is string type)
                                 {
-                                    BaseObject baseObject = ObjectResearch.FindBaseObjectByName(type);
+                                    BaseObject baseObject = new BaseObject(type, true);
                                     
                                     if (baseObject != null){
 

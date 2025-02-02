@@ -75,16 +75,17 @@ public class ObjectResearch
 
     //NO DOUBLONS I SAID
     public static void Add(BaseObject obj){
-    
-        var existingObject = AllBaseObjects.FirstOrDefault(o => o.Equals(obj));
         
-        if (existingObject == null)
+        //AllBaseObjects.Add(obj);
+        var existingObjectIndex = AllBaseObjects.FindIndex(o => o.Equals(obj));
+
+        if (existingObjectIndex == -1)
         {
             AllBaseObjects.Add(obj);
         }
         else
         {
-            // Debug.Log($"objet {obj.Name} doublon grrr");
+            //Nothing
         }
     }
 
