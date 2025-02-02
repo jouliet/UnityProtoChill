@@ -3,6 +3,7 @@
         <ui:VisualElement class="uml-diagram-header">
             <ui:Label name="base-object" class="uml-base-object">ClassName</ui:Label>
             <ui:Button name="collapse-button" class="collapse-button__down"/>
+            <ui:Button name="options-button" class="options-button" text="+"/>
         </ui:VisualElement>
         <ui:VisualElement name="uml-diagram-contents">
             <ui:VisualElement class="uml-section">

@@ -21,7 +21,6 @@ public class UIManager : EditorWindow
     private Button resetButton;
 
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
-    public event System.Action<string> OnMessageToChat;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -95,6 +94,7 @@ public class UIManager : EditorWindow
         // Set up UML Diagram View
         umlContainer = new VisualElement { name = "uml-container" };
         umlContainer.style.flexGrow = 7;
+        umlContainer.style.width = new Length(70, LengthUnit.Percent);
         umlContainer.style.borderRightWidth = 3;
         umlContainer.style.borderRightColor = Color.gray;
         umlContainer.style.overflow = Overflow.Hidden;
@@ -105,7 +105,6 @@ public class UIManager : EditorWindow
         chatContainer = new VisualElement { name = "chat-window" };
         chatContainer.style.flexGrow = 3;
         chatContainer.style.flexDirection = FlexDirection.Column;
-        chatContainer.style.maxWidth = new Length(30, LengthUnit.Percent);
         chatContainer.style.width = new Length(30, LengthUnit.Percent);
         InitializeChatView();
         mainContainer.Add(chatContainer);
@@ -126,6 +125,7 @@ public class UIManager : EditorWindow
         umlDiagramWindow = ScriptableObject.CreateInstance<UMLClassDiag.UMLDiagramWindow>();
         var umlCanvas = umlDiagramWindow.CreateDiagramView(this);
         umlCanvas.style.flexGrow = 1;
+        umlCanvas.style.width = new Length(100, LengthUnit.Percent);
         umlContainer.Add(umlCanvas);
     }
 
@@ -133,6 +133,8 @@ public class UIManager : EditorWindow
     {
         chatWindow = ScriptableObject.CreateInstance<ChatClass.ChatWindow>();
         var chatCanvas = chatWindow.CreateChatView(this);
+        chatCanvas.style.flexGrow = 1;
+        chatCanvas.style.width = new Length(100, LengthUnit.Percent);
         chatContainer.Add(chatCanvas);
     }
 
@@ -163,10 +165,11 @@ public class UIManager : EditorWindow
         RemoveJsonFiles();
     }
 
-    public void SendMessageToChatWindow(string message)
+    public void SendSelectionStateToChatWindow(bool isSelected, string message)
     {
-        OnMessageToChat?.Invoke(message);
+        chatWindow.PushSelectionState(isSelected, message);
     }
+
     public void AddChatResponse(string response){
         chatWindow.AddChatResponse(response);
     }
