@@ -7,7 +7,7 @@ using UnityPusher;
 using UnityEngine;
 using UnityEditor;
 using static UMLDiag;
-
+using static ObjectResearch;
 public static class SaverLoader
 {
     private static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
@@ -25,6 +25,7 @@ public static class SaverLoader
 
             File.WriteAllText(UMLFilePath, input);
             //Debug.Log("UML saved at :" + UMLFilePath);
+            Debug.Log("finished saving UML");
         }
         catch (Exception ex)
         {
@@ -42,16 +43,17 @@ public static class SaverLoader
                 return;
             }
             
-            string jsonString = File.ReadAllText(UMLFilePath);
-            GenerativeProcess.SetJsonScripts(jsonString);
-            Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
-            List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+            // string jsonString = File.ReadAllText(UMLFilePath);
+            // GenerativeProcess.SetJsonScripts(jsonString);
+            // Dictionary<string, object> parsedObject = (Dictionary<string, object>) Parse(jsonString);
+            // List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+            // List<BaseGameObject> gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
             Debug.Log("UML Loaded");
 
             //Reload UI (cas relous...) géré par uml diag
-            if (baseObjects != null)
+            if (AllBaseObjects != null)
             {
-                UMLDiag.Instance.ReloadUI(baseObjects);
+                UMLDiag.Instance.ReloadUI(AllBaseObjects);
             }
             else {
                 Debug.Log("TRES SUS NE PAS IGNORER CE DEBUG");

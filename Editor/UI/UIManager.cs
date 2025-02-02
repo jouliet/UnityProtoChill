@@ -18,6 +18,8 @@ public class UIManager : EditorWindow
     private UMLDiagramWindow umlDiagramWindow;
     private Button settingsButton;
 
+    private Button resetButton;
+
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
     public event System.Action<string> OnMessageToChat;
 
@@ -45,7 +47,7 @@ public class UIManager : EditorWindow
     private void OnGUI()
     {   
         if (ObjectResearch.AllBaseObjects.Count == 0){
-            LoadUML();
+            //LoadUML();
         }
         if (GPTGenerator.Instance._chatGPTConversation == null){
             GPTSettingsManager.LoadGPTSettings(() => {});
@@ -81,7 +83,8 @@ public class UIManager : EditorWindow
         settingsContainer.style.alignItems = Align.Center;
 
         InitializeGPTButton();
-        
+        InitializeResetUMLDataButton();
+
         rootContainer.Add(settingsContainer);
 
         // Set up main content
@@ -143,11 +146,21 @@ public class UIManager : EditorWindow
         settingsButton.clicked += OnSettingsButtonClick;
         settingsContainer.Add(settingsButton);
     }
+
+    private void InitializeResetUMLDataButton(){
+        resetButton = new Button() { text = "Reset" };
+        resetButton.clicked += OnResetButtonClick;
+        settingsContainer.Add(resetButton);
+    }
     private void OnSettingsButtonClick()
     {
         //Debug.Log("Custom OnClick Event: Settings button clicked!");
 
         SettingsWindow.ShowWindow();
+    }
+
+    private void OnResetButtonClick(){
+        RemoveJsonFiles();
     }
 
     public void SendMessageToChatWindow(string message)

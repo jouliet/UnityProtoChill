@@ -6,6 +6,8 @@ using System.IO;
 using static JsonParser;
 using static UIManager;
 using static SaverLoader;
+using static ObjectResearch;
+using System;
 
 namespace UMLClassDiag
 {
@@ -16,7 +18,6 @@ namespace UMLClassDiag
         private VisualTreeAsset umlVisualTree;
         private StyleSheet umlStyleSheet;
 
-        private List<BaseObject> baseObjects = new List<BaseObject>();
         private HashSet<BaseObject> drawnNodes = new HashSet<BaseObject>(); // Suivi des nœuds déjà dessinés
         private Dictionary<BaseObject, VisualElement> nodeElements = new Dictionary<BaseObject, VisualElement>(); // Associe chaque BaseObject à son élément visuel
         private List<Connection> connections = new List<Connection> ();
@@ -39,16 +40,21 @@ namespace UMLClassDiag
 
         public static void ShowDiagram(List<BaseObject> baseObjects){
             var window = GetWindow<UMLDiagramWindow>("UML Diagram");
-            window.baseObjects = baseObjects;
+            //window.baseObjects = baseObjects;
             window.Repaint();
             window.Refresh();
         }
-
+ 
         private void OnGUI()
         {   
             if (ObjectResearch.AllBaseObjects.Count == 0){
-                LoadUML();
+                //LoadUML();
             }
+            else{
+
+                Refresh();
+            }
+
         }
 
         public void ReloadDiagram(List<BaseObject> baseObjects)
@@ -60,7 +66,7 @@ namespace UMLClassDiag
             }
             else
             {
-                this.baseObjects = baseObjects;
+                //this.baseObjects = baseObjects;
                 nodeElements.Clear();
                 DrawNetwork();
             }
@@ -121,7 +127,7 @@ namespace UMLClassDiag
             float currentY = 50f;
             drawnNodes.Clear();
 
-            foreach (var baseObject in baseObjects)
+            foreach (var baseObject in AllBaseObjects)
             {
                 if (!drawnNodes.Contains(baseObject))
                 {
@@ -385,7 +391,7 @@ namespace UMLClassDiag
 
         private void Refresh()
         {
-            if (baseObjects != null)
+            if (AllBaseObjects.Count > 0)
             {
                 DrawNetwork();
             }
@@ -445,6 +451,7 @@ namespace UMLClassDiag
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
                         selectedNode = null;
                         selectedObject = null;
+                        DeselectObject();
                     }
                 }
                 isDragging = false;
@@ -512,23 +519,36 @@ namespace UMLClassDiag
         }
 
         /// 
-        /// CLICK EVENTS
+        /// CLICK EVENTS 
         /// 
         private void OnRefreshtButtonClick()
         {
-            LoadUML();
-            ReloadDiagram(baseObjects);
-            /*var jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath);
-            if (jsonFile != null)
-            {
-                string jsonString = jsonFile.text;
+            CleanUp();
+            //LoadUML();
+            try {
+                var jsonFile = File.ReadAllText(UMLFilePath);
+                string jsonString = jsonFile;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+                List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+                foreach(BaseObject bo in AllBaseObjects){
+                    bo.refreshStateToMatchUnityProjet();
+                }
+
                 GenerativeProcess.SetJsonScripts(jsonString);
-                ReloadDiagram(baseObjects);
-            }*/
+                ReloadDiagram(AllBaseObjects);
+
+
+            }
+            catch (Exception ex) {
+                Debug.LogWarning(ex);
+            }
+
+
+
         }
+
         
         /// 
         /// BASE OBJECT SELECTION
@@ -537,8 +557,13 @@ namespace UMLClassDiag
         private void OnSelectNode(BaseObject baseObject)
         {
             selectedObject = baseObject;
+            UMLDiag.Instance.selectedObject = selectedObject;
             string msg = $"Node {baseObject.Name} selected in UML Diagram.";
             uiManager.SendMessageToChatWindow(msg);
+        }
+
+        private void DeselectObject(){
+            UMLDiag.Instance.selectedObject = null;
         }
 
         public BaseObject GetSelectedBaseObjectFromUML()

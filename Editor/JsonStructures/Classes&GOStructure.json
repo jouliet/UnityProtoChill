@@ -5,13 +5,12 @@
         "Attributes": [
             {
             "Name": "AttributeName1",
-            "Type": "AttributeType1",
-            "DefaultValue": "DefaultValue1"
+            "Type": "AttributeType1"
+
             },
             {
             "Name": "AttributeName2",
-            "Type": "AttributeType2",
-            "DefaultValue": "null"
+            "Type": "AttributeType2"
             }
         ],
         "Methods": [
@@ -21,8 +20,7 @@
             "Parameters": [
                 {
                 "Name": "ParamName1",
-                "Type": "ParamType1",
-                "DefaultValue": "ParamDefaultValue1"
+                "Type": "ParamType1"
                 }
             ]
             },
@@ -40,8 +38,7 @@
         "Attributes": [
             {
             "Name": "AttributeName1",
-            "Type": "AttributeType1",
-            "DefaultValue": "DefaultValue1"
+            "Type": "AttributeType1"
             }
         ],
         "Methods": [

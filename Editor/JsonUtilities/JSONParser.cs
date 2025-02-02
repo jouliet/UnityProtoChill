@@ -4,11 +4,11 @@ using System.Text;
 using UnityEngine;
 using UMLClassDiag;
 
+using System.Text.RegularExpressions;
 
 public static class JsonParser
 {
-    public static List<BaseObject> baseObjects = new List<BaseObject>();
-
+     
     public static object Parse(string json)
     {
         if (string.IsNullOrEmpty(json)){
@@ -52,6 +52,7 @@ public static class JsonParser
             json = json.Substring(jsonStartIndex + jsonMarker.Length).Trim();  // Extract only the JSON part
         }
 
+        json = Regex.Replace(json, @"\s*//.*", ""); 
        
     
         if (json.StartsWith("{"))
@@ -240,6 +241,9 @@ public static string GetScript(string response){
     return response;
 }
 
+public static string Serialize(object jsonobject){
+    return "yes";
+}
 
 }
 

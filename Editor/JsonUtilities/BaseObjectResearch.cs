@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UMLClassDiag;
@@ -21,6 +22,17 @@ public class ObjectResearch
     }
 
     public static List<BaseObject> AllBaseObjects = new List<BaseObject>();
+    public static List<BaseGameObject> AllBaseGameObjects = new List<BaseGameObject>();
+    public static BaseObject FindBaseObjectByName(string name){
+        foreach (var baseObject in AllBaseObjects) {
+        if (baseObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+            return baseObject;
+        }
+    
+    }
+    return null;
+
+    }
     public static BaseObject BaseObjectResearch(BaseObject root, string className)
     {
         string baseObjectName = "";
@@ -44,6 +56,7 @@ public class ObjectResearch
 
     public static void CleanUp(){
         AllBaseObjects = new List<BaseObject>();
+        AllBaseGameObjects = new List<BaseGameObject>();
     }
 
     public static List<BaseObject> BaseObjectList(BaseObject root){
@@ -71,7 +84,20 @@ public class ObjectResearch
         }
         else
         {
-            Debug.Log($"objet {obj.Name} doublon grrr");
+            // Debug.Log($"objet {obj.Name} doublon grrr");
+        }
+    }
+
+    public static void AddBGO(BaseGameObject bgo){
+        var existingObject = AllBaseGameObjects.FirstOrDefault(o => o.Equals(bgo));
+        
+        if (existingObject == null)
+        {
+            AllBaseGameObjects.Add(bgo);
+        }
+        else
+        {
+            // Debug.Log($"objet {bgo} doublon grrr");
         }
     }
 }

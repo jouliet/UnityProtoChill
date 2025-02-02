@@ -24,9 +24,9 @@ namespace ChatClass
         private string userInput = "";
         private Button submitButton;
 
-        private ScrollView chatContainer;
+        private ScrollView chatContainer; 
         private static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
-        private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
+        //private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
 
 
@@ -59,7 +59,7 @@ namespace ChatClass
             if (!string.IsNullOrWhiteSpace(userInput))
             {
                 // Actuellement le seul abonn� est l'instance de UMLDiag de main.
-                OnSubmitText?.Invoke("Make a UML and a GameObject List for the system :" + userInput);
+                OnSubmitText?.Invoke(userInput);
 
                 AddUserMessage(userInput);
                 

@@ -19,7 +19,7 @@ using System.Numerics;
 namespace UnityPusher
 {
 
-public class GameObjectCreator : GenerativeProcess{
+public class GameObjectCreator : GenerativeProcess {
     public static string prefabPath = "Assets/Prefabs";
     public static List<string> GameObjectNameList;
     private static Dictionary<string, object> jsonDictGOs;
@@ -131,7 +131,12 @@ public class GameObjectCreator : GenerativeProcess{
 
         foreach (object _component in components)
         {
-            if (_component is Dictionary<string, object> componentDict)
+            AddComponentToGO(_component, go);
+        }
+    }
+
+    public static void AddComponentToGO(object _component, GameObject go){
+        if (_component is Dictionary<string, object> componentDict)
             {
                 string type = componentDict.ContainsKey("type") ? componentDict["type"].ToString() : string.Empty;
 
@@ -174,16 +179,14 @@ public class GameObjectCreator : GenerativeProcess{
                     Debug.LogWarning($"Composant non reconnu : {type}");
                 }
             }
-        }
     }
-
 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)
         {
             var propertyInfo = componentType.GetProperty(kvp.Key);
-            try 
-            {
+            // try 
+            // {
                 if (propertyInfo == null){
                     throw new Exception("Cette property n'est pas reconnu: " + kvp.Key + " : " + kvp.Value);
                 }
@@ -226,9 +229,9 @@ public class GameObjectCreator : GenerativeProcess{
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
-            }catch (Exception ex){
-                    Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
-            }
+            // }catch (Exception ex){
+            //         Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+            // }
             
         }
     }

@@ -12,3 +12,6 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Ignore generated content in the Editor folder
+Editor/GeneratedContent/
