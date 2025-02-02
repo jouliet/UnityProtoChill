@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:VisualElement name="root" style="flex-grow: 1">
-        <ui:VisualElement name="canvas">
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:VisualElement name="canvas"  style="border-color: white; border-width: 2px;">
             <!-- UML Diagram is dynamically addes here -->
         </ui:VisualElement>
 

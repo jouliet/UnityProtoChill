@@ -378,7 +378,7 @@ namespace UMLClassDiag
             }
 
             float padding = 100f;
-            return new Rect(minX - padding, minY - padding, maxX - minX + 2 * padding, maxY - minY + 2 * padding);
+            return new Rect(minX - padding, minY - padding, maxX - minX + 2 * padding, maxY - minY + 3 * padding);
         }
 
         private void AdjustCanvasSize()
@@ -640,8 +640,6 @@ namespace UMLClassDiag
 
         public void OnLoadingUML(bool state)
         {
-            canvas.Clear();
-
             if (loadingImage == null)
             {
                 Debug.LogError("loadingImage is null. Ensure LoadImages() is called.");
@@ -650,6 +648,7 @@ namespace UMLClassDiag
 
             if (state)
             {
+                canvas.Clear();
                 var loadingText = new Label("GENERATING UML...");
                 loadingText.style.top = 0f;
                 loadingText.style.left = 0f;
