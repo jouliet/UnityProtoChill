@@ -161,7 +161,8 @@ public class UIManager : EditorWindow
         SettingsWindow.ShowWindow();
     }
 
-    private void OnResetButtonClick(){
+    private void OnResetButtonClick()
+    {
         RemoveJsonFiles();
     }
 
