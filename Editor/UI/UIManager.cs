@@ -21,7 +21,6 @@ public class UIManager : EditorWindow
     private Button resetButton;
 
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
-    public event System.Action<string> OnMessageToChat;
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -166,10 +165,11 @@ public class UIManager : EditorWindow
         RemoveJsonFiles();
     }
 
-    public void SendMessageToChatWindow(string message)
+    public void SendSelectionStateToChatWindow(bool isSelected, string message)
     {
-        OnMessageToChat?.Invoke(message);
+        chatWindow.PushSelectionState(isSelected, message);
     }
+
     public void AddChatResponse(string response){
         chatWindow.AddChatResponse(response);
     }

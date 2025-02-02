@@ -96,12 +96,22 @@
     position: absolute;
     bottom: 0px;
     right: 0px;
-    color: black;
+    color: #40563f;
     background-color: #88e181;
     height: 10%;
     width: 20%;
+    border-color: #40563f;
 }
 
+.chat-submit-button:hover {
+    background-color: #39cf32;
+}
+
+.chat-submit-button:active {
+    background-color: #0efb03;
+}
+
+/* Style for the delete button */
 .delete-button{
     position: absolute;
     margin: 1px;
@@ -109,4 +119,31 @@
     right: 3px;
     height: 15px;
     width: 10px;
+    background-color: transparent;
+}
+
+.delete-button:hover{
+    background-color: #ff9494;
+}
+
+.delete-button:active{
+    background-color: #f50e0e;
+}
+
+.selection-state {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    background-color: #f8f591;
+    height: 8%;
+    width: 77%;
+    margin: 1px;
+    border-radius: 12px;
+}
+
+.selection-state-text {
+    font-size: 10px;
+    color: black;
+    left: 10px;
+    padding: 3px;
 }

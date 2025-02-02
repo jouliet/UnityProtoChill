@@ -24,7 +24,10 @@ namespace ChatClass
         private string userInput = "";
         private Button submitButton;
 
-        private ScrollView chatContainer; 
+        private ScrollView chatContainer;
+        private VisualElement stateContainer;
+        private Label stateText;
+
         private static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
         //private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
@@ -45,9 +48,11 @@ namespace ChatClass
             inputField = chatCanvas.Q<TextField>("chat-input-field");
             submitButton = chatCanvas.Q<Button>("chat-submit-button");
             chatContainer = chatCanvas.Q<ScrollView>("chat-messages-container");
+            stateContainer = chatCanvas.Q<VisualElement>("selection-state");
+            stateText = chatCanvas.Q<Label>("selection-state-text");
+            stateContainer.style.display = DisplayStyle.None;
 
             submitButton.clicked += OnSubmitButtonClick;
-            uiManager.OnMessageToChat += PushProtochillMessage;
 
 
             ReloadChat();
@@ -91,28 +96,17 @@ namespace ChatClass
             dialogueMemory.Add(new DialogueMessage { Message = message, TypeMessage = "user" });
         }
 
-        private void PushProtochillMessage(string message)
+        public void PushSelectionState(bool isSelected, string message)
         {
-            VisualElement bubble = new VisualElement();
-            bubble.AddToClassList("chat-protochill-bubble");
-
-            TextField content = new TextField();
-            content.AddToClassList("chat-text");
-            content.multiline = true;
-            content.value = message;
-            content.isReadOnly = true;
-            bubble.Add(content);
-
-            Button deleteButton = new Button();
-            deleteButton.clicked += () => DeleteMessage(message, bubble);
-            deleteButton.AddToClassList("delete-button");
-            bubble.Add(deleteButton);
-
-            chatContainer.Add(bubble);
-            chatContainer.ScrollTo(bubble);
-
-            dialogueMemory.Add(new DialogueMessage { Message = message, TypeMessage = "user" });
-            ConvertToJSON(dialogueMemory);
+            if (isSelected)
+            {
+                stateText.text = message;
+                stateContainer.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                stateContainer.style.display = DisplayStyle.None;
+            }
         }
         
         public void AddChatResponse(string responseText)

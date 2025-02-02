@@ -185,18 +185,20 @@ namespace UMLClassDiag
                     if (selectedObject != null && selectedObject != obj)
                     {
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        OnSelectNode(false, obj);
                     }
                     if (nodeContainer.ClassListContains("uml-diagram__selected"))
                     {
                         nodeContainer.RemoveFromClassList("uml-diagram__selected");
                         selectedNode = null;
                         selectedObject = null;
+                        OnSelectNode(false, obj);
                     }
                     else
                     {
                         nodeContainer.AddToClassList("uml-diagram__selected");
                         selectedNode = nodeContainer;
-                        OnSelectNode(obj);
+                        OnSelectNode(true, obj);
                     }
                 }
                 evt.StopPropagation();
@@ -448,6 +450,7 @@ namespace UMLClassDiag
                     if (selectedNode != null)
                     {
                         selectedNode.RemoveFromClassList("uml-diagram__selected");
+                        OnSelectNode(false, selectedObject);
                         selectedNode = null;
                         selectedObject = null;
                         DeselectObject();
@@ -553,12 +556,12 @@ namespace UMLClassDiag
         /// BASE OBJECT SELECTION
         /// 
         ///
-        private void OnSelectNode(BaseObject baseObject)
+        private void OnSelectNode(bool isSelected, BaseObject baseObject)
         {
             selectedObject = baseObject;
             UMLDiag.Instance.selectedObject = selectedObject;
-            string msg = $"Node {baseObject.Name} selected in UML Diagram.";
-            uiManager.SendMessageToChatWindow(msg);
+            string msg = $"Modifying : {baseObject.Name}";
+            uiManager.SendSelectionStateToChatWindow(isSelected, msg);
         }
 
         private void DeselectObject(){
