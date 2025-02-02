@@ -511,7 +511,11 @@ namespace UMLClassDiag
             CleanUp();
             //LoadUML();
             try {
+                if (!File.Exists(UMLFilePath)){
+                    return;
+                }
                 var jsonFile = File.ReadAllText(UMLFilePath);
+                
                 string jsonString = jsonFile;
                 Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
                 ObjectResearch.CleanUp();

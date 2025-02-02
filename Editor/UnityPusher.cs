@@ -256,15 +256,15 @@ public class GameObjectCreator : GenerativeProcess {
       
         //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
         //Material DefaultMaterial = Resources.Load<Material>("Packages/com.jin.protochill/Editor/Material/Black.mat"); 
-        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Black.mat");
+        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Material/Black.mat");
 
         DefaultMaterial.SetInt("_Smoothness", 0);
         if (color == "Yellow"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Yellow.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Material/Yellow.mat");
         }else if (color == "Red"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Red.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Material/Red.mat");
         }else if (color == "Green"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.jin.protochill/Editor/Resources/Green.mat");
+            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Material/Green.mat");
         }
         
         meshRenderer.material = DefaultMaterial;

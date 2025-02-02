@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEditor;
 using static UMLDiag;
 using static ObjectResearch;
+using ChatClass;
 public static class SaverLoader
 {
     private static string generatedContentFolder = "Packages/com.jin.protochill/Editor/GeneratedContent"; 
@@ -70,10 +71,14 @@ public static class SaverLoader
         try{
             if (File.Exists(UMLFilePath))
             {
-                File.Delete(UMLFilePath);
+                AssetDatabase.DeleteAsset(UMLFilePath);
+            }else if (File.Exists(ChatWindow.DialoguePath)){
+                AssetDatabase.DeleteAsset(ChatWindow.DialoguePath); 
             }
         }catch(Exception ex){
             Debug.Log("Failed to delete json files: " + ex);
-        }       
+        }     
+        AssetDatabase.Refresh();
+  
     }
 }
