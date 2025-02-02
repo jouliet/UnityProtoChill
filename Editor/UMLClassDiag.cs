@@ -162,7 +162,11 @@ public class BaseObject
 
     public string ToJsonGOSpecific()
     {
-        var propertiesJson = string.Join(", ", Properties.Select(kv => $"\"{kv.Key}\": \"{kv.Value}\""));
+        var propertiesJson = string.Join(", ", Properties.Select(kv => 
+            kv.Value is System.Collections.IEnumerable && kv.Value is not string
+                ? $"\"{kv.Key}\": [{string.Join(", ", ((IEnumerable<object>)kv.Value).Select(v => $"\"{v}\""))}]"
+                : $"\"{kv.Key}\": \"{kv.Value}\""
+        ));
         return $"{{\"type\": \"{Name}\", \"properties\": {{ {propertiesJson} }} }}";
     }
 

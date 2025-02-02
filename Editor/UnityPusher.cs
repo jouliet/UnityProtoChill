@@ -185,8 +185,8 @@ public class GameObjectCreator : GenerativeProcess {
         foreach (var kvp in jsonDict)
         {
             var propertyInfo = componentType.GetProperty(kvp.Key);
-            try 
-            {
+            // try 
+            // {
                 if (propertyInfo == null){
                     throw new Exception("Cette property n'est pas reconnu: " + kvp.Key + " : " + kvp.Value);
                 }
@@ -229,9 +229,9 @@ public class GameObjectCreator : GenerativeProcess {
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
-            }catch (Exception ex){
-                    Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
-            }
+            // }catch (Exception ex){
+            //         Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+            // }
             
         }
     }
