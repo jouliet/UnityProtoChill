@@ -63,11 +63,12 @@ public class LevelDesignCreator : GenerativeProcess
         if (!File.Exists(LevelDesignJsonPath)){
             throw new Exception("Cannot modify the level design without the json File!");
         }else{
-            jsonLD = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
+            string jsonLD = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
         }
 
         directivePromptForModification = "You must modify the level described in this json (respecting the format): \n" + AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
         input = directivePromptForModification + formatPrompt + input;
+        DeleteGeneratedGOs();
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonLD = response;
@@ -80,7 +81,7 @@ public class LevelDesignCreator : GenerativeProcess
 
             //Le cast est nécessaire pour parse
             Dictionary<string, object> LDDictionary = (Dictionary<string, object>) Parse(jsonLD);
-            DeleteGeneratedGOs();
+            
             PushGOsOnScene(LDDictionary);
         });
     }
@@ -106,8 +107,8 @@ public class LevelDesignCreator : GenerativeProcess
                 go.transform.localScale = scale;
                 go.transform.eulerAngles = rotation;
 
-                if (GODict.ContainsKey("Camera") && GODict["Camera"] is Dictionary<string, object> cameraPosition){
-                    Vector3 cameraPos = ParseVector3((List<object>)LD_GOtransform["position"]);
+                if (GODict.ContainsKey("Camera") && GODict["Camera"] is Dictionary<string, object> camera){
+                    Vector3 cameraPos = ParseVector3((List<object>)camera["position"]);
                     // Get the camera on the scene or create it.
                     Camera cam = Camera.main;
                     if (cam == null) // No Main Camera found
@@ -122,6 +123,8 @@ public class LevelDesignCreator : GenerativeProcess
                         }
                     }
                     cam.transform.SetParent(go.transform);
+                    Debug.Log(cameraPos);
+                    cam.transform.position = cameraPos;
                 }
                 gosOnScene.Add(go);
             }
