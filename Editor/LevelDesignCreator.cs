@@ -134,8 +134,23 @@ public class LevelDesignCreator : GenerativeProcess
     public static GameObject goPushToScene(Dictionary<string, object> GODict){
             string prefabName = GODict["prefab_name"].ToString();
             GameObject prefab = null;
+            Dictionary<string, object> LD_GOtransform = (Dictionary<string, object>)GODict["transform"];
             if (prefabName == "Camera"){
-                return null;
+                Camera cam = Camera.main;
+                if (cam == null) // No Main Camera found
+                {
+                    cam = UnityEngine.Object.FindFirstObjectByType<Camera>(); // Try to find any camera
+
+                    if (cam == null) // No camera at all, create a new one
+                    {
+                        GameObject camObject = new GameObject("Main Camera");
+                        cam = camObject.AddComponent<Camera>();
+                        cam.tag = "MainCamera"; // Set it as the Main Camera
+                    }
+                }
+                Vector3 positionCam = ParseVector3((List<object>)LD_GOtransform["position"]);
+                cam.gameObject.transform.position = positionCam;
+                return cam.gameObject;
             }else{
                 string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
                 prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -143,7 +158,6 @@ public class LevelDesignCreator : GenerativeProcess
                     throw new Exception("Prefab non trouvée: " + prefabPath);
                 }
             }
-            Dictionary<string, object> LD_GOtransform = (Dictionary<string, object>)GODict["transform"];
             Vector3 position = ParseVector3((List<object>)LD_GOtransform["position"]);
             Vector3 rotation = ParseVector3((List<object>)LD_GOtransform["rotation"]);
             Vector3 scale = ParseVector3((List<object>)LD_GOtransform["scale"]);
