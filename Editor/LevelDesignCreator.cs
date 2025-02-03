@@ -88,10 +88,15 @@ public class LevelDesignCreator : GenerativeProcess
 
     public static GameObject goPushToScene(Dictionary<string, object> GODict){
             string prefabName = GODict["prefab_name"].ToString();
-            string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-            if (prefab == null){
-                throw new Exception("Prefab non trouvée: " + prefabPath);
+            GameObject prefab = null;
+            if (prefabName == "Camera"){
+                return null;
+            }else{
+                string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                if (prefab == null){
+                    throw new Exception("Prefab non trouvée: " + prefabPath);
+                }
             }
             Dictionary<string, object> LD_GOtransform = (Dictionary<string, object>)GODict["transform"];
             Vector3 position = ParseVector3((List<object>)LD_GOtransform["position"]);
