@@ -6,3 +6,6 @@ Protochill is a Unity package that allows for rapid prototyping using ChatGPT.
 2. Add the [ChatGPT-Wrapper-For-Unity](https://github.com/GraesonB/ChatGPT-Wrapper-For-Unity) from GIT URL.
 3. Add the [ProtoChill Package](https://github.com/jouliet/UnityProtoChill) from GIT URL.
 4. Go to **Window > ProtoChill** to start using the tool.
+
+I you don't git, you need to install it to import the packages:
+https://git-scm.com/downloads/win
