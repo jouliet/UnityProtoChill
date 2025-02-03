@@ -13,7 +13,7 @@ using System.Globalization;
 using System.Security.Permissions;
 using UnityEngine.UI;
 using System.Numerics;
-
+using UnityEngine.Rendering;
 
 
 namespace UnityPusher
@@ -267,10 +267,25 @@ public class GameObjectCreator : GenerativeProcess {
         {
             Debug.LogWarning($"Material '{color}' not found at {materialPath}. Creating a new one...");
             
-            Shader shader = Shader.Find("Standard");
+            // Vérification du nom de la render pipeline dans QualitySettings
+            string shaderName = "Standard"; // Valeur par défaut
+            if (QualitySettings.renderPipeline != null)
+            {
+                string pipelineName = QualitySettings.renderPipeline.name;
+                if (pipelineName.Contains("Universal"))
+                {
+                    shaderName = "Universal Render Pipeline/Lit"; // Shader URP
+                }
+                else if (pipelineName.Contains("HDRP"))
+                {
+                    shaderName = "HDRP/Lit"; // Shader HDRP
+                }
+            }
+
+            Shader shader = Shader.Find(shaderName);
             if (shader == null)
             {
-                Debug.LogError("Standard shader not found! Cannot create material.");
+                Debug.LogError($"{shaderName} shader not found! Cannot create material.");
                 return;
             }
 
@@ -299,6 +314,7 @@ public class GameObjectCreator : GenerativeProcess {
 
             // Sauvegarde du matériau
             AssetDatabase.CreateAsset(material, materialPath);
+            EditorUtility.SetDirty(material);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
