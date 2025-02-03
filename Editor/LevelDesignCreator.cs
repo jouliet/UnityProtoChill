@@ -31,7 +31,7 @@ public class LevelDesignCreator : GenerativeProcess
     public static List<GameObject> gosOnScene = new List<GameObject>();
     public static void GenerateLevelDesign(string input){
         if (File.Exists(UMLFilePath)){
-            jsonClassesAndGos = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath).text;
+            jsonClassesAndGos = File.ReadAllText(UMLFilePath);
         }else{
             throw new Exception("Cannot push GameObjects without a the UMLandGOs json.");
         }
