@@ -12,15 +12,21 @@ namespace SettingsClass
         public static event System.Action<bool, string, string, CustomChatGPTConversation.Model, string, float> OnInitializeGPTInformation;
         private bool useProxy;
         private string proxyUri = "";
-        private string apiKey = "";
+        private static string apiKey = "";
         private float temperature;
-        private CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT4;
+        private static CustomChatGPTConversation.Model selectedModel = CustomChatGPTConversation.Model.ChatGPT4;
         private string initialPrompt;
         private Vector2 topScrollPosition;
+        private static GPTSettingsManager.GPTSettings gPTSettings;
 
         public static void ShowWindow()
         {
             GetWindow<SettingsWindow>("GPT Settings");
+            gPTSettings = GPTSettingsManager.LoadGPTSettings(() => {});
+            if (gPTSettings != null){
+                selectedModel = gPTSettings.Model;
+                apiKey = gPTSettings.ApiKey;
+            }
         }
 
         private void OnGUI()
@@ -28,6 +34,8 @@ namespace SettingsClass
             // SECTION INIT
             GUILayout.BeginVertical("box");
             GUILayout.Label("Initialize GPT Settings", EditorStyles.boldLabel);
+
+            
 
             apiKey = EditorGUILayout.PasswordField("API Key", apiKey);
             if (apiKey == ""){
@@ -42,6 +50,8 @@ namespace SettingsClass
                     //Debug.Log($"Variable d'environnement trouvée : {apiKey}");
                 }
             }
+
+            
             selectedModel = (CustomChatGPTConversation.Model)EditorGUILayout.EnumPopup("Model", selectedModel);
 
             // GUILayout.Label("Initial Prompt", EditorStyles.label);

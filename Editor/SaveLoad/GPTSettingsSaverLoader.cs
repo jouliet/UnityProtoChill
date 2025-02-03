@@ -38,18 +38,18 @@ public class GPTSettingsManager
         }
     }
 
-    public static void LoadGPTSettings(Action onSettingsLoaded)
+    public static GPTSettings LoadGPTSettings(Action onSettingsLoaded)
     {
         try
         {
             if (!File.Exists(settingsFilePath))
             {
-                return;
+                return null;
             }
 
             string json = File.ReadAllText(settingsFilePath);
             GPTSettings settings = JsonUtility.FromJson<GPTSettings>(json);
- 
+            //Debug.Log(settings.Model);
             if (settings != null) 
             {
                 GPTGenerator.Instance.InitChatGptConversationAsynchroneFriendly(settings.UseProxy, settings.ProxyUri, settings.ApiKey, settings.Model, settings.InitialPrompt, settings.Temperature, () =>
@@ -68,16 +68,18 @@ public class GPTSettingsManager
             {
                 Debug.LogError("Failed to parse GPT settings.");
             }
+            return settings;
         }
         catch (Exception ex)
         {
             Debug.LogError("Error loading GPT settings: " + ex.Message);
+            return null;
         }
     }
 
 
     [Serializable]
-    private class GPTSettings
+    public class GPTSettings
     {
         public bool UseProxy;
         public string ProxyUri;
