@@ -21,7 +21,7 @@ public class LevelDesignWindow : EditorWindow
         GUILayout.Label("Describe the level", EditorStyles.boldLabel);
         GUIStyle textAreaStyle = new GUIStyle(EditorStyles.textArea);
         textAreaStyle.wordWrap = true;
-        levelDescription = EditorGUILayout.TextArea("I want a platformer leveldesign that obliges me to jump to get to the end of the level.", textAreaStyle, GUILayout.Height(50), GUILayout.ExpandHeight(true));
+        levelDescription = EditorGUILayout.TextArea(levelDescription, textAreaStyle, GUILayout.Height(50), GUILayout.ExpandHeight(true));
         
         GUILayout.Space(15);
 
