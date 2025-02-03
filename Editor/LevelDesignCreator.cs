@@ -107,7 +107,7 @@ public class LevelDesignCreator : GenerativeProcess
         if (!File.Exists(LevelDesignJsonPath)){
             throw new Exception("Cannot modify the level design without the json File!");
         }else{
-            string jsonLD = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
+            string jsonLD = File.ReadAllText(LevelDesignJsonPath);
         }
 
         directivePromptForModification = "You must modify the level described in this json (respecting the format): \n" + AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
