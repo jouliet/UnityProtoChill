@@ -273,7 +273,7 @@ public class GameObjectCreator : GenerativeProcess {
             if (QualitySettings.renderPipeline != null)
             {
                 pipelineName = QualitySettings.renderPipeline.name;
-                if (pipelineName.Contains("Universal"))
+                if (pipelineName.Contains("PC_RPAsset"))
                 {
                     shaderName = "Unlit/Color"; // Shader URP
                 }
