@@ -269,19 +269,23 @@ public class GameObjectCreator : GenerativeProcess {
             
             // Vérification du nom de la render pipeline dans QualitySettings
             string shaderName = "Standard"; // Valeur par défaut
+            string pipelineName = "Default";
             if (QualitySettings.renderPipeline != null)
             {
-                string pipelineName = QualitySettings.renderPipeline.name;
+                pipelineName = QualitySettings.renderPipeline.name;
                 if (pipelineName.Contains("Universal"))
                 {
-                    shaderName = "Universal Render Pipeline/Lit"; // Shader URP
+                    shaderName = "Unlit/Color"; // Shader URP
                 }
                 else if (pipelineName.Contains("HDRP"))
                 {
                     shaderName = "HDRP/Lit"; // Shader HDRP
+                    Debug.LogWarning("Not sure the pipeline : " + pipelineName + "works, it hasnt been tested yet. Consider changing your rendering pipeline");
                 }
             }
 
+            Debug.Log(shaderName);
+            Debug.Log(pipelineName);
             Shader shader = Shader.Find(shaderName);
             if (shader == null)
             {
