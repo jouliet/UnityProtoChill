@@ -342,7 +342,7 @@ public class BaseObject
                     .GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
                     .FirstOrDefault(t => t.Name == Name);
-                Debug.LogWarning("Not finding component : "+ Name + " . Did you forget to generate it ? Interact with the graph !");
+                    //Debug.LogWarning("Not finding component : "+ Name + " . Did you forget to generate it ? Interact with the graph !");
             }
         else{
             Component newComponent;
