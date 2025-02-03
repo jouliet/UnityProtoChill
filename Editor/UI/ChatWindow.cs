@@ -33,7 +33,6 @@ namespace ChatClass
         public static string DialoguePath = Path.Combine(DialoguePathFolder, "Dialogue.json");
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
 
-
         public VisualElement CreateChatView(UIManager manager)
         {
             uiManager = manager;
@@ -157,7 +156,11 @@ namespace ChatClass
                 }
             }
             jsonBuilder.Append("]\n}");
-            File.WriteAllText(DialoguePath, jsonBuilder.ToString());
+            if (!Directory.Exists(DialoguePathFolder)){
+                Directory.CreateDirectory(DialoguePathFolder);
+            }else{
+                File.WriteAllText(DialoguePath, jsonBuilder.ToString());
+            }
         }
 
         public void ReloadChat(){
