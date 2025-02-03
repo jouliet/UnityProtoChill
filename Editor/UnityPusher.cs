@@ -180,13 +180,12 @@ public class GameObjectCreator : GenerativeProcess {
                 }
             }
     }
-
+ 
     public static void AddPropertiesToComponent(Dictionary<string, object> jsonDict, Component component, Type componentType){
         foreach (var kvp in jsonDict)
         {
             var propertyInfo = componentType.GetProperty(kvp.Key);
-             try 
-             {
+            try {
                 if (propertyInfo == null){
                     throw new Exception("Cette property n'est pas reconnu: " + kvp.Key + " : " + kvp.Value);
                 }
@@ -229,8 +228,9 @@ public class GameObjectCreator : GenerativeProcess {
                 }else{
                     Debug.LogWarning($"Property déjà définit ou non éditable : {kvp.Key}");
                 }
-             }catch (Exception ex){
-                     Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
+            }
+            catch(Exception ex) {
+                Debug.LogWarning("Exeption for property value : " + kvp.Value  + "\n Exception : " + ex);
             }
             
         }
@@ -251,24 +251,60 @@ public class GameObjectCreator : GenerativeProcess {
     }
 
 
-    public static void SetMeshRendererFromString(MeshRenderer meshRenderer, string color) 
+    public static void SetMeshRendererFromString(MeshRenderer meshRenderer, string color)
     {
-      
-        //Material material = Resources.GetBuiltinResource<Material>(materialName + ".mat");
-        //Material DefaultMaterial = Resources.Load<Material>("Packages/com.jin.protochill/Editor/Material/Black.mat"); 
-        Material DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Black.mat");
-
-        DefaultMaterial.SetInt("_Smoothness", 0);
-        if (color == "Yellow"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Yellow.mat");
-        }else if (color == "Red"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Red.mat");
-        }else if (color == "Green"){
-            DefaultMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Green.mat");
+        if (meshRenderer == null)
+        {
+            Debug.LogError("MeshRenderer is null! Make sure the object has a MeshRenderer component.");
+            return;
         }
-        
-        meshRenderer.material = DefaultMaterial;
-       
+
+        string materialPath = $"Assets/Materials/{color}.mat";
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+
+        // Si le matériau n'existe pas, on le crée
+        if (material == null)
+        {
+            Debug.LogWarning($"Material '{color}' not found at {materialPath}. Creating a new one...");
+            
+            Shader shader = Shader.Find("Standard");
+            if (shader == null)
+            {
+                Debug.LogError("Standard shader not found! Cannot create material.");
+                return;
+            }
+
+            material = new Material(shader);
+
+            // Définition de la couleur avec "_Color"
+            Color matColor = Color.black; // Par défaut
+
+            switch (color.ToLower())
+            {
+                case "yellow": matColor = Color.yellow; break;
+                case "red": matColor = Color.red; break;
+                case "green": matColor = Color.green; break;
+                default:
+                    Debug.LogWarning($"Unknown color '{color}', defaulting to black.");
+                    break;
+            }
+
+            material.SetColor("_Color", matColor);
+
+            // Vérifie si le dossier "Assets/Materials" existe, sinon le crée
+            if (!AssetDatabase.IsValidFolder("Assets/Materials"))
+            {
+                AssetDatabase.CreateFolder("Assets", "Materials");
+            }
+
+            // Sauvegarde du matériau
+            AssetDatabase.CreateAsset(material, materialPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        // Assignation du matériau au MeshRenderer
+        meshRenderer.sharedMaterial = material;
     }
 
 
