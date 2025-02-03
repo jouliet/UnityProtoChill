@@ -117,30 +117,8 @@ public class UMLDiag : GenerativeProcess
                 umlDiagramWindow.ReloadDiagram(baseObjects);
                 Debug.Log("finished generating !");
                 SaveDataToCurrentUML();
-                // if (GameObjectCreator.GameObjectNameList != null){
-                //     GameObjectCreator.GameObjectNameList.Clear();
-                // }
-                //Mapping vers structure objet maison
-                //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
-                baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
-                gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
 
-                if (umlDiagramWindow == null)
-                {
-                    Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
-                    return;
-                }
-                umlDiagramWindow.OnLoadingUML(false);
-                umlDiagramWindow.ReloadDiagram(baseObjects);
-                Debug.Log("finished generating !");
-                SaveDataToCurrentUML();
-                // if (GameObjectCreator.GameObjectNameList != null){
-                //     GameObjectCreator.GameObjectNameList.Clear();
-                // }
 
-                // GameObjectCreator.JsonToDictionary(jsonScripts);
-                // GameObjectCreator.StockEveryGOsInList();
-                // GameObjectCreator.CreateAllGameObjects();
             }
             catch (Exception e) 
             {
