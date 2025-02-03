@@ -2,6 +2,18 @@
     "levelName": "Level_1",
     "gameObjects": [
       {
+        "name": "Player",
+        "prefab_name": "Player",
+        "transform": {
+          "position": ["0", "1", "0"],
+          "rotation": ["0", "0", "0"],
+          "scale": ["1", "1", "1"]
+        },
+        "Camera": {
+          "position": ["0", "0", "-10"]
+        }
+      },
+      {
         "name": "GameObject_1",
         "prefab_name": "GameObject",
         "transform": {

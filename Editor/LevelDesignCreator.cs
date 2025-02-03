@@ -19,14 +19,14 @@ public class LevelDesignCreator : GenerativeProcess
     private static string LevelDesignStructureJsonPath = "Packages/com.jin.protochill/Editor/JsonStructures/LevelDesignStructure.json";
     private static string directivePromptForCreation = "You make a json to describe a level with the position, scale and rotation of the game objects. \n" +
     "The game and the game objects are enumerated in the following json. The prefab_name must be equal with a gameObject Name of the following json. \n";
-
-    private static string directivePromptForModification = 
-    "You must modify the level described in this json (respecting the format): \n" +
-    AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
+    private static string directivePromptForModification;
     private static string jsonClassesAndGos;
     private static string formatPrompt = 
     "The json must follow this format: \n" +
-    AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignStructureJsonPath).text + "\n";
+    AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignStructureJsonPath).text + "\n" +
+    "You saw that there is a camera object under the Player object in the json structure. Place it only if you want the Camera to be Child of the Player. \n" +
+    "There can be only one camera per level. \n";
+
     private static string jsonLD;
     private static List<GameObject> gosOnScene = new List<GameObject>();
     public static void GenerateLevelDesign(string input){
@@ -65,6 +65,8 @@ public class LevelDesignCreator : GenerativeProcess
         }else{
             jsonLD = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
         }
+
+        directivePromptForModification = "You must modify the level described in this json (respecting the format): \n" + AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
         input = directivePromptForModification + formatPrompt + input;
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
@@ -82,6 +84,8 @@ public class LevelDesignCreator : GenerativeProcess
             PushGOsOnScene(LDDictionary);
         });
     }
+
+    [Obsolete]
     public static void PushGOsOnScene(Dictionary<string, object> LDDictionary){
         try{
             List<object> LD_GO_List = (List<object>)LDDictionary["gameObjects"];
@@ -101,10 +105,25 @@ public class LevelDesignCreator : GenerativeProcess
                 go.transform.position = position;
                 go.transform.localScale = scale;
                 go.transform.eulerAngles = rotation;
-                gosOnScene.Add(go);
-                //ndo.RegisterCreatedObjectUndo(go, "Instancier " + prefabName);
 
-                //Assert.IsNotNull(go, "Le prefab n'a pas été instancié correctement.");
+                if (GODict.ContainsKey("Camera") && GODict["Camera"] is Dictionary<string, object> cameraPosition){
+                    Vector3 cameraPos = ParseVector3((List<object>)LD_GOtransform["position"]);
+                    // Get the camera on the scene or create it.
+                    Camera cam = Camera.main;
+                    if (cam == null) // No Main Camera found
+                    {
+                        cam = UnityEngine.Object.FindObjectOfType<Camera>(); // Try to find any camera
+
+                        if (cam == null) // No camera at all, create a new one
+                        {
+                            GameObject camObject = new GameObject("Main Camera");
+                            cam = camObject.AddComponent<Camera>();
+                            cam.tag = "MainCamera"; // Set it as the Main Camera
+                        }
+                    }
+                    cam.transform.SetParent(go.transform);
+                }
+                gosOnScene.Add(go);
             }
         }catch(Exception ex){
             Debug.LogError("Error during the mapping of the LevelDesign json:\n" + ex);
