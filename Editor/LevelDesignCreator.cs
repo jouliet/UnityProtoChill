@@ -28,7 +28,7 @@ public class LevelDesignCreator : GenerativeProcess
     "There can be only one camera per level. \n";
 
     private static string jsonLD;
-    private static List<GameObject> gosOnScene = new List<GameObject>();
+    public static List<GameObject> gosOnScene = new List<GameObject>();
     public static void GenerateLevelDesign(string input){
         if (File.Exists(UMLFilePath)){
             jsonClassesAndGos = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath).text;
@@ -86,26 +86,36 @@ public class LevelDesignCreator : GenerativeProcess
         });
     }
 
-    [Obsolete]
+    public static GameObject goPushToScene(Dictionary<string, object> GODict){
+            string prefabName = GODict["prefab_name"].ToString();
+            string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null){
+                throw new Exception("Prefab non trouvée: " + prefabPath);
+            }
+            Dictionary<string, object> LD_GOtransform = (Dictionary<string, object>)GODict["transform"];
+            Vector3 position = ParseVector3((List<object>)LD_GOtransform["position"]);
+            Vector3 rotation = ParseVector3((List<object>)LD_GOtransform["rotation"]);
+            Vector3 scale = ParseVector3((List<object>)LD_GOtransform["scale"]);
+            GameObject go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            go.transform.position = position;
+            go.transform.localScale = scale;
+            go.transform.eulerAngles = rotation;
+            go.name = GODict["name"].ToString();
+            return go;
+    }
+
     public static void PushGOsOnScene(Dictionary<string, object> LDDictionary){
         try{
             List<object> LD_GO_List = (List<object>)LDDictionary["gameObjects"];
             foreach (Dictionary<string, object> GODict in LD_GO_List)
             {
-                string prefabName = GODict["prefab_name"].ToString();
-                string prefabPath = GameObjectCreator.prefabPath + prefabName + ".prefab";
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-                if (prefab == null){
-                    throw new Exception("Prefab non trouvée: " + prefabPath);
+                GameObject go = goPushToScene(GODict);
+                if (go == null)
+                {
+                    Debug.LogWarning("Le GameObject n'a pas pu être créé depuis le dictionnaire.");
+                    continue; // Ignore this iteration and proceed to the next
                 }
-                Dictionary<string, object> LD_GOtransform = (Dictionary<string, object>)GODict["transform"];
-                Vector3 position = ParseVector3((List<object>)LD_GOtransform["position"]);
-                Vector3 rotation = ParseVector3((List<object>)LD_GOtransform["rotation"]);
-                Vector3 scale = ParseVector3((List<object>)LD_GOtransform["scale"]);
-                GameObject go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                go.transform.position = position;
-                go.transform.localScale = scale;
-                go.transform.eulerAngles = rotation;
 
                 if (GODict.ContainsKey("Camera") && GODict["Camera"] is Dictionary<string, object> camera){
                     Vector3 cameraPos = ParseVector3((List<object>)camera["position"]);
@@ -122,22 +132,45 @@ public class LevelDesignCreator : GenerativeProcess
                             cam.tag = "MainCamera"; // Set it as the Main Camera
                         }
                     }
-                    cam.transform.SetParent(go.transform);
-                    Debug.Log(cameraPos);
+                    // Check if the camera already has a parent and handle accordingly
+                    if (cam.transform.parent != go.transform)
+                    {
+                        cam.transform.SetParent(go.transform);
+                    }
+                    //Debug.Log(cameraPos);
                     cam.transform.position = cameraPos;
+                    EditorUtility.SetDirty(go);
                 }
                 gosOnScene.Add(go);
             }
         }catch(Exception ex){
-            Debug.LogError("Error during the mapping of the LevelDesign json:\n" + ex);
+            Debug.LogWarning("Error during the mapping of the LevelDesign json:\n" + ex);
         }
     }
 
+
     public static void DeleteGeneratedGOs(){
         foreach( GameObject go in gosOnScene){
-            GameObject.DestroyImmediate(go);
+            UnityEngine.Object.DestroyImmediate(go);
         }
         File.Delete(LevelDesignJsonPath);
+    }
+
+    public static void ReloadGOs(){
+        try{
+            if (File.Exists(LevelDesignJsonPath)){
+                string jsonLD = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
+                Dictionary<string, object> LDDictionary = (Dictionary<string, object>) Parse(jsonLD);
+                List<object> LD_GO_List = (List<object>)LDDictionary["gameObjects"];
+                foreach (Dictionary<string, object> GODict in LD_GO_List)
+                {
+                    GameObject go = GameObject.Find(GODict["name"].ToString());
+                    gosOnScene.Add(go);
+                }
+            }
+        }catch(Exception ex){
+            Debug.LogWarning("Error in the reload : \n" + ex);
+        }
     }
 
     private static Vector3 ParseVector3(List<object> vector3ListJson){

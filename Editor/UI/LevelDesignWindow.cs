@@ -18,6 +18,9 @@ public class LevelDesignWindow : EditorWindow
 
     private void OnGUI()
     {
+        if (LevelDesignCreator.gosOnScene == null || LevelDesignCreator.gosOnScene.Count == 0){
+            LevelDesignCreator.ReloadGOs();
+        }
         if (File.Exists(LevelDesignCreator.LevelDesignJsonPath)){
             onIteration = true;
         }else{
