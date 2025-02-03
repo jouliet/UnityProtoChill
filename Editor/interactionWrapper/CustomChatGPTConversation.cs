@@ -46,7 +46,7 @@ namespace ChatGPTWrapper
                 ("Content-Type", "application/json")
             };
 
-            SetModel(_model);
+            SetModel(model);
         }
 
         public void SetModel(Model model)

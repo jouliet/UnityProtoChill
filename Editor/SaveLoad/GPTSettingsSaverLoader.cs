@@ -37,8 +37,8 @@ public class GPTSettingsManager
             Debug.LogError("Error saving GPT settings: " + ex.Message);
         }
     }
-
-    public static GPTSettings LoadGPTSettings(Action onSettingsLoaded)
+ 
+    public static GPTSettings LoadGPTSettings(Action onSettingsLoaded, GPTGenerator gptGenerator)
     {
         try
         {
@@ -52,10 +52,10 @@ public class GPTSettingsManager
             //Debug.Log(settings.Model);
             if (settings != null) 
             {
-                GPTGenerator.Instance.InitChatGptConversationAsynchroneFriendly(settings.UseProxy, settings.ProxyUri, settings.ApiKey, settings.Model, settings.InitialPrompt, settings.Temperature, () =>
+                gptGenerator.InitChatGptConversationAsynchroneFriendly(settings.UseProxy, settings.ProxyUri, settings.ApiKey, settings.Model, settings.InitialPrompt, settings.Temperature, () =>
                 {
                     
-                    if (GPTGenerator.Instance._chatGPTConversation != null) {
+                    if (gptGenerator._chatGPTConversation != null) {
                         onSettingsLoaded?.Invoke();
                     }
                     else {

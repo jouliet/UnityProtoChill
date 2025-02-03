@@ -59,20 +59,6 @@ public class ObjectResearch
         AllBaseGameObjects = new List<BaseGameObject>();
     }
 
-    public static List<BaseObject> BaseObjectList(BaseObject root){
-        var baseObjectList = new List<BaseObject>{root};
-
-        if (root.ComposedClasses.Count > 0)
-        {
-            foreach (var composedClass in root.ComposedClasses)
-            {
-                baseObjectList.AddRange(BaseObjectList(composedClass));
-            }
-            
-        }
-        return baseObjectList;
-    }
-
     //NO DOUBLONS I SAID
     public static void Add(BaseObject obj){
         

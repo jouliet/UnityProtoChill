@@ -22,7 +22,7 @@ namespace SettingsClass
         public static void ShowWindow()
         {
             GetWindow<SettingsWindow>("GPT Settings");
-            gPTSettings = GPTSettingsManager.LoadGPTSettings(() => {});
+            gPTSettings = GPTSettingsManager.LoadGPTSettings(() => {}, GPTGenerator.Instance);
             if (gPTSettings != null){
                 selectedModel = gPTSettings.Model;
                 apiKey = gPTSettings.ApiKey;

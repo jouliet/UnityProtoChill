@@ -26,6 +26,11 @@ namespace ChatGPTWrapper
         }
     }
 
+    public static GPTGenerator CreateNewIndependantGPTGenerator()
+    {
+        return new GPTGenerator();
+    }
+
     public UIManager uIManager;
         private GPTGenerator()
         {
@@ -89,6 +94,7 @@ namespace ChatGPTWrapper
         // Appelé par UML Diag
         public void GenerateFromText(string text, Action<string> onResponse)
         {
+            
             if (_chatGPTConversation == null)
             {
                 Debug.LogError("ChatGPTConversation is not initialized. Trying to load user data...");
@@ -104,9 +110,10 @@ namespace ChatGPTWrapper
                         Debug.LogWarning("Settings loading failed, you might wanna try manually entering your settings. En sommes, nul ici malgré la réussite des étapes précédentes");
                     }
                         
-                }); 
+                }, this); 
             }
             else {
+                Debug.Log(_chatGPTConversation._model);
                 SendTextToChatGPT(text, onResponse);
             }
         }

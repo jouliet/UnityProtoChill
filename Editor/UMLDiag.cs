@@ -32,7 +32,7 @@ public class UMLDiag : GenerativeProcess
     private UMLDiag(UMLDiagramWindow umlDiagramWindowInstance)
     {
         umlDiagramWindow = umlDiagramWindowInstance;
-
+        gPTGenerator = GPTGenerator.Instance;
 
         ChatWindow.OnSubmitText += OnSubmit;
         //UIManager.OnGenerateScriptEvent += OnGenerateScript;
@@ -61,53 +61,26 @@ public class UMLDiag : GenerativeProcess
 
     public void OnSubmit(string input)
     {
-        umlDiagramWindow.OnLoadingUML(true);
+        
         if (selectedObject == null){
+            umlDiagramWindow.OnLoadingUML(true);
             Debug.Log("Submit received in UMLDiag. Generating UML..." + input);
             GenerateClassesandGOs(input);
         }
         else {
             Debug.Log("Submit received in UMLDiag, Updating specific Object "+selectedObject.Name+ ". Generating UML..." + input);
-            GenerateSingleClass(input,selectedObject);
+            //GenerateSingleClass(input,selectedObject);
+            GenerateScript(selectedObject, input);
         }
     }
 
     public void OnGenerateScript(BaseObject root){
         Debug.Log("generating script for" + root.ToString() + "...");
-        GenerateScript(root);
+        GenerateScript(root, "");
     }
 
 
-    private void GenerateSingleClass(string input, BaseObject bo){
-        input = UpdateSingleClassPrompt(bo, input);
-
-        GPTGenerator.Instance.GenerateFromText(input, (response) =>
-        {
-            jsonScripts = response;
-            Debug.Log("Generated UML & GameObjects JSON: " + jsonScripts);
-
-            try
-            {
-                //Le cast est nécessaire pour parse
-                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonScripts);
-                JsonMapper.MapAllBaseObjects(parsedObject);
-
-                if (umlDiagramWindow == null)
-                {
-                    Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
-                    return;
-                }
-                SaveDataToCurrentUML();
-                umlDiagramWindow.OnLoadingUML(false);
-                umlDiagramWindow.ReloadDiagram(AllBaseObjects);
-            }
-            catch (Exception e) 
-            {
-                Debug.LogError($"Wrong JSON format: {e.Message}");
-                umlDiagramWindow.OnLoadingUML(false);
-            }
-        });
-    }
+    
     private void GenerateClassesandGOs(string input)
     {
         input = UMLAndGOPrompt(input);
@@ -147,6 +120,23 @@ public class UMLDiag : GenerativeProcess
                 // if (GameObjectCreator.GameObjectNameList != null){
                 //     GameObjectCreator.GameObjectNameList.Clear();
                 // }
+                //Mapping vers structure objet maison
+                //root = JSONMapper.MapToBaseObject((Dictionary<string, object>)parsedObject["UML"]);
+                baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
+                gameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+
+                if (umlDiagramWindow == null)
+                {
+                    Debug.LogError("umlDiagramWindow is null when calling ReloadDiagram");
+                    return;
+                }
+                umlDiagramWindow.OnLoadingUML(false);
+                umlDiagramWindow.ReloadDiagram(baseObjects);
+                Debug.Log("finished generating !");
+                SaveDataToCurrentUML();
+                // if (GameObjectCreator.GameObjectNameList != null){
+                //     GameObjectCreator.GameObjectNameList.Clear();
+                // }
 
                 // GameObjectCreator.JsonToDictionary(jsonScripts);
                 // GameObjectCreator.StockEveryGOsInList();
@@ -162,9 +152,9 @@ public class UMLDiag : GenerativeProcess
 
     //Pour l'instant generateScripts est ici mais on pourra le bouger si besoin. De même pour BaseObjectList
     //GenerateScripts est lié à l'event UI generateScripts for selected baseObject
-    private void GenerateScript(BaseObject root){
+    private void GenerateScript(BaseObject root, string input){
         Debug.Log("Script was generated");
-        root.GenerateScript();
+        root.GenerateScript(input);
     }
 
     public void ReloadUI(List<BaseObject> baseObjects){
