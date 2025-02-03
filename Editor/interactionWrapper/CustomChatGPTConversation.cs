@@ -13,7 +13,7 @@ namespace ChatGPTWrapper
         public enum Model
         {
             ChatGPT4,
-            GPT3,
+            Fine_Tuned_GPT4,
             GPT4
         }
         public Model _model = Model.ChatGPT4;
@@ -59,10 +59,10 @@ namespace ChatGPTWrapper
                     _uri = "https://api.openai.com/v1/chat/completions";
                     _selectedModel = "chatgpt-4o-latest";
                     break;
-                case Model.GPT3:
+                case Model.Fine_Tuned_GPT4:
                     _chat = new Chat(_initialPrompt);
                     _uri = "https://api.openai.com/v1/chat/completions";
-                    _selectedModel = "gpt-3.5-turbo";
+                    _selectedModel = "ft:gpt-4o-2024-08-06:personal::AwSP1AwC";
                     break;
                 case Model.GPT4:
                     _chat = new Chat( _initialPrompt);

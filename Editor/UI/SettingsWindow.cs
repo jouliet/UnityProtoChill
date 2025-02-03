@@ -49,8 +49,8 @@ namespace SettingsClass
             // initialPrompt = EditorGUILayout.TextArea(initialPrompt, GUILayout.Height(70));
             // GUILayout.EndScrollView();
 
-            GUILayout.Space(15);
-            temperature = EditorGUILayout.Slider("Temperature", temperature, 0f, 2f);
+            //GUILayout.Space(15);
+            //temperature = EditorGUILayout.Slider("Temperature", temperature, 0f, 2f);
 
             // Bouton INIT GPT
             if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
