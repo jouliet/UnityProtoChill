@@ -360,8 +360,11 @@ public class BaseObject : GenerativeProcess
                 GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
             }
             else{
-                Debug.Log("Adding" + scriptType.Name + "to" + newComponent.name);
-                GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
+                try {
+                
+                    GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
+                }
+                catch (Exception e) {Debug.LogWarning("Adding" + scriptType.Name + "to" + newComponent.name +"Exception :" +e.Message);}
             }
         } 
     }
