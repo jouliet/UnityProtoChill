@@ -21,19 +21,17 @@ public abstract class GenerativeProcess
     public static void SetJsonGOs(string json){
         jsonGOs = json;
     }
+
+    protected GPTGenerator gPTGenerator;
     //public abstract void OnSubmit(string input);
     //public abstract void OnGenerateScript(BaseObject root);
 
     // Generative process est abonné à l'editor window
     public GenerativeProcess()
     {
-        // MyEditorWindow.OnSubmitText += OnSubmit;
-        // MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
-        // gptGenerator = new GPTGenerator();
-        // ChatWindow.OnSubmitText += OnSubmit;
-        // MyEditorWindow.OnSubmitText += OnSubmit;
-        // UIManager.OnGenerateScriptEvent += OnGenerateScript;
-        // MyEditorWindow.OnGenerateScriptEvent += OnGenerateScript;
+        //Dans le cas ou on est sur le main thread il faut le préciser dans le constructeur qui hérite, par défaut on fait un nouveau generator
+        gPTGenerator= GPTGenerator.CreateNewIndependantGPTGenerator();
+
     }  
     // Abstract cleanup
     ~GenerativeProcess()

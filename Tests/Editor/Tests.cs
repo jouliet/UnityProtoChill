@@ -50,7 +50,7 @@ public class DataStructureTests
 
 
     private void GenerateScripts(BaseObject root){
-        List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
+        //List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
         Debug.Log("Generation des scripts");
         //Debug.Log("baseObject.Count = " + baseObjects.Count);
         // foreach (var baseObject in baseObjects){
@@ -71,11 +71,11 @@ public class gptTest{
 
 
     private void GenerateScripts(BaseObject root, GPTGenerator gptGenerator){
-        List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
-        Debug.Log("Generation d'un script:");
-        //Debug.Log("baseObject.Count = " + baseObjects.Count);
+        ///// List<BaseObject> baseObjects = ObjectResearch.BaseObjectList(root);
+        // Debug.Log("Generation d'un script:");
+        // //Debug.Log("baseObject.Count = " + baseObjects.Count);
         
-        GenerateScript(gptGenerator, baseObjects[1]);
+        // GenerateScript(gptGenerator, baseObjects[1]);
     }
 
     public void GenerateScript(GPTGenerator gptGenerator, BaseObject bo)

@@ -30,6 +30,9 @@ public class BaseGameObject
     }
     public string ToJson()
     {
+        if (Name == "Unknown"){
+            Debug.LogWarning("An unidentified gameObject was generated, consider verifying your prefabs and retrying");
+        }
         var componentsJson = string.Join(",\n\t\t", Components.Select(c => c.ToJsonGOSpecific()));
 
         return $"{{\n" +
@@ -131,7 +134,7 @@ public class Method
 }
  
 
-public class BaseObject
+public class BaseObject : GenerativeProcess
 {
     // On constitue la liste localement
     public BaseObject(string Name, bool isReal = false){
@@ -139,8 +142,8 @@ public class BaseObject
         this.isReal = isReal;
         if (!isReal){
             ObjectResearch.Add(this);
-        }
-        scriptType = Type.GetType($"{this.Name}, Assembly-CSharp");
+        } 
+        scriptType = Type.GetType($"{Name}, Assembly-CSharp");
 
         if (scriptType != null) {
             hasBeenGenerated = true;
@@ -276,15 +279,15 @@ public class BaseObject
 
 
     // Appelé par UMLDiag ligne 110
-    public void GenerateScript(){
-        GenerateScriptbis();
+    public void GenerateScript(string input){
+        GenerateScriptbis(input);
         // Des trucs s'exécutent en parallèle voir le moment ou "oui" arrive (bien plus tôt que les debug de generate bis)
 
         //Debug.Log("oui");
     }
       
     // Bordel à refact dans une classe composée scriptGenerator ou dans unityPusher. Gaffe alors au timing de l'exécution de RefreshDatabase
-    private void GenerateScriptbis()
+    private void GenerateScriptbis(string inputUser)
     {
         string composedClassesString = ComposedClassesString();
         if (ComposedClasses.Count>0){
@@ -297,13 +300,13 @@ public class BaseObject
         }
         
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
-        string input = ScriptGenerationPrompt(this.Name, this.ToString());
+        string input = ScriptGenerationPrompt(this.Name, this.ToString(), inputUser);
         
-        if (GPTGenerator.Instance == null){
+        if (gPTGenerator == null){
             Debug.Log("No instance of gptGenerator");
             return;
         }
-        GPTGenerator.Instance.GenerateFromText(input, (response) =>
+        gPTGenerator.GenerateFromText(input, (response) =>
         {
             Debug.Log("Generated class: " + response);
             WriteScriptFile(GetScript(response));
@@ -357,6 +360,7 @@ public class BaseObject
                 GameObjectCreator.AddPropertiesToComponent(Properties, newComponent, scriptType);
             }
             else{
+                Debug.Log("Adding" + scriptType.Name + "to" + newComponent.name);
                 GameObjectCreator.AddFieldsToComponent(Properties, newComponent, scriptType);
             }
         } 
@@ -496,6 +500,7 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
                 if (obj is Dictionary<string, object> gameObjectDict)
                 {
                     UsefulFunctions.EnsureTagExists(gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged");
+                    UsefulFunctions.EnsureLayerExists(gameObjectDict.ContainsKey("layer") ? gameObjectDict["layer"].ToString() : "Default");
                     BaseGameObject baseGameObject = new BaseGameObject
                     {
                         Name = gameObjectDict.ContainsKey("name") ? gameObjectDict["name"].ToString() : "Unknown",

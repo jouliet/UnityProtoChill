@@ -247,6 +247,7 @@ public class GameObjectCreator : GenerativeProcess {
         else
         {
             Debug.LogError($"PrimitiveType '{primitiveTypeName}' invalide.");
+            
         }
     }
 
@@ -334,10 +335,12 @@ public class GameObjectCreator : GenerativeProcess {
             if (kvp.Key == "Name"){
                 continue;
             }
+            
 
             var fieldInfo = componentType.GetField(kvp.Key);
             if (fieldInfo == null){
-                throw new Exception("Ce field n'est pas reconnu: " + kvp.Key);
+                Debug.LogWarning("Ce field n'est pas reconnu: " + kvp.Key);
+                continue;
             }
 
             if (fieldInfo != null && fieldInfo.CanWrite())
@@ -361,7 +364,15 @@ public class GameObjectCreator : GenerativeProcess {
                     }
                     else
                     {
-                        value = Convert.ChangeType(value, fieldType);
+                        // Gestion des classes persos
+                        if (fieldType.IsClass && fieldType != typeof(string))
+                            {
+                                value = Activator.CreateInstance(fieldType);
+                            }
+                            else
+                            {
+                                value = Convert.ChangeType(value, fieldType);
+}
                     }
                     fieldInfo.SetValue(component, value);
                     if (component != null)

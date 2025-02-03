@@ -8,6 +8,7 @@ using static UIManager;
 using static SaverLoader;
 using static ObjectResearch;
 using System;
+using static ScriptsCoherenceHandler;
 
 namespace UMLClassDiag
 {
@@ -541,15 +542,18 @@ namespace UMLClassDiag
             //LoadUML();
             try {
                 if (!File.Exists(UMLFilePath)){
+                    ScriptsCoherenceHandler.UpdateBaseObjectsToMatchProject();
+                    UMLDiag.SaveDataToCurrentUML();
                     return;
                 }
                 var jsonFile = File.ReadAllText(UMLFilePath);
                 
                 string jsonString = jsonFile;
-                Dictionary<string, object> parsedObject = (Dictionary<string, object>)Parse(jsonString);
+                Dictionary<string, object> parsedObject  = (Dictionary<string, object>)Parse(jsonString);
                 //ObjectResearch.CleanUp();
                 List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
                 List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
+                ScriptsCoherenceHandler.UpdateBaseObjectsToMatchProject();
                 foreach(BaseObject bo in AllBaseObjects){
                     bo.refreshStateToMatchUnityProjet();
                 }
@@ -613,7 +617,7 @@ namespace UMLClassDiag
                 selectedObject = baseObject;
                 UMLDiag.Instance.selectedObject = selectedObject;
             }
-            string msg = $"Modifying : {baseObject.Name}";
+            string msg = $"Generating script for class : {baseObject.Name}";
             uiManager.SendSelectionStateToChatWindow(isSelected, msg);
         }
 
@@ -686,7 +690,7 @@ namespace UMLClassDiag
         {
             Debug.Log($"GenerateObject called for {obj.Name}");
 
-            obj.GenerateScript();
+            obj.GenerateScript("");
         }
 
         public void OnLoadingUML(bool state)

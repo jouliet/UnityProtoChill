@@ -21,9 +21,12 @@ public class UIManager : EditorWindow
 
     private Button resetButton;
 
-    private Button LDCreatorButton;
 
     //public static event System.Action<BaseObject> OnGenerateScriptEvent;
+
+    private Button LDCreatorButton;
+
+
 
     [MenuItem("Window/ProtoChill")]
     public static void ShowWindow()
@@ -52,7 +55,7 @@ public class UIManager : EditorWindow
             //LoadUML();
         }
         if (GPTGenerator.Instance._chatGPTConversation == null){
-            GPTSettingsManager.LoadGPTSettings(() => {});
+            GPTSettingsManager.LoadGPTSettings(() => {}, GPTGenerator.Instance);
         }
     }
 
@@ -63,6 +66,8 @@ public class UIManager : EditorWindow
         Main.Instance.Init(umlDiagramWindow);
         //Initialise GPTGenerator pour qu'il puisse envoyer des réponses quel que soit la source de l'appel ... On fait le tri après
         GPTGenerator.Instance.uIManager =this;
+       
+
     }
 
     private void OnDisable()
