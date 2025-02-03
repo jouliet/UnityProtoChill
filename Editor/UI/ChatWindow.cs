@@ -28,8 +28,9 @@ namespace ChatClass
         private VisualElement stateContainer;
         private Label stateText;
 
-        public static string DialoguePath = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
+        public static string DialoguePathFolder = "Packages/com.jin.protochill/Editor/GeneratedContent/Dialogue.json"; 
         //private static string DialogueModelPath = "Packages/com.jin.protochill/Editor/GeneratedContent/DialogueModel.json"; 
+        public static string DialoguePath = Path.Combine(DialoguePathFolder, "Dialogue.json");
         List<DialogueMessage> dialogueMemory = new List<DialogueMessage>();
 
 
