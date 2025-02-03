@@ -18,24 +18,67 @@ public class LevelDesignCreator : GenerativeProcess
     public static string LevelDesignJsonPath = "Packages/com.jin.protochill/Editor/GeneratedContent/LevelDesign.json";
     private static string LevelDesignStructureJsonPath = "Packages/com.jin.protochill/Editor/JsonStructures/LevelDesignStructure.json";
     private static string directivePromptForCreation = "You make a json to describe a level with the position, scale and rotation of the game objects. \n" +
-    "The game and the game objects are enumerated in the following json. The prefab_name must be equal with a gameObject Name of the following json. \n";
+    "The game and the prefabs to use are enumerated in the following json.\n";
     private static string directivePromptForModification;
     private static string jsonClassesAndGos;
     private static string formatPrompt = 
     "The json must follow this format: \n" +
     AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignStructureJsonPath).text + "\n" +
     "You saw that there is a camera object under the Player object in the json structure. Place it only if you want the Camera to be Child of the Player. \n" +
-    "There can be only one camera per level. \n";
-
+    "There can be only one camera per level. \n" +
+    "The prefab_name of the game objects must be equal with one of these names. They correspond with existing prefabs: \n";
     private static string jsonLD;
     public static List<GameObject> gosOnScene = new List<GameObject>();
+    private static List<GameObject> prefabs = new List<GameObject>();
+    private static string prefabsList = "";
+    private static void BuildPrefabList(){
+        if (Directory.Exists(GameObjectCreator.prefabPath)){
+            // Récupère tous les fichiers du dossier
+            string[] assetPaths = Directory.GetFiles(GameObjectCreator.prefabPath, "*", SearchOption.AllDirectories);
+            prefabsList = "";
+            foreach (string assetPath in assetPaths)
+            {
+                GameObject prefab = Resources.Load<GameObject>(assetPath);
+                if (prefab != null){
+                    Debug.Log(prefab.name);
+                    prefabs.Add(prefab);
+                    prefabsList += prefab.name + " / ";
+                }
+                
+            }
+            
+        }else{
+            throw new Exception("There is no prefab so I cannot generate a level.");
+        }
+    }
     public static void GenerateLevelDesign(string input){
+        if (Directory.Exists(GameObjectCreator.prefabPath)){
+            // Récupère tous les fichiers du dossier
+            string[] assetPaths = Directory.GetFiles(GameObjectCreator.prefabPath, "*", SearchOption.AllDirectories);
+            prefabsList = "";
+            foreach (string assetPath in assetPaths)
+            {
+                Debug.Log(assetPath);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (prefab != null){
+                    Debug.Log(prefab.name);
+                    prefabs.Add(prefab);
+                    prefabsList += prefab.name + " / ";
+                }
+                
+            }
+            prefabsList += "\n";
+            
+        }else{
+            throw new Exception("There is no prefab so I cannot generate a level.");
+        }
+
         if (File.Exists(UMLFilePath)){
             jsonClassesAndGos = File.ReadAllText(UMLFilePath);
         }else{
             throw new Exception("Cannot push GameObjects without a the UMLandGOs json.");
         }
-        input = directivePromptForCreation + jsonClassesAndGos + formatPrompt + input;
+        input = directivePromptForCreation + jsonClassesAndGos + formatPrompt + prefabsList + input;
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
             jsonLD = response;
@@ -54,6 +97,7 @@ public class LevelDesignCreator : GenerativeProcess
     }
 
     public static void GenerateLevelDesignModification(string input){
+        BuildPrefabList();
         if (File.Exists(UMLFilePath)){
             jsonClassesAndGos = AssetDatabase.LoadAssetAtPath<TextAsset>(UMLFilePath).text;
         }else{
@@ -67,7 +111,8 @@ public class LevelDesignCreator : GenerativeProcess
         }
 
         directivePromptForModification = "You must modify the level described in this json (respecting the format): \n" + AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDesignJsonPath).text;
-        input = directivePromptForModification + formatPrompt + input;
+
+        input = directivePromptForModification + formatPrompt + prefabsList + input;
         DeleteGeneratedGOs();
         GPTGenerator.Instance.GenerateFromText(input, (response) =>
         {
@@ -128,7 +173,7 @@ public class LevelDesignCreator : GenerativeProcess
                     Camera cam = Camera.main;
                     if (cam == null) // No Main Camera found
                     {
-                        cam = UnityEngine.Object.FindObjectOfType<Camera>(); // Try to find any camera
+                        cam = UnityEngine.Object.FindFirstObjectByType<Camera>(); // Try to find any camera
 
                         if (cam == null) // No camera at all, create a new one
                         {
