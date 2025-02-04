@@ -46,7 +46,7 @@ public static class ObjectsCreator
         //On garde l'UML au cas ou on neuil (jcrois on neuil ou on va bientôt neuil jvais craquer jvais saver data ici et écraser json)
 
         GenerativeProcess.SetJsonScripts(jsonString);
-        UMLDiag.SaveDataToCurrentUML();
+        //UMLDiag.SaveDataToCurrentUML();
         
     }
 }
