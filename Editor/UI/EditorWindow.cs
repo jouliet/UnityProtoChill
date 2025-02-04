@@ -84,7 +84,7 @@ Never assume a method, class or function exists without explicitly seeing it in 
     GUILayout.EndScrollView();
 
     GUILayout.Space(15);
-
+ 
     // Bouton INIT GPT
     if (GUILayout.Button("Initialize GPT", GUILayout.Height(40)))
     {

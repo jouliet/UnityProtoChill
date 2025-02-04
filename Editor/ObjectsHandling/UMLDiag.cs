@@ -147,13 +147,11 @@ public class UMLDiag : GenerativeProcess
     public static void SaveDataToCurrentUML()
     {
         string updatedJson = "{\n\t\"Classes\": [\n";
-        // Ajouter les classes
+        
         for (int i = 0; i < AllBaseObjects.Count; i++)
         {
-            // Ici, on suppose que bo.ToJson() renvoie une chaîne représentant un objet de classe JSON
+            
             updatedJson += "\t\t" + AllBaseObjects[i].ToJson();
-
-            // Add a comma after each object except the last one
             if (i < AllBaseObjects.Count - 1)
             {
                 updatedJson += ",";
@@ -163,14 +161,10 @@ public class UMLDiag : GenerativeProcess
         }
 
         updatedJson += "\t],\n\t\"GameObjects\": [\n";
-
-        // Ajouter les objets de jeu
         for (int i = 0; i < AllBaseGameObjects.Count; i++)
         {
-            // Ici aussi, on suppose que bgo.ToJson() renvoie une chaîne représentant un objet de jeu en JSON
+         
             updatedJson += "\t\t" + AllBaseGameObjects[i].ToJson();
-
-            // Add a comma after each object except the last one
             if (i < AllBaseGameObjects.Count - 1)
             {
                 updatedJson += ",";
@@ -180,8 +174,6 @@ public class UMLDiag : GenerativeProcess
         }
 
         updatedJson += "\t]\n}";
-
-        // Save the formatted JSON
         SaveUML(updatedJson);
     }
 }
