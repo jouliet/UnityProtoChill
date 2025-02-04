@@ -19,7 +19,7 @@ Advised Unity version is Unity 6 (see troubleshooting versions if you want to op
 If you want colors, Universal and Built-in render pipelines should work. 3D is strongly advised as of current version.
 Once you have an opened Unity project :
 1. Go to **Window > Package Manager**, click on the "+" button on the top left, then chose "install from git URL"
-2. Add the [ChatGPT-Wrapper-For-Unity](https://github.com/GraesonB/ChatGPT-Wrapper-For-Unity) from GIT URL : paste the link https://github.com.GraesonB/ChatGPT-Wrapper-For-Unity.git
+2. Add the [ChatGPT-Wrapper-For-Unity](https://github.com/GraesonB/ChatGPT-Wrapper-For-Unity) from GIT URL : paste the link https://github.com/GraesonB/ChatGPT-Wrapper-For-Unity.git
 3. Add the [ProtoChill Package](https://github.com/jouliet/UnityProtoChill) from GIT URL : paste the link https://github.com/jouliet/UnityProtoChill.git
 4. Go to **Window > ProtoChill** to start using the tool. At this point clicking (once or twice... be patient) the Magic Refresh button on the top left should load your local classes in the Assets/Scripts folder.
 5. In the Protochill window go to settings, put your API key and click init. Your key will be saved in the Application.PersistentDataPath which is local to your machine but watch out.
