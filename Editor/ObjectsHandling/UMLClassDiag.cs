@@ -21,11 +21,14 @@ namespace UMLClassDiag
 public class BaseGameObject
 {
     public string Name;
-    public string Tag = "Untagged";
-    public string Layer = "Default";
+    public string Tag;
+    public string Layer;
     public List<BaseObject> Components = new List<BaseObject>(); 
 
-    public BaseGameObject(){
+    public BaseGameObject(string Name, string Tag= "Untagged", string Layer="Default") {
+        this.Name = Name;
+        this.Tag = Tag;
+        this.Layer = Layer;
         ObjectResearch.AddBGO(this);
     }
     public string ToJson()
@@ -41,6 +44,29 @@ public class BaseGameObject
             $"\t\"layer\": \"{Layer}\",\n" +
             $"\t\"components\": [\n\t\t{componentsJson}\n\t]\n" +
             $"}}";
+    }
+
+    public override string ToString()
+    {
+        string componentsstring = "\n Components :";
+        if (Components.Count>0){
+            foreach(BaseObject component in this.Components){
+                componentsstring += component.Name;
+            }
+        }else {
+            componentsstring = "";
+        }
+
+        string Tagstring ="";
+        if (Tag!= "Untagged"){
+            Tagstring = "Tag : " + Tag; 
+        }
+        string Layerstring = "";
+        if (Layer!="Default"){
+            Layerstring = "Layer : "+Layer;
+        }
+
+        return "name : "+Name+", Tag :"+Tag+"Layer, "+Layer  + componentsstring;
     }
 
     public override bool Equals(object obj)
@@ -97,6 +123,16 @@ public class Attribute
 
     public override string ToString()
     {
+        if (Type == "GameObject" || Type =="gameObject") {
+
+            BaseGameObject bgo = ObjectResearch.FindBaseGameObjectByName(Name);
+            if (bgo == null) {
+                //On tente sait on jamais. On le fait pas dans le json pcq vsy
+                //Faudrait standardiser ça quoi ff at this point todo
+                bgo = new BaseGameObject(Name);
+            }
+            return "Attribute"+ bgo.ToString();
+        }
         return $"Attribute Name: {Name}, Type: {Type}";
     }
 
@@ -132,7 +168,7 @@ public class Method
             $"}}";
     }
 }
- 
+  
 
 public class BaseObject : GenerativeProcess
 {
@@ -237,7 +273,7 @@ public class BaseObject : GenerativeProcess
     private bool isReal;
     public bool hasBeenGenerated = false;
     public bool isSpecificUnityComponent;
-
+    public string scriptFile;
     public Type scriptType;
     public void InitWithProperties(Dictionary<string, object> propertiesDict)
     {
@@ -300,7 +336,7 @@ public class BaseObject : GenerativeProcess
         }
         
         //Peut etre précisé que la classe doit au moins indirectement hériter de mono behaviour 
-        string input = ScriptGenerationPrompt(this.Name, this.ToString(), inputUser);
+        string input = ScriptGenerationPrompt(this.Name, this.ToString() + composedClassesString, inputUser, this.scriptFile);
         
         if (gPTGenerator == null){
             Debug.Log("No instance of gptGenerator");
@@ -502,15 +538,17 @@ public static List<BaseGameObject> MapAllBaseGOAndLinksToBO(Dictionary<string, o
             {
                 if (obj is Dictionary<string, object> gameObjectDict)
                 {
-                    UsefulFunctions.EnsureTagExists(gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged");
-                    UsefulFunctions.EnsureLayerExists(gameObjectDict.ContainsKey("layer") ? gameObjectDict["layer"].ToString() : "Default");
-                    BaseGameObject baseGameObject = new BaseGameObject
-                    {
-                        Name = gameObjectDict.ContainsKey("name") ? gameObjectDict["name"].ToString() : "Unknown",
-                        Tag = gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged",
-                        Layer = gameObjectDict.ContainsKey("layer") ? gameObjectDict["layer"].ToString() : "Default",
-                        Components = new List<BaseObject>()
-                    };
+                    
+                    string name = gameObjectDict.ContainsKey("name") ? gameObjectDict["name"].ToString() : "Unknown";
+                    string Tag = gameObjectDict.ContainsKey("tag") ? gameObjectDict["tag"].ToString() : "Untagged";
+                    string Layer = gameObjectDict.ContainsKey("layer") ? gameObjectDict["layer"].ToString() : "Default";
+
+
+                    UsefulFunctions.EnsureTagExists(Tag);
+                    UsefulFunctions.EnsureLayerExists(Layer);
+    
+
+                    BaseGameObject baseGameObject = new BaseGameObject(name, Tag, Layer);
                     
                     if (gameObjectDict.ContainsKey("components") && gameObjectDict["components"] is List<object> componentList)
                     {

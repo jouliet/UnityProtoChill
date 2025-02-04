@@ -195,7 +195,7 @@ public class GameObjectCreator : GenerativeProcess {
                     // Ecrit les properties dans le component
                     //Debug.Log("type de " + kvp.Value + " : " + kvp.Value.GetType());
         
-                    object value = kvp.Value;
+                    object value = kvp.Value;   
                     Type propertyType = propertyInfo.PropertyType;
 
                     // Gestion spécifique des floats

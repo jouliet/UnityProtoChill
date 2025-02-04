@@ -9,6 +9,7 @@ using static SaverLoader;
 using static ObjectResearch;
 using System;
 using static ScriptsCoherenceHandler;
+using static ObjectsCreator;
 
 namespace UMLClassDiag
 {
@@ -537,37 +538,20 @@ namespace UMLClassDiag
         /// 
         /// CLICK EVENTS 
         /// 
+
+        // LE BOUTON MAGIQUE DIEU SOIT LOUE LE BOUTON MAGIQUE
         private void OnRefreshtButtonClick()
         {
             //LoadUML();
             try {
-                if (!File.Exists(UMLFilePath)){
-                    ScriptsCoherenceHandler.UpdateBaseObjectsToMatchProject();
-                    UMLDiag.SaveDataToCurrentUML();
-                    return;
-                }
-                var jsonFile = File.ReadAllText(UMLFilePath);
+                CreateAllObjectsAndReload();
                 
-                string jsonString = jsonFile;
-                Dictionary<string, object> parsedObject  = (Dictionary<string, object>)Parse(jsonString);
-                //ObjectResearch.CleanUp();
-                List<BaseObject> baseObjects = JsonMapper.MapAllBaseObjects(parsedObject);
-                List<BaseGameObject> baseGameObjects = JsonMapper.MapAllBaseGOAndLinksToBO(parsedObject);
-                ScriptsCoherenceHandler.UpdateBaseObjectsToMatchProject();
-                foreach(BaseObject bo in AllBaseObjects){
-                    bo.refreshStateToMatchUnityProjet();
-                }
-
-                GenerativeProcess.SetJsonScripts(jsonString);
                 ReloadDiagram(AllBaseObjects);
-
 
             }
             catch (Exception ex) {
                 Debug.LogWarning(ex);
             }
-
-
 
         }
 

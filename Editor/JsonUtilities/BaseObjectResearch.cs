@@ -25,9 +25,19 @@ public class ObjectResearch
     public static List<BaseGameObject> AllBaseGameObjects = new List<BaseGameObject>();
     public static BaseObject FindBaseObjectByName(string name){
         foreach (var baseObject in AllBaseObjects) {
-        if (baseObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
-            return baseObject;
-        }
+            if (baseObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+                return baseObject;
+            }
+    
+    }
+    return null;
+
+    }
+    public static BaseGameObject FindBaseGameObjectByName(string name){
+        foreach (var baseGameObject in AllBaseGameObjects) {
+            if (baseGameObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+                return baseGameObject;
+            }
     
     }
     return null;
@@ -59,33 +69,52 @@ public class ObjectResearch
         AllBaseGameObjects = new List<BaseGameObject>();
     }
 
-    //NO DOUBLONS I SAID
+    //NO DOUBLONS I SAID 
     public static void Add(BaseObject obj){
         
-        //AllBaseObjects.Add(obj);
         var existingObjectIndex = AllBaseObjects.FindIndex(o => o.Equals(obj));
 
-        if (existingObjectIndex == -1)
+        if (existingObjectIndex == -1) //Pas trouvé
         {
             AllBaseObjects.Add(obj);
         }
         else
         {
-            AllBaseObjects[existingObjectIndex] = obj;
+            AllBaseObjects[existingObjectIndex] = obj; //replace
         }
     }
 
     public static void AddBGO(BaseGameObject bgo){
-        var existingObject = AllBaseGameObjects.FirstOrDefault(o => o.Equals(bgo));
+        var existingObjectIndex = AllBaseGameObjects.FindIndex(o => o.Equals(bgo));
         
-        if (existingObject == null)
+        if (existingObjectIndex == -1)
         {
             AllBaseGameObjects.Add(bgo);
         }
         else
         {
-            // Debug.Log($"objet {bgo} doublon grrr");
+            AllBaseGameObjects[existingObjectIndex] = bgo;
         }
+    }
+
+    public static string AllBaseObjectsToCleanString(){
+        string allBo = "";
+        foreach(BaseObject bo in AllBaseObjects){
+            allBo+= bo.ToString();
+            allBo+="\n";
+        }
+
+        return allBo;
+
+    }
+
+    public static string AllBaseGameObjectsToCleanString(){
+        string AllBgo = "";
+        foreach(BaseGameObject bgo in AllBaseGameObjects){
+            AllBgo+= bgo.ToString();
+            AllBgo+="\n";
+        }
+        return AllBgo;
     }
 }
 

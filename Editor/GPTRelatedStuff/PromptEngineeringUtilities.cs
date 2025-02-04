@@ -2,6 +2,8 @@ using UnityEngine;
 using System.IO;
 using static SaverLoader;
 using UMLClassDiag;
+using static ObjectResearch;
+using ChatClass;
 public static class PromptEngineeringUtilities
 {
     static bool FirstGen = true;
@@ -14,12 +16,10 @@ public static class PromptEngineeringUtilities
     public static string UMLAndGOPrompt(string inputUser) 
     {
 
-
-        
         string output;
         string currentUml = "nada";
         try {currentUml = File.ReadAllText(UMLFilePath); }
-        catch{Debug.Log("No UML Yet, Generating for the first time");}
+        catch{Debug.Log("No UML Yet, Generating for the first time"); FirstGen = true;}
         string classesAndGOJsonStructure;
         string separationRequest = "The UML in the 'Classes' node describe the scripts and the 'GameObjects' node describes the prefabs and it's components, which are scripts defined in Classes or Unity specific components. Their properties are also described, you may modify values inside the properties ";
         string classesRequest = "For the Classes part: \n" +
@@ -47,7 +47,7 @@ public static class PromptEngineeringUtilities
             FirstGen = false;
         }
         else { //Cas d'update
-            classesAndGOJsonStructure = currentUml;
+            
             output = currentUml + goRequests + "Modify this Json File to achieve this goal : " + inputUser + ". Begin by answering this question : Do you need to modify the Classes or their properties in the GameObjects Node ? You may comment your operations on the Json to reaffirm this goal. Now on to Json Generation : ";
         }
         
@@ -56,15 +56,32 @@ public static class PromptEngineeringUtilities
     }
 
     //Prompt spécifique pour générer un script
-    public static string ScriptGenerationPrompt(string name, string jsonOfSelfAndNeighbors, string userInput)
+    public static string ScriptGenerationPrompt(string name, string jsonOfSelfAndNeighbors, string userInput, string currentScript)
+    {//le milieu de jsonOfselfAndNeighbors est en fait ComposedClassesString juste en dessous et gère comment la jonction entre ces deux sections est locale à baseObject
+        if (currentScript==null){
+            return "You are in Unity, write this c# class :" + name + "as described by this structure : " + jsonOfSelfAndNeighbors + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
+            Never assume a method, class or function exists unless specified in the uml. Use GameObjects rather than Transforms as fields and then access the transforms with go.transform. Keep your fields public. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. " + userInput;
+        }
+        else {
+            return currentScript + "\n This C# class needs refining. Here is a description of it's properties :" + jsonOfSelfAndNeighbors + "\n Achieve this goal :" + userInput + "\n You may make // comments to reaffirm the goal and the steps needed to achieve it as you go";
+        }
+    }
+ 
+    public static string MakeRecomandationsPrompt(string contextUser){
+        string ListOfClasses = "Here is the list of classes : \n" + AllBaseObjectsToCleanString() + "\n";
+        string ListOfGameObjects = "Here is the list of prefabs : \n" + AllBaseGameObjectsToCleanString() + "\n";
+        return contextUser + ListOfClasses + ListOfGameObjects + "Make a good recomandation. What does my project need ?";
+    }
+
+    public static string readAllDialoguesUgly()
     {
-        return "You are in Unity, write this c# class :" + name + "as described in this json : " + jsonOfSelfAndNeighbors + @"You only use functions defined in the uml or native to Unity (Start and Update should be used to initialize and update objects over time).
-        Never assume a method, class or function exists unless specified in the uml. Use GameObjects rather than Transforms as fields and then access the transforms with go.transform. Keep your fields public. Relevant gameObjects and prefabs will always be named ObjectNameGO. Use ```csharp marker. " + userInput;
+        if (!File.Exists(ChatWindow.DialoguePath))
+        {
+            return null;
+        }
+        string dialogue = File.ReadAllText(ChatWindow.DialoguePath);
+        return dialogue;
     }
 
-    public static string UpdateSingleClassPrompt(BaseObject bo, string inputuser){
-        return ("Modify the object : " + "{ Classes: [ " + bo.ToJson() + " ]}"  +  "\n"+ "Follow these instructions : " + inputuser + "\n" + "Adding a new class means writing a similar structure for it in the Classes list, and being careful to use the same name in ComposedClasses");
-    }
-
-    public static string ComposedClassesString(){ return "Here are the attribut and methods of the composed class you may use to interact with others objects : "; }
+    public static string ComposedClassesString(){ return "\n Here are the attributes and methods of the composed class you may use to interact with others objects : \n"; }
 }

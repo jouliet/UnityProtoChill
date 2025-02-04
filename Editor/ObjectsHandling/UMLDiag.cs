@@ -147,7 +147,6 @@ public class UMLDiag : GenerativeProcess
     public static void SaveDataToCurrentUML()
     {
         string updatedJson = "{\n\t\"Classes\": [\n";
-
         // Ajouter les classes
         for (int i = 0; i < AllBaseObjects.Count; i++)
         {
